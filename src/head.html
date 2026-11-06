@@ -98,6 +98,13 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
 .hint{color:#8b8f86;font-size:.7em;margin-top:calc(var(--u)*4);text-transform:none;letter-spacing:.03em}
 #scr-menu{background:radial-gradient(ellipse at center,rgba(5,8,12,.2) 0,rgba(0,0,0,.1) 45%,rgba(0,0,0,.5) 100%);justify-content:flex-end;padding-bottom:calc(var(--u)*12);box-sizing:border-box}
 #scr-brief{flex-direction:row;gap:calc(var(--u)*6);padding:calc(var(--u)*8);box-sizing:border-box;align-items:stretch}
+#call911{height:100%;width:58%;box-sizing:border-box;display:flex;flex-direction:column;gap:calc(var(--u)*2);border:1px solid #2f3a48;background:linear-gradient(#0a0e14,#06080b);padding:calc(var(--u)*3);text-transform:none;letter-spacing:.02em}
+#call911.hidden{display:none}#call911 .ch{font-size:.6em;letter-spacing:.2em;color:#8a96a6;display:flex;align-items:center;gap:calc(var(--u)*2)}
+#call911 .rec{width:calc(var(--u)*2);height:calc(var(--u)*2);border-radius:50%;background:#d03a30;box-shadow:0 0 6px #d03a30;animation:recb 1.2s steps(1) infinite}@keyframes recb{50%{opacity:.2}}
+#call911 .cm{display:flex;justify-content:space-between;font-size:.62em;color:#c9b458;letter-spacing:.15em}
+#wave{width:100%;height:calc(var(--u)*34);background:#05070a;border:1px solid #1c2430}
+#calltx{flex:1;overflow:auto;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.74em;line-height:1.5;color:#7d8794;padding-right:calc(var(--u)*2)}
+#calltx p{margin:0 0 calc(var(--u)*1.6)}#calltx p.cur{color:#eef0f2}#calltx b{display:block;font-size:.72em;letter-spacing:.18em;margin-bottom:calc(var(--u)*.4)}#calltx .d b{color:#6fd0c0}#calltx .c b{color:#e0b060}#calltx .x{color:#5a6470;font-style:italic}
 #brief-map{height:100%;max-width:58%;object-fit:contain;border:1px solid #2f5a50;background:#0b1512}
 #brief-r{flex:1;display:flex;flex-direction:column;min-width:0}
 #brief-txt{flex:1;overflow:auto;font-size:.66em;text-transform:none;letter-spacing:.02em;line-height:1.5;color:#c4c8bc;white-space:pre-wrap;background:rgba(10,14,12,.6);padding:calc(var(--u)*3);border:1px solid #23302a}
@@ -186,10 +193,12 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
 
  <div id="scr-brief" class="screen hidden">
   <canvas id="brief-map" width="800" height="580"></canvas>
+  <div id="call911" class="hidden"><div class="ch"><span class="rec"></span>911 · RIDGEFIELD COUNTY DISPATCH · ZAPIS ROZMOWY</div><div class="cm"><span id="callwho">ŁĄCZENIE…</span><span id="calltime">05:52:14</span></div>
+   <canvas id="wave" width="800" height="220"></canvas><div id="calltx"></div><button class="btn" id="callre" style="min-width:0;align-self:flex-start">↺ Odtwórz ponownie</button></div>
   <div id="brief-r">
-   <div class="h2" style="margin-bottom:calc(var(--u)*3);font-size:1em">Odprawa · Operacja „Cicha sala”</div>
+   <div class="h2" id="brief-h" style="margin-bottom:calc(var(--u)*3);font-size:1em">Odprawa · Operacja „Cicha sala”</div>
    <div id="brief-txt"></div>
-   <div style="font-size:.6em;color:#8b8f86;margin:calc(var(--u)*3) 0 calc(var(--u)*1)">Punkt wejścia</div>
+   <div id="ent-l" style="font-size:.6em;color:#8b8f86;margin:calc(var(--u)*3) 0 calc(var(--u)*1)">Punkt wejścia</div>
    <div id="entries"></div>
    <div class="row" style="justify-content:flex-start;margin-top:calc(var(--u)*2)"><button class="btn" data-go="scen" style="min-width:0">Wróć</button><button class="btn" id="to-gear" style="flex:1">Rozpocznij operację ›</button></div>
   </div>

@@ -203,9 +203,8 @@ function houseRender(c,cx,cy){const H=G.h;if(!H)return;
 function houseObj(){const H=G.h;if(!H)return'';const s=H.s,ar=s.state==='cuffed'||!s.alive,ins=H.talked&&H.inside;
  const row=(ok,t)=>'<div class="'+(ok?'ok':'no')+'">'+(ok?'■':'□')+' '+t+'</div>';
  return'<div class="h">2-ADAM-14 · 214 OAKRIDGE LN · '+fmtT(G.stats.time)+'</div>'+row(ins,'Sprawdź zgłoszenie')+(H.freezer?row(ar,'Zatrzymaj podejrzanego'):'')+(H.nf?'<div class="opt">Notatki: '+H.nf+'</div>':'');}
-function houseBrief(){return`<div class="sec"><span class="lbl">ZGŁOSZENIE</span>06:40, jesienny poranek · <b>214 Oakridge Lane</b>, Ridgefield. Sąsiadka zgłasza krzyki i dwa huki z domu obok.</div>
-<div class="sec"><span class="lbl">JEDNOSTKA</span>Ridgefield PD · patrol <b>2-Adam-14</b>: Ofc. Miller, Ofc. Ortiz.</div>
-<div class="sec"><span class="lbl">DANE</span>Dom Hartleyów: małżeństwo i syn (20 l.). Brak wcześniejszych interwencji.</div>
+function houseBrief(){return`<div class="sec"><span class="lbl">JEDNOSTKA</span>Ridgefield PD · patrol <b>2-Adam-14</b><br>Ofc. Miller, Ofc. Ortiz</div>
+<div class="sec"><span class="lbl">ADRES</span>214 Oakridge Lane, Ridgefield<br>06:40 · jesienny poranek</div>
 <div class="sec"><span class="lbl">ZADANIE</span>Sprawdzić zgłoszenie.</div>`;}
 function houseDebrief(){const s=G.stats,H=G.h||{nf:0,clues:[]};let score=G.win?100:0;score+=H.nf*4;if(H.result==='arrested')score+=20;score-=s.roe*15+s.squadLost*15+s.civKilled*30;if(G.win)score+=Math.max(0,10-Math.floor(s.time/60));
  const rank=!G.win?'F':score>=140?'S':score>=125?'A':score>=105?'B':score>=80?'C':'D';
@@ -370,3 +369,37 @@ function checkId(u){const H=G.h;H.idChecked=true;const s=H.s;turnTo(s,Math.atan2
  setTimeout(()=>{if(G.ended)return;idPortrait();$('idcard').classList.add('on');setTimeout(()=>$('idcard').classList.remove('on'),6500);},2600);
  setTimeout(()=>{if(G.ended)return;radio(u.name,'Dispatch, 2-Adam-14. Sprawdźcie osobę: Hartley, Ethan, urodzony czternastego marca dwa tysiące sześć.',{radio:1});
   setTimeout(()=>{if(!G.ended){radio('DISPATCH','2-Adam-14, Hartley Ethan — bez notowań. Na ten adres zarejestrowany pistolet. Właściciel: Richard Hartley.');logEv('Dispatch: brak notowań, pod adresem zarejestrowana broń ojca');}},5200);},9200);}
+// ---- 911 call briefing ----
+const CALL=[['D','911, jaki jest adres zdarzenia?'],['C','Oakridge Lane, dwieście dziesięć. Ale to nie u mnie... to u sąsiadów, pod dwieście czternaście.'],['D','Dobrze. Co się tam dzieje?'],
+ ['C','Słyszałam krzyki. Kobieta krzyczała... a potem były dwa huki. Jakby strzały.'],['D','Kiedy to było?'],['C','Kilka minut temu. Teraz jest zupełnie cicho.'],
+ ['D','Czy widzi pani kogoś przed domem? Ktoś wychodził, odjeżdżał?'],['C','Nie... nic nie widzę. Zasłony są zasunięte.'],['D','Kto tam mieszka?'],['C','Hartleyowie. Richard i Linda. I ich syn, Ethan.'],
+ ['D','Proszę zostać w domu i nie podchodzić. Wysyłam patrol.'],['C','Dobrze... Boże. Proszę się pospieszyć.']];
+const CALLW={D:'DYSPOZYTOR',C:'ZGŁASZAJĄCA'};
+const CALLS={on:false,i:-1,t:0,dur:0,syl:0,ended:false,wave:new Float32Array(160)};
+function callChain(){const c=A.ctx;if(!c||A.callG)return;A.callG=c.createGain();A.callG.gain.value=0;const an=c.createAnalyser();an.fftSize=1024;A.callAn=an;
+ const hp=c.createBiquadFilter();hp.type='highpass';hp.frequency.value=320;const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=3200;hp.connect(lp);lp.connect(an);an.connect(A.callG);A.callG.connect(A.master);
+ A.callAM=c.createGain();A.callAM.gain.value=0;A.callAM.connect(hp);
+ const src=c.createOscillator();src.type='sawtooth';src.frequency.value=190;A.callO=src;const vib=c.createOscillator();vib.frequency.value=5;A.callVib=c.createGain();A.callVib.gain.value=2;vib.connect(A.callVib);A.callVib.connect(src.frequency);
+ A.callF=[];for(const[f,q,g]of[[700,6,1],[1200,8,.6],[2500,10,.3]]){const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=f;bp.Q.value=q;const gg=c.createGain();gg.gain.value=g;src.connect(bp);bp.connect(gg);gg.connect(A.callAM);A.callF.push(bp);}
+ const n=c.createBufferSource();n.buffer=A.noise;n.loop=true;const nb=c.createBiquadFilter();nb.type='bandpass';nb.frequency.value=4000;A.callS=c.createGain();A.callS.gain.value=0;n.connect(nb);nb.connect(A.callS);A.callS.connect(hp);
+ const hiss=c.createGain();hiss.gain.value=.025;n.connect(hiss);hiss.connect(hp);n.start();src.start();vib.start();}
+function startCall(){audioInit();callChain();Object.assign(CALLS,{on:true,i:-1,t:-1.6,dur:0,ended:false});$('calltx').innerHTML='';$('callwho').textContent='ŁĄCZENIE…';
+ if(A.ctx){A.callG.gain.setTargetAtTime(.5,A.ctx.currentTime,.05);const o=ui(.08),t0=A.ctx.currentTime;tone(o,t0,.35,{f:440,g:.25});tone(o,t0,.35,{f:480,g:.25});}}
+function stopCall(){CALLS.on=false;if(A.callG&&A.ctx){A.callG.gain.setTargetAtTime(0,A.ctx.currentTime,.05);A.callAM.gain.setTargetAtTime(0,A.ctx.currentTime,.02);}}
+function callUpdate(dt){if(!CALLS.on)return;CALLS.t+=dt;const t=A.ctx&&A.ctx.currentTime;
+ if(CALLS.i<0||CALLS.t>=CALLS.dur){if(CALLS.t<0)return;CALLS.i++;CALLS.t=0;
+  if(CALLS.i>=CALL.length){CALLS.on=false;CALLS.ended=true;$('callwho').textContent='POŁĄCZENIE ZAKOŃCZONE';const p=document.createElement('p');p.className='x';p.textContent='[rozmowa zakończona · 01:04]';$('calltx').appendChild(p);
+   if(A.ctx){A.callAM.gain.setTargetAtTime(0,t,.02);const o=ui(.06);for(let k=0;k<3;k++)tone(o,t+.3+k*.5,.25,{f:480,g:.3});}return;}
+  const[w,txt]=CALL[CALLS.i];CALLS.dur=.9+txt.length*.062+.55;CALLS.w=w;
+  const box=$('calltx');[...box.children].forEach(e=>e.classList.remove('cur'));const p=document.createElement('p');p.className=(w==='D'?'d':'c')+' cur';p.innerHTML='<b>'+CALLW[w]+'</b>'+txt;box.appendChild(p);box.scrollTop=box.scrollHeight;
+  $('callwho').textContent=CALLW[w];if(A.ctx){A.callVib.gain.setTargetAtTime(w==='C'?7:2,t,.1);A.callVib.context&&0;}}
+ const speaking=CALLS.t<CALLS.dur-.55;CALLS.syl-=dt;
+ if(CALLS.syl<=0){const pause=!speaking||Math.random()<.12;CALLS.syl=pause?rand(.15,.35):rand(.08,.17);CALLS.amp=pause?0:rand(.5,1);
+  if(A.ctx){if(pause){A.callAM.gain.setTargetAtTime(0,t,.03);A.callS.gain.setTargetAtTime(0,t,.02);}
+   else{const vw=VOW[(Math.random()*VOW.length)|0],k=CALLS.w==='C'?1.12:1;A.callF.forEach((f,i)=>f.frequency.setTargetAtTime(vw[i]*k*rand(.92,1.08),t,.03));A.callO.frequency.setTargetAtTime((CALLS.w==='C'?rand(215,265):rand(170,200)),t,.05);A.callAM.gain.setTargetAtTime(CALLS.amp,t,.02);A.callS.gain.setTargetAtTime(Math.random()<.25?.25:0,t,.015);}}}
+ const s=$('calltime');if(s){const sec=14+(G._callClock=(G._callClock||0)+dt);s.textContent='05:52:'+String(Math.floor(sec)%60).padStart(2,'0');}}
+function drawWave(){const c=$('wave'),g=c.getContext('2d'),W=c.width,H=c.height;g.fillStyle='#05070a';g.fillRect(0,0,W,H);g.fillStyle='rgba(120,140,160,.08)';for(let x=0;x<W;x+=40)g.fillRect(x,0,1,H);g.fillRect(0,H/2,W,1);
+ const col=CALLS.w==='C'?'224,176,96':'111,208,192';let data=null;if(A.callAn&&A.ctx){data=new Uint8Array(A.callAn.fftSize);A.callAn.getByteTimeDomainData(data);}
+ g.strokeStyle='rgba('+col+',.9)';g.lineWidth=2;g.shadowColor='rgba('+col+',.6)';g.shadowBlur=8;g.beginPath();
+ for(let i=0;i<W;i+=2){let v;if(data){v=(data[Math.floor(i/W*data.length)]-128)/128*3.2;}else{const a=CALLS.on&&CALLS.amp?CALLS.amp:0;v=a*(Math.sin(i*.09+performance.now()/60)*.5+Math.sin(i*.31+performance.now()/37)*.3)*Math.random();}v=clamp(v,-1,1);const y=H/2+v*H*.42;if(i===0)g.moveTo(i,y);else g.lineTo(i,y);}
+ g.stroke();g.shadowBlur=0;}

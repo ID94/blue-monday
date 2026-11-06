@@ -20,7 +20,7 @@ const CIVS=[{x:19,y:19,k:'nurse',st:'hide'},{x:39,y:5,k:'doctor',st:'hide'},{x:4
  {x:9,y:6,k:'patient',st:'wander'},{x:17,y:6,k:'patient',st:'wander'},{x:25,y:6,k:'patient',st:'wander'},{x:27,y:17,k:'patient',st:'wander'},{x:29,y:16,k:'patient',st:'wander'},{x:5,y:17,k:'patient',st:'wander'},{x:4,y:6,k:'patient',st:'wander'}];
 const CORPSES=[[33,14,'guard'],[33,33,'guard'],[54,30,'guard'],[47,12,'orderly'],[60,9,'doctor']];
 const INTEL=[[56,6,'ZAKŁADNIK?'],[37,31,'WARTA?'],[20,34,'?'],[73,29,'?'],[16,11,'?']];
-function startMission(){radioClear();buildMap();bakeWorld();LV.doorRows=null;mc.clearRect(0,0,memory.width,memory.height);
+function startMission(){radioClear();stopCall();buildMap();bakeWorld();LV.doorRows=null;mc.clearRect(0,0,memory.width,memory.height);
  Object.assign(G,{running:true,paused:false,ended:false,time:0,units:[],squad:[],enemies:[],civs:[],fx:[],tracers:[],lights:[],nades:[],ops:[],order:'follow',alarm:false,execT:45,warned:false,
   camv:null,flashW:0,shake:0,obj:{found:false,freed:false},devs:null,babyT:rand(3,6),panicCD:0,log:[],nvg:false,negT:rand(50,80),negBonus:0,negAlarm:0,traps:[],stats:{roe:0,traps:0,reports:0,wounded:0,healed:0,eKilled:0,eArrest:0,eSed:0,civKilled:0,civSecured:0,squadLost:0,shots:0,time:0},press:{},deadline:720,dl:{},blackT:rand(40,70),blackDur:0,scareT:rand(10,20),trail:[],trailOwner:null,postAnchor:null,stillT:0,lightT:rand(6,15),lightF:0,clankT:rand(8,18),heartT:0,p1:null,p2:null,hudT:0});
  if(!ENTRIES[G.entry])G.entry=0;const E=ENTRIES[G.entry],fx=Math.cos(E.a),fy=Math.sin(E.a),rx=-fy,ry=fx,offs=[[0,0],[-1,-.9],[-1,.9],[-2,-.5],[-2,.5]];
@@ -462,7 +462,10 @@ const BRIEF=()=>G.lvl==='house'?houseBrief():`<div class="sec"><span class="lbl"
 <div class="sec"><span class="lbl">UWAGA</span><span class="red">Nie strzelaj do cywili ani do poddanych.</span> Monitoring szpitala działa — dyżurka ochrony (wsch. od holu) · ultimatum 12 min · alarm = zagrożenie dla zakładnika.</div>`;
 function openBriefing(){G.scen=G.lvl==='house'?houseScen():genScen();if(G.entry>=ENTRIES.length)G.entry=0;showScreen('brief');const el=$('brief-txt');el.innerHTML=BRIEF();const ent=$('entries');ent.innerHTML='';
  ENTRIES.forEach((e,i)=>{const b=document.createElement('button');b.className='btn ent'+(i===G.entry?' sel':'');b.innerHTML='<b>'+(i+1)+'. '+e.n+'</b> — '+e.s;b.onclick=()=>{G.entry=i;SND.click();[...ent.children].forEach((c,j)=>c.classList.toggle('sel',j===i));};ent.appendChild(b);});
- radioClear();setTimeout(()=>radio('TOC','Alfa, uzbrojona grupa w szpitalu psychiatrycznym. Jeden zakładnik. Pozycje napastników niepotwierdzone. Nie strzelać do cywili.'),400);}
+ radioClear();const hs=G.lvl==='house';$('brief-map').style.display=hs?'none':'';$('call911').classList.toggle('hidden',!hs);$('ent-l').style.display=hs?'none':'';$('entries').style.display=hs?'none':'';
+ $('brief-h').textContent=hs?'Zgłoszenie · 214 Oakridge Lane':'Odprawa · Operacja „St. Dymphna”';
+ if(hs){G._callClock=0;setTimeout(startCall,500);}else setTimeout(()=>radio('TOC','Alfa, uzbrojona grupa w szpitalu psychiatrycznym. Jeden zakładnik. Pozycje napastników niepotwierdzone. Nie strzelać do cywili.'),400);}
+$('callre').onclick=()=>{SND.click();G._callClock=0;startCall();};
 $('sq-next').onclick=()=>{SND.click();openBriefing();};
 $('go-mission').onclick=()=>{SND.click();audioInit();startMission();};
 $('scen-next').onclick=()=>{SND.click();G.p1Spec=0;G.p2Spec=1;openBriefing();};
@@ -491,7 +494,7 @@ addEventListener('resize',resize);resize();
 buildMap();bakeWorld();
 let last=performance.now();
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
- try{const blur=G.running?'none':'blur(2.5px)';if(cv.style.filter!==blur)cv.style.filter=blur;const tf=!G.running?menuSway():tiltOn()?'perspective('+(TILT.p*wrap.clientHeight)+'px) rotateX('+(TILT.th*180/Math.PI)+'deg) scale('+TILT.k+')':'none';if(cv.style.transform!==tf){cv.style.transform=tf;$('monov').style.transform=G.running?'none':tf;}if(G.running){if(!G.paused)update(dt);render();}else{renderMenu(dt);if(!$('scr-brief').classList.contains('hidden'))drawPlan($('brief-map'),false,G.entry);}}catch(err){console.error(err);}
+ try{const blur=G.running?'none':'blur(2.5px)';if(cv.style.filter!==blur)cv.style.filter=blur;const tf=!G.running?menuSway():tiltOn()?'perspective('+(TILT.p*wrap.clientHeight)+'px) rotateX('+(TILT.th*180/Math.PI)+'deg) scale('+TILT.k+')':'none';if(cv.style.transform!==tf){cv.style.transform=tf;$('monov').style.transform=G.running?'none':tf;}if(G.running){if(!G.paused)update(dt);render();}else{renderMenu(dt);if(!$('scr-brief').classList.contains('hidden')){if(G.lvl==='house'){callUpdate(dt);drawWave();}else drawPlan($('brief-map'),false,G.entry);}else if(CALLS.on)stopCall();}}catch(err){console.error(err);}
  requestAnimationFrame(frame);}
 requestAnimationFrame(frame);
 document.addEventListener('click',()=>audioInit(),{once:false});
