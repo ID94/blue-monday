@@ -165,7 +165,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
   <div class="h2">Wybór scenariusza</div>
   <div class="row">
    <div class="card scen sel1" id="sc1"><div class="cn">01 · 214 Oakridge Lane</div><div class="cr">Ridgefield PD · patrol 2-Adam-14 · rozpoznanie</div><div class="cs">Jesienny poranek na przedmieściu. Sąsiadka słyszała krzyki i dwa huki. Dwóch funkcjonariuszy jedzie sprawdzić zgłoszenie.</div></div>
-   <div class="card scen" id="sc2"><div class="cn">02 · St. Dymphna</div><div class="cr">Ridgefield PD S.W.A.T. · zakładnik · trudny</div><div class="cs">Noc, ulewa. Uzbrojona grupa opanowała skrzydło administracyjne i przetrzymuje dyrektora placówki. Personel i pacjenci wciąż w środku.</div></div>
+   <div class="card scen lock" id="sc2"><div class="cn">02 · St. Dymphna</div><div class="cr">Ridgefield PD S.W.A.T. · zablokowane</div><div class="cs">Noc, ulewa. Uzbrojona grupa opanowała skrzydło administracyjne i przetrzymuje dyrektora placówki. Personel i pacjenci wciąż w środku.</div></div>
    <div class="card scen lock"><div class="cn">03 · Union Station</div><div class="cr">Metro · wkrótce</div><div class="cs">Scenariusz w przygotowaniu.</div></div>
   </div>
   <div class="h2" style="margin:calc(var(--u)*8) 0 calc(var(--u)*2);font-size:.9em">Tryb</div>
@@ -838,7 +838,6 @@ const SPECS=[
  {id:'breach',name:'CPL. HAYES',role:'Breacher',weap:'shotgun',fov:68,range:8,acc:'#c0583a',ab:'Ładunek wyważający (×2) — niszczy drzwi i ogłusza wszystkich po drugiej stronie.',ps:'Najszybciej wyważa drzwi kopniakiem.'},
  {id:'tech',name:'OFC. MASON',role:'Tech',weap:'silenced',fov:72,range:9,acc:'#4fb0a8',ab:'Kamera światłowodowa — podgląd pomieszczenia za zamkniętymi drzwiami.',ps:'Cicho otwiera zamki wytrychem. Broń z tłumikiem.'},
  {id:'medic',name:'OFC. REYES',role:'Medic',weap:'smg',fov:72,range:9,acc:'#d8d8d8',ab:'Strzykawka z sedatywem (×4) — obezwładnia z bliska: pacjenta, napastnika od tyłu, oszołomionego lub poddanego.',ps:'Uspokaja pacjentów.'},
- {id:'scout',name:'OFC. GRANT',role:'Pointman',weap:'rifle',fov:92,range:11,acc:'#7aa35a',ab:'Granat hukowy (×3) — oślepia i ogłusza wszystkich w zasięgu wzroku wybuchu.',ps:'Najszersze i najdalsze pole widzenia.'},
 ];
 const PAL={
  squad:{body:'#2b3139',vest:'#1d2228',legs:'#252a30',head:'#2a3036',face:'#a87c62',visor:'#0c0f12',glove:'#151515'},
@@ -1957,7 +1956,7 @@ function startMission(){radioClear();buildMap();bakeWorld();LV.doorRows=null;mc.
  Object.assign(G,{running:true,paused:false,ended:false,time:0,units:[],squad:[],enemies:[],civs:[],fx:[],tracers:[],lights:[],nades:[],ops:[],order:'follow',alarm:false,execT:45,warned:false,
   camv:null,flashW:0,shake:0,obj:{found:false,freed:false},devs:null,babyT:rand(3,6),panicCD:0,log:[],nvg:false,negT:rand(50,80),negBonus:0,negAlarm:0,traps:[],stats:{roe:0,traps:0,reports:0,wounded:0,healed:0,eKilled:0,eArrest:0,eSed:0,civKilled:0,civSecured:0,squadLost:0,shots:0,time:0},press:{},deadline:720,dl:{},blackT:rand(40,70),blackDur:0,scareT:rand(10,20),trail:[],trailOwner:null,postAnchor:null,stillT:0,lightT:rand(6,15),lightF:0,clankT:rand(8,18),heartT:0,p1:null,p2:null,hudT:0});
  if(!ENTRIES[G.entry])G.entry=0;const E=ENTRIES[G.entry],fx=Math.cos(E.a),fy=Math.sin(E.a),rx=-fy,ry=fx,offs=[[0,0],[-1,-.9],[-1,.9],[-2,-.5],[-2,.5]];
- if(G.lvl==='house')spawnPatrol(E);else{const order=[G.p1Spec,...[0,1,2,3,4].filter(i=>i!==G.p1Spec)];
+ if(G.lvl==='house')spawnPatrol(E);else{const order=[G.p1Spec,...SPECS.map((_,i)=>i).filter(i=>i!==G.p1Spec)];
  order.forEach((si,k)=>{const s=SPECS[si],o=offs[k];const u=new Unit({team:'squad',spec:s.id,name:s.name,role:s.role,weap:s.weap,fov:s.fov,range:s.range,acc:s.acc,pal:PAL.squad,charges:s.id==='breach'?2:0,flash:s.id==='scout'?3:0,sed:s.id==='medic'?4:0,shoutCd:0});applyLoad(u,(G.load||defaultLoad())[si]);
   u.x=E.x*TS+8+fx*o[0]*TS+rx*o[1]*TS;u.y=E.y*TS+fy*o[0]*TS+ry*o[1]*TS;u.ang=E.a;u.heading=E.a;unstick(u);G.squad[si]=u;G.units.push(u);});}
  G.p1=G.squad[G.p1Spec];G.p1.human=1;if(G.players===2){G.p2=G.squad[G.p2Spec];G.p2.human=2;}
@@ -2377,7 +2376,7 @@ document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=
  if(g==='squad'){buildSquadCards();}if(g==='menu'&&G.running){G.running=false;$('hud').classList.add('hidden');radioClear();}
  if(G.paused&&g==='menu'){G.paused=false;}showScreen(g==='ctrl'&&G.paused?'ctrl':g);}));
 $('mode1').onclick=()=>{G.players=1;$('mode1').classList.add('sel');$('mode2').classList.remove('sel');$('modehint').textContent='Pozostali członkowie oddziału są sterowani przez AI i wykonują twoje rozkazy.';SND.click();};
-[['sc1','house'],['sc2','hosp']].forEach(([id,l])=>{$(id).onclick=()=>{if(G.lvl!==l)setLevel(l);$('sc1').classList.toggle('sel1',l==='house');$('sc2').classList.toggle('sel1',l==='hosp');SND.click();};});
+[['sc1','house'],['sc2','hosp']].forEach(([id,l])=>{$(id).onclick=()=>{if($(id).classList.contains('lock')){SND.click();toast('Scenariusz chwilowo niedostępny');return;}if(G.lvl!==l)setLevel(l);$('sc1').classList.toggle('sel1',l==='house');$('sc2').classList.toggle('sel1',l==='hosp');SND.click();};});
 $('mode2').onclick=()=>{G.players=2;$('mode2').classList.add('sel');$('mode1').classList.remove('sel');$('modehint').textContent='Gracz 1 prowadzi zespół, gracz 2 steruje partnerem (pad lub strzałki). Reszta to AI. Kamera wspólna.';SND.click();};
 let pickStage=1;
 function buildSquadCards(){pickStage=1;const box=$('sq-cards');box.innerHTML='';

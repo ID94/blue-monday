@@ -13,7 +13,6 @@ const SPECS=[
  {id:'breach',name:'CPL. HAYES',role:'Breacher',weap:'shotgun',fov:68,range:8,acc:'#c0583a',ab:'Ładunek wyważający (×2) — niszczy drzwi i ogłusza wszystkich po drugiej stronie.',ps:'Najszybciej wyważa drzwi kopniakiem.'},
  {id:'tech',name:'OFC. MASON',role:'Tech',weap:'silenced',fov:72,range:9,acc:'#4fb0a8',ab:'Kamera światłowodowa — podgląd pomieszczenia za zamkniętymi drzwiami.',ps:'Cicho otwiera zamki wytrychem. Broń z tłumikiem.'},
  {id:'medic',name:'OFC. REYES',role:'Medic',weap:'smg',fov:72,range:9,acc:'#d8d8d8',ab:'Strzykawka z sedatywem (×4) — obezwładnia z bliska: pacjenta, napastnika od tyłu, oszołomionego lub poddanego.',ps:'Uspokaja pacjentów.'},
- {id:'scout',name:'OFC. GRANT',role:'Pointman',weap:'rifle',fov:92,range:11,acc:'#7aa35a',ab:'Granat hukowy (×3) — oślepia i ogłusza wszystkich w zasięgu wzroku wybuchu.',ps:'Najszersze i najdalsze pole widzenia.'},
 ];
 const PAL={
  squad:{body:'#2b3139',vest:'#1d2228',legs:'#252a30',head:'#2a3036',face:'#a87c62',visor:'#0c0f12',glove:'#151515'},
