@@ -1955,19 +1955,19 @@ function callChain(){const c=A.ctx;if(!c||A.callG)return;A.callG=c.createGain();
  A.callF=[];for(const[f,q,g]of[[700,6,1],[1200,8,.6],[2500,10,.3]]){const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=f;bp.Q.value=q;const gg=c.createGain();gg.gain.value=g;src.connect(bp);bp.connect(gg);gg.connect(A.callAM);A.callF.push(bp);}
  const n=c.createBufferSource();n.buffer=A.noise;n.loop=true;const nb=c.createBiquadFilter();nb.type='bandpass';nb.frequency.value=4000;A.callS=c.createGain();A.callS.gain.value=0;n.connect(nb);nb.connect(A.callS);A.callS.connect(hp);
  const hiss=c.createGain();hiss.gain.value=.025;n.connect(hiss);hiss.connect(hp);n.start();src.start();vib.start();}
-function startCall(){audioInit();callChain();Object.assign(CALLS,{on:true,i:-1,t:-1.6,dur:0,ended:false});$('calltx').innerHTML='';$('callwho').textContent='ŁĄCZENIE…';
- if(A.ctx){A.callG.gain.setTargetAtTime(.5,A.ctx.currentTime,.05);const o=ui(.08),t0=A.ctx.currentTime;tone(o,t0,.35,{f:440,g:.25});tone(o,t0,.35,{f:480,g:.25});}}
-function stopCall(){CALLS.on=false;if(A.callG&&A.ctx){A.callG.gain.setTargetAtTime(0,A.ctx.currentTime,.05);A.callAM.gain.setTargetAtTime(0,A.ctx.currentTime,.02);}}
+function startCall(){audioInit();Object.assign(CALLS,{on:true,i:-1,t:-1.6,dur:0,ended:false});$('calltx').innerHTML='';$('callwho').textContent='ŁĄCZENIE…';
+ if(A.ctx){const o=ui(.08),t0=A.ctx.currentTime;tone(o,t0,.35,{f:440,g:.25});tone(o,t0,.35,{f:480,g:.25});}}
+function stopCall(){CALLS.on=false;if(A.callG&&A.ctx&&false){A.callG.gain.setTargetAtTime(0,A.ctx.currentTime,.05);A.callAM.gain.setTargetAtTime(0,A.ctx.currentTime,.02);}}
 function callUpdate(dt){if(!CALLS.on)return;CALLS.t+=dt;const t=A.ctx&&A.ctx.currentTime;
  if(CALLS.i<0||CALLS.t>=CALLS.dur){if(CALLS.t<0)return;CALLS.i++;CALLS.t=0;
   if(CALLS.i>=CALL.length){CALLS.on=false;CALLS.ended=true;$('callwho').textContent='POŁĄCZENIE ZAKOŃCZONE';const p=document.createElement('p');p.className='x';p.textContent='[rozmowa zakończona · 01:04]';$('calltx').appendChild(p);
-   if(A.ctx){A.callAM.gain.setTargetAtTime(0,t,.02);const o=ui(.06);for(let k=0;k<3;k++)tone(o,t+.3+k*.5,.25,{f:480,g:.3});}return;}
+   if(A.ctx){const o=ui(.06);for(let k=0;k<3;k++)tone(o,t+.3+k*.5,.25,{f:480,g:.3});}return;}
   const[w,txt]=CALL[CALLS.i];CALLS.dur=.9+txt.length*.062+.55;CALLS.w=w;
   const box=$('calltx');[...box.children].forEach(e=>e.classList.remove('cur'));const p=document.createElement('p');p.className=(w==='D'?'d':'c')+' cur';p.innerHTML='<b>'+CALLW[w]+'</b>'+txt;box.appendChild(p);box.scrollTop=box.scrollHeight;
-  $('callwho').textContent=CALLW[w];if(A.ctx){A.callVib.gain.setTargetAtTime(w==='C'?7:2,t,.1);A.callVib.context&&0;}}
+  $('callwho').textContent=CALLW[w];if(A.ctx&&A.callG){A.callVib.gain.setTargetAtTime(w==='C'?7:2,t,.1);A.callVib.context&&0;}}
  const speaking=CALLS.t<CALLS.dur-.55;CALLS.syl-=dt;
  if(CALLS.syl<=0){const pause=!speaking||Math.random()<.12;CALLS.syl=pause?rand(.15,.35):rand(.08,.17);CALLS.amp=pause?0:rand(.5,1);
-  if(A.ctx){if(pause){A.callAM.gain.setTargetAtTime(0,t,.03);A.callS.gain.setTargetAtTime(0,t,.02);}
+  if(A.ctx&&A.callG){if(pause){A.callAM.gain.setTargetAtTime(0,t,.03);A.callS.gain.setTargetAtTime(0,t,.02);}
    else{const vw=VOW[(Math.random()*VOW.length)|0],k=CALLS.w==='C'?1.12:1;A.callF.forEach((f,i)=>f.frequency.setTargetAtTime(vw[i]*k*rand(.92,1.08),t,.03));A.callO.frequency.setTargetAtTime((CALLS.w==='C'?rand(215,265):rand(170,200)),t,.05);A.callAM.gain.setTargetAtTime(CALLS.amp,t,.02);A.callS.gain.setTargetAtTime(Math.random()<.25?.25:0,t,.015);}}}
  const s=$('calltime');if(s){const sec=14+(G._callClock=(G._callClock||0)+dt);s.textContent='05:52:'+String(Math.floor(sec)%60).padStart(2,'0');}}
 function drawWave(){const c=$('wave'),g=c.getContext('2d'),W=c.width,H=c.height;g.fillStyle='#05070a';g.fillRect(0,0,W,H);g.fillStyle='rgba(120,140,160,.08)';for(let x=0;x<W;x+=40)g.fillRect(x,0,1,H);g.fillRect(0,H/2,W,1);
