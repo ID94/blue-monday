@@ -145,6 +145,7 @@ function houseTraces(){const r=rng(14);
 function houseInteract(u){const H=G.h;if(!H)return null;const fx=u.x+Math.cos(u.ang)*8,fy=u.y+Math.sin(u.ang)*8,near=(x,y,r)=>Math.min(dist(fx,fy,x,y),dist(u.x,u.y,x,y))<(r||16);
  const fd=LV.doorAt[I(42,34)];if(!H.knocked&&fd&&!fd.broken&&fd.target===0&&near(42*TS+8,34*TS+8,22)&&u.y>34*TS)return{k:'house',label:'Zapukaj do drzwi',dur:0,f:knockDoor};
  const s=H.s;if(s.alive&&s.team==='civ'&&!H.talked&&s.state==='opened'&&near(s.x,s.y,30))return{k:'house',label:'Porozmawiaj z mieszkańcem',dur:0,f:talkSuspect};
+ if(s.alive&&s.team==='civ'&&H.talked&&!H.idChecked&&!['cuffed','escape','comply'].includes(s.state)&&near(s.x,s.y,24))return{k:'house',label:'Poproś o dokument',dur:.5,f:checkId};
  const n=H.n;if(n.alive&&!H.said.neigh&&near(n.x,n.y,20))return{k:'house',label:'Porozmawiaj z sąsiadką',dur:0,f:talkNeighbor};
  for(const c of H.clues)if(!c.found&&near(c.x*TS+8,c.y*TS+8,13))return{k:'house',label:'Przyjrzyj się',dur:.8,f:(u)=>findClue(u,c)};
  if(!H.freezer&&near(FREEZER.x,FREEZER.y,20))return{k:'house',label:'Otwórz zamrażarkę',dur:1.4,f:openFreezer};
@@ -326,16 +327,18 @@ function oddBehaviour(c,dt,goTo,face){const H=G.h;H.oddT+=dt;
  if(H.ringStart&&G.time>H.ringStart&&G.time<H.ringStart+4.2&&(!H.ringT||G.time-H.ringT>1.25)){H.ringT=G.time;if(A.ctx){const o=out(48*TS+8,27*TS+8,.22,{rev:.25}),t0=A.ctx.currentTime;if(o){for(let k=0;k<4;k++)tone(o,t0+k*.11,.08,{type:'square',f:k%2?1320:1760,g:.18});nz(o,t0,.5,{type:'lowpass',f:180,g:.4,attack:.02});}}
   if(!H.said.ringNote){H.said.ringNote=1;logEv('W kuchni dzwoni telefon matki');}}}
 // ---- living screens (TV, PC), TV audio, fly over freezer ----
-const SCREENS=[{x:34*16+8,y:28*16,r:46,k:'tv'},{x:49*16,y:21*16,r:30,k:'pc'},{x:34*16+8,y:20*16+4,r:44,k:'lamp'},{x:37*16+8,y:20*16+4,r:30,k:'lamp',dim:1}];
+const SCREENS=[{x:34*16+8,y:28*16,r:46,k:'tv'},{x:49*16,y:21*16,r:30,k:'pc'},{x:34*16+8,y:20*16+4,r:44,k:'lamp'},{x:37*16+8,y:20*16+4,r:30,k:'lamp',dim:1},{x:48*16+8,y:27*16+2,r:26,k:'phone'}];
 function screenGlow(c,cx,cy){if(!G.h)return;const t=G.time;
  for(const s of SCREENS){const x=s.x-cx,y=s.y-cy;if(x<-60||y<-60||x>VW+60||y>VH+60)continue;let col,a;
   if(s.k==='tv'){const ph=(t*6.5|0);const pal=[[120,150,255],[255,210,160],[140,255,190],[200,200,230],[255,140,120],[160,180,255]];col=pal[(ph*7+((ph*13)>>2))%pal.length];a=.11+((Math.sin(ph*12.9898)*43758.5453)%1+1)%1*.12;}
   else if(s.k==='lamp'){col=[255,190,120];a=s.dim?.09:.2;}
+  else if(s.k==='phone'){const H=G.h,on=H&&H.ringStart&&G.time>H.ringStart&&G.time<H.ringStart+4.4;if(!on)continue;col=[150,210,255];a=.16+(Math.sin(G.time*18)>0?.08:0);}
   else{col=[110,190,255];a=.1+Math.sin(t*1.7)*.015+(Math.random()<.02?.05:0);}
   const g=c.createRadialGradient(x,y,0,x,y,s.r);g.addColorStop(0,'rgba('+col+','+a.toFixed(3)+')');g.addColorStop(1,'rgba('+col+',0)');c.fillStyle=g;c.fillRect(x-s.r,y-s.r,s.r*2,s.r*2);}
  // the screens themselves
  const tvx=34*16+3-cx,tvy=27*16+1-cy-(FH.tv||0);if(tvx>-20&&tvy>-20&&tvx<VW+20&&tvy<VH+20){const ph=(t*6.5|0);for(let i=0;i<5;i++)P(c,tvx+1+i*2,tvy+2,2,4,'rgba('+[[90,120,220],[220,180,140],[120,220,160],[200,200,220]][(ph+i)%4]+',.5)');}
  for(const lx of [34,37]){const x=lx*16+5-cx,y=20*16-3-cy-(FH.tableS||0);if(x>-10&&y>-10&&x<VW+10&&y<VH+10){P(c,x+1,y+4,4,3,'#3a2a1a');P(c,x,y,6,4,lx===34?'#f0c880':'#a88a60');P(c,x+1,y,4,1,lx===34?'#fff0c8':'#c8a878');}}
+ {const H=G.h;if(H&&H.ringStart&&G.time>H.ringStart&&G.time<H.ringStart+4.4){const x=48*16+5-cx,y=27*16+4-cy-(FH.counterP||0);if(((G.time*8)|0)%2||true){P(c,x,y,4,6,'#c8e8ff');P(c,x+1,y+1,2,3,'#ffffff');P(c,x+((G.time*30|0)%2),y-1,4,1,'rgba(200,232,255,.6)');}}}
  const pcx=48*16+11-cx,pcy=20*16-3-cy-(FH.deskPC||0);if(pcx>-20&&pcy>-20&&pcx<VW+20&&pcy<VH+20){P(c,pcx,pcy,9,5,'rgba(90,170,240,.35)');P(c,pcx+3,pcy+2,3,1,'rgba(230,240,255,.5)');}}
 function drawFly(c,cx,cy){const H=G.h;if(!H)return;const t=G.time,bx=FREEZER.x-cx,by=FREEZER.y-28-cy;
  const x=bx+Math.sin(t*3.1)*9+Math.sin(t*7.3)*4+Math.sin(t*13)*1.5,y=by+Math.cos(t*2.3)*5+Math.sin(t*9.1)*3;
@@ -358,3 +361,12 @@ function tvAudio(L){if(!A.ctx||!G.h)return;const c=A.ctx,t=c.currentTime;
   else{const vw=VOW[(Math.random()*VOW.length)|0];A.tvF.forEach((f,i)=>f.frequency.setTargetAtTime(vw[i]*rand(.92,1.08),t,.03));if(Math.random()<.03)G.tvHi=!G.tvHi;A.tvO.frequency.setTargetAtTime(rand(105,165)*(G.tvHi?1.45:1),t,.05);
    A.tvAM.gain.setTargetAtTime(rand(.5,1),t,.02);A.tvS.gain.setTargetAtTime(Math.random()<.25?rand(.15,.35):0,t,.015);}}
  const fd=dist(L.x,L.y,FREEZER.x,FREEZER.y)/TS;A.flyG.gain.setTargetAtTime(G.ended?0:clamp(1-fd/4.5,0,1)*.007*(.6+.4*Math.sin(G.time*2.1)),t,.1);}
+// ---- ID check ----
+function idPortrait(){const c=$('idph'),g=c.getContext('2d'),p=PAL_SUSPECT;g.clearRect(0,0,18,22);P(g,0,0,18,22,'#9fb2c0');P(g,0,16,18,6,'#8a9cab');
+ P(g,3,15,12,7,p.body);P(g,7,12,4,4,shadeC(p.skin,-12));P(g,5,4,8,10,p.skin);P(g,4,6,1,4,p.skin);P(g,13,6,1,4,p.skin);P(g,5,2,8,4,p.hair);P(g,4,3,2,4,p.hair);P(g,12,3,2,3,p.hair);
+ P(g,6,8,2,1,'#2a1a12');P(g,10,8,2,1,'#2a1a12');P(g,6,7,2,1,shadeC(p.hair,10));P(g,10,7,2,1,shadeC(p.hair,10));P(g,8,10,2,1,shadeC(p.skin,-20));P(g,7,12,4,1,'#8a5a4a');P(g,5,11,1,2,shadeC(p.skin,-10));}
+function checkId(u){const H=G.h;H.idChecked=true;const s=H.s;turnTo(s,Math.atan2(u.y-s.y,u.x-s.x),1,9);logEv('Legitymowanie: Ethan Hartley (20)');
+ say(u.name,'Poproszę jakiś dokument tożsamości.');say('ETHAN HARTLEY','...Proszę. Prawo jazdy.');
+ setTimeout(()=>{if(G.ended)return;idPortrait();$('idcard').classList.add('on');setTimeout(()=>$('idcard').classList.remove('on'),6500);},2600);
+ setTimeout(()=>{if(G.ended)return;radio(u.name,'Dispatch, 2-Adam-14. Sprawdźcie osobę: Hartley, Ethan, urodzony czternastego marca dwa tysiące sześć.',{radio:1});
+  setTimeout(()=>{if(!G.ended){radio('DISPATCH','2-Adam-14, Hartley Ethan — bez notowań. Na ten adres zarejestrowany pistolet. Właściciel: Richard Hartley.');logEv('Dispatch: brak notowań, pod adresem zarejestrowana broń ojca');}},5200);},9200);}
