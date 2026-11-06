@@ -349,7 +349,9 @@ function updateOne(op,dt){op.t+=dt;const d=op.d;op.mem=op.mem.filter(u=>u.alive&
    const sc=op.mode.includes('flash')&&op.mem.find(u=>u.spec==='scout'&&u.flash>0);
    if(sc&&!op.flashed){op.flashed=1;const tx=(op.sd.fx+op.sd.ox*2)*TS+8,ty=(op.sd.fy+op.sd.oy*2)*TS+8;
     sc.ang=Math.atan2(ty-sc.y,tx-sc.x);
-    if(losClear(sc.x,sc.y,d.x*TS+8,d.y*TS+8))throwNade(sc,tx,ty);else{sc.flash--;G.nades.push({x:op.sd.nx*TS+8,y:op.sd.ny*TS+8,vx:op.sd.ox*70,vy:op.sd.oy*70,z:6,vz:40,t:1.5,by:sc});radio(sc.name,'Granat!',{prio:1});}
+    {const ox=op.sd.ox,oy=op.sd.oy,dx0=d.x*TS+8-ox*5,dy0=d.y*TS+8-oy*5;let k=2.6;while(k>1.2&&!walkable(Math.floor((d.x*TS+8+ox*k*TS)/TS),Math.floor((d.y*TS+8+oy*k*TS)/TS)))k-=.4;
+     const dd=k*TS+5,sp=dd*1.5;sc.flash--;logEv(sc.name+' wrzucił granat hukowy ('+roomName(d.x*TS+8+ox*TS,d.y*TS+8+oy*TS)+')');sc.ang=Math.atan2(oy,ox);
+     G.nades.push({x:dx0,y:dy0,vx:ox*sp,vy:oy*sp,z:8,vz:48,t:1.6,by:sc});SND.pick(sc.x,sc.y);radio(sc.name,pick(['Granat!','Hukowy, uwaga!','Rzucam hukowy!']),{prio:1});}
     op.stage='flashwait';op.t=0;}
    else{op.stage='enter';op.t=0;}break;}
  case'flashwait':if(op.t>1.75){op.stage='enter';op.t=0;}break;
