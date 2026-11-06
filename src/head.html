@@ -35,6 +35,8 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
 #weapon{right:calc(var(--u)*5)}
 #p2weapon{left:calc(var(--u)*5);text-align:left;border-left:calc(var(--u)*1) solid #5fc7d6}
 .wbox .wn{color:#8b8f86;font-size:.8em}.wbox .am{font-size:1.8em;color:#f2eedf;font-weight:bold}.wbox .am small{font-size:.5em;color:#8b8f86}.wbox .ab{font-size:.75em;color:#c9b458}
+#say{position:absolute;left:50%;bottom:calc(var(--u)*36);transform:translateX(-50%);max-width:72%;text-align:center;color:#f2efe6;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:1.05em;letter-spacing:.02em;text-transform:none;line-height:1.35;text-shadow:0 0 3px #000,0 1px 2px #000,0 0 10px rgba(0,0,0,.9);opacity:0;transition:opacity .25s;pointer-events:none}
+#say.on{opacity:1}#say .sn{display:block;font-size:.72em;letter-spacing:.22em;color:#d9b77a;margin-bottom:calc(var(--u)*.8);text-transform:uppercase}#say .sh{font-weight:bold;letter-spacing:.06em;color:#fff}
 #radio{position:absolute;left:50%;bottom:calc(var(--u)*36);transform:translateX(-50%);max-width:70%;background:rgba(4,10,6,.78);border:1px solid #3c5a40;color:#bfe3b4;padding:calc(var(--u)*2) calc(var(--u)*4);text-transform:none;letter-spacing:.02em;font-size:1.02em;opacity:0;transition:opacity .2s}
 #radio.on{opacity:1}
 #radio b{color:#7fdc6a;margin-right:calc(var(--u)*2);text-transform:uppercase}
@@ -138,6 +140,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
   <div id="weapon" class="wbox"></div>
   <div id="p2weapon" class="wbox hidden"></div>
   <div id="radio"></div>
+  <div id="say"></div>
   <div id="toast"></div>
   <div id="cmdhint">PPM: rozkazy · F: za mną · H: stój · 1–5 / TAB: zmiana operatora · M: plan · ESC: pauza</div>
  </div>

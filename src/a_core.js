@@ -202,11 +202,16 @@ const R={q:[],busy:false,voice:null};
 function loadVoices(){if(!('speechSynthesis' in window))return;const vs=speechSynthesis.getVoices();R.voice=vs.find(v=>/^pl/i.test(v.lang))||null;
  const el=$('o-vinfo');if(el)el.textContent=R.voice?('Głos radia: '+R.voice.name):'Brak polskiego głosu syntezy w tej przeglądarce — komunikaty będą tylko w napisach.';}
 if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices;}
+function say(who,text,o={}){radio(who,text,Object.assign({},o,{say:1}));}
 function radio(who,text,o={}){
+ if(G.lvl==='house'&&!o.radio&&G.squad&&G.squad.some(s=>s&&s.name===who))o.say=1;
  if(R.q.some(m=>m.text===text))return;
  if(!o.prio&&R.q.length>2)return;
  const m={who,text,o};if(o.prio)R.q.unshift(m);else R.q.push(m);pump();}
 function pump(){if(R.busy||!R.q.length)return;const m=R.q.shift();R.busy=true;
+ if(m.o.say||m.o.raw){const el=$('say');el.innerHTML='<span class="sn">'+m.who+'</span>'+(m.o.raw?'<span class="sh">'+m.text+'</span>':m.text);el.classList.add('on');
+  if(m.o.raw&&A.ctx)SND.shoutFx(clamp(m.text.length*.05,.8,2.4));
+  setTimeout(()=>{el.classList.remove('on');setTimeout(()=>{R.busy=false;pump();},260);},1300+m.text.length*58);return;}
  const el=$('radio');el.innerHTML='<b>'+m.who+'</b>'+m.text;el.classList.add('on');
  if(!m.o.raw&&A.voice!=='static')SND.squelch();
  let done=false;const fin=()=>{if(done)return;done=true;if(!m.o.raw&&A.voice!=='static')SND.squelchEnd();setTimeout(()=>{el.classList.remove('on');R.busy=false;pump();},380);};
@@ -216,5 +221,5 @@ function pump(){if(R.busy||!R.q.length)return;const m=R.q.shift();R.busy=true;
    u.pitch=m.who==='TOC'?.6:(m.o.pitch||.85);u.volume=Math.min(1,(m.o.vol||.9)*A.vol+.1);u.onend=fin;u.onerror=fin;speechSynthesis.speak(u);},m.o.raw?0:170);
   setTimeout(fin,2600+m.text.length*110);
  }else setTimeout(fin,1000+m.text.length*55);}
-function radioClear(){R.q.length=0;if('speechSynthesis' in window)speechSynthesis.cancel();R.busy=false;const el=$('radio');if(el)el.classList.remove('on');}
+function radioClear(){R.q.length=0;if('speechSynthesis' in window)speechSynthesis.cancel();R.busy=false;for(const id of ['radio','say']){const el=$(id);if(el)el.classList.remove('on');}}
 let toastT=0;function toast(t){const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),1800);}
