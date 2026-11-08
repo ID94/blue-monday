@@ -102,9 +102,6 @@ F('police',3,2,1,0,(g,x,y)=>{
  P(g,x+40,y+12,1,8,'#22262a');P(g,x+8,y+15,1,1,'#888');});
 
 // ---- level switch ----
-function setLevel(l){G.lvl=l;const h=l==='house';
- ROOMS=h?ROOMS_HOUSE:ROOMS_HOSP;DOORS=h?DOORS_HOUSE:DOORS_HOSP;FURN=h?FURN_HOUSE:FURN_HOSP;LAMPS=h?LAMPS_HOUSE:LAMPS_HOSP;CAMS=h?[]:CAMS_HOSP;ENTRIES=h?ENTRIES_HOUSE:ENTRIES_HOSP;G.entry=0;
- buildMap();bakeWorld();LV.doorRows=null;_wf=null;G.devs=null;}
 G.lvl='house';ROOMS=ROOMS_HOUSE;DOORS=DOORS_HOUSE;FURN=FURN_HOUSE;LAMPS=LAMPS_HOUSE;CAMS=[];
 
 // ---- mission ----
@@ -127,9 +124,7 @@ const CLUES=[
  {id:'drag',x:54,y:27,msg:'Smugi na betonie, jakby coś ciągnięto.'}];
 const FREEZER={x:56*16,y:26*16+4};
 function houseScen(){return{intel:[[41,25,'ZGŁOSZENIE']],est:[1,1],hroom:'Klonowa 14',hide:[],en:[],traps:[]};}
-function spawnPatrol(E){const L=[{spec:'lead',name:'OFC. MILLER',pal:PAL.patrolA,o:[0,-.5]},{spec:'scout',name:'OFC. ORTIZ',pal:PAL.patrolB,o:[-.9,.6]}];
- L.forEach((d,i)=>{const u=new Unit({team:'squad',spec:d.spec,name:d.name,role:'Patrol Officer',weap:'pistol',fov:84,range:10,acc:'#d8b048',pal:d.pal,patrol:true,charges:0,flash:0,sed:0,shoutCd:0,armor:'light',spray:2});
-  u.x=E.x*TS+8+d.o[1]*TS;u.y=E.y*TS-d.o[0]*TS;u.ang=E.a;u.heading=E.a;unstick(u);u.holster=true;G.squad[i]=u;G.units.push(u);});}
+function spawnPatrol(E){spawnPatrolPair(E);}
 function startHouse(){
  G.hostage=null;G.deadline=1e9;
  G.h={talked:false,opened:false,clues:CLUES.map(c=>({...c,found:false})),nf:0,freezer:false,said:{},react:null,endT:null,result:null};
@@ -226,9 +221,7 @@ function autumnDecor(){const r=rng(1031),C=['#8a3c14','#b0581c','#c8862a','#6a2a
   for(const f of LV.furn)if(f.k==='tree'&&Math.abs(f.x-x)<=2&&Math.abs(f.y-y)<=2){n+=6;break;}
   for(let k=0;k<n;k++){const lx=x*TS+(r()*15|0),ly=y*TS+(r()*15|0),c=C[(r()*C.length)|0];P(wc,lx,ly,2,1,c);if(r()<.5)P(wc,lx+(r()<.5?0:1),ly+1,1,1,shadeC(c,-20));}
   if(!gr&&r()<.06){const g=wc.createRadialGradient(x*TS+8,y*TS+8,0,x*TS+8,y*TS+8,10);g.addColorStop(0,'rgba(120,140,160,.12)');g.addColorStop(1,'rgba(120,140,160,0)');wc.fillStyle=g;wc.fillRect(x*TS-4,y*TS-4,24,24);}}
- OUTM=document.createElement('canvas');OUTM.width=MW*TS;OUTM.height=MH*TS;const og=OUTM.getContext('2d');og.fillStyle='#fff';
- for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=tAt(x,y);if(t===T.GRASS||t===T.ASPH)og.fillRect(x*TS,y*TS,TS,TS);else if(t===T.WALL||t===T.WIN){const b=tAt(x,y+1);if(b===T.GRASS||b===T.ASPH)og.fillRect(x*TS,y*TS+4,TS,12);}}
- for(let y=1;y<MH;y++)for(let x=0;x<MW;x++){const t=tAt(x,y);if((t===T.WALL||t===T.WIN)&&(tAt(x,y+1)===T.GRASS||tAt(x,y+1)===T.ASPH))og.fillRect(x*TS,(y-1)*TS+4,TS,12);}}
+ buildOUTM();}
 const LEAVES=[];for(let i=0;i<46;i++)LEAVES.push({x:Math.random()*VW,y:Math.random()*VH,s:rand(9,20),ph:rand(0,6.28),c:['#b0581c','#c8862a','#8a3c14','#d09a3a','#9a4a1c'][i%5]});
 function drawLeaves(cx,cy){const dt=1/60,wind=8+Math.sin(G.time*.3)*6;
  for(const l of LEAVES){l.ph+=dt*rand(2,3.5);l.y+=l.s*dt;l.x+=(wind+Math.sin(l.ph)*10)*dt;if(l.y>VH+4){l.y=-4;l.x=Math.random()*VW;}if(l.x>VW+4)l.x=-4;
@@ -343,7 +336,7 @@ function drawFly(c,cx,cy){const H=G.h;if(!H)return;const t=G.time,bx=FREEZER.x-c
  const x=bx+Math.sin(t*3.1)*9+Math.sin(t*7.3)*4+Math.sin(t*13)*1.5,y=by+Math.cos(t*2.3)*5+Math.sin(t*9.1)*3;
  if(x<-4||y<-4||x>VW+4||y>VH+4)return;P(c,x|0,y|0,1,1,'#0a0a0a');if(((t*30)|0)%2)P(c,(x|0)-1,(y|0)-1,1,1,'rgba(200,210,220,.35)');}
 const VOW=[[800,1200,2500],[500,1800,2500],[320,2200,2900],[500,900,2400],[360,800,2300],[650,1100,2400]];
-function tvAudio(L){if(!A.ctx||!G.h)return;const c=A.ctx,t=c.currentTime;
+function tvAudio(L,TVP,VM,FLY){TVP=TVP||SCREENS[0];VM=VM==null?1:VM;FLY=FLY||FREEZER;if(!A.ctx||!G.h)return;const c=A.ctx,t=c.currentTime;
  if(!A.tvG){A.tvG=c.createGain();A.tvG.gain.value=0;const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1800;A.tvLP=lp;lp.connect(A.tvG);A.tvG.connect(A.master);
   const sw=c.createGain();sw.gain.value=.25;A.tvG.connect(sw);sw.connect(A.revSIn||A.revIn);
   A.tvAM=c.createGain();A.tvAM.gain.value=0;A.tvAM.connect(lp);
@@ -353,13 +346,13 @@ function tvAudio(L){if(!A.ctx||!G.h)return;const c=A.ctx,t=c.currentTime;
   const pad=c.createGain();pad.gain.value=.012;pad.connect(lp);for(const f of [110,138.6,164.8]){const o=c.createOscillator();o.type='triangle';o.frequency.value=f;o.connect(pad);o.start();}
   src.start();vib.start();
   A.flyG=c.createGain();A.flyG.gain.value=0;const fo=c.createOscillator();fo.type='sawtooth';fo.frequency.value=215;const fl=c.createOscillator();fl.frequency.value=7;const flg=c.createGain();flg.gain.value=18;fl.connect(flg);flg.connect(fo.frequency);const fb=c.createBiquadFilter();fb.type='bandpass';fb.frequency.value=900;fb.Q.value=.8;fo.connect(fb);fb.connect(A.flyG);A.flyG.connect(A.master);fo.start();fl.start();}
- const tv=SCREENS[0],d=dist(L.x,L.y,tv.x,tv.y)/TS,los=losClear(L.x,L.y,tv.x,tv.y+8),v=G.ended?0:clamp(1-d/12,0,1)*(los?1:.4);
- A.tvG.gain.setTargetAtTime(v*.045,t,.3);A.tvLP.frequency.setTargetAtTime(los?2600:800,t,.3);
+ const tv=TVP,d=dist(L.x,L.y,tv.x,tv.y)/TS,los=losClear(L.x,L.y,tv.x,tv.y+8),v=G.ended?0:clamp(1-d/(12+VM*4),0,1)*(los?1:.4);
+ A.tvG.gain.setTargetAtTime(v*.045*VM,t,.3);A.tvLP.frequency.setTargetAtTime(los?2600:800,t,.3);
  G.tvSyl=(G.tvSyl||0)-1/60;if(G.tvSyl<=0){const pause=Math.random()<.14;G.tvSyl=pause?rand(.25,.6):rand(.09,.19);
   if(pause){A.tvAM.gain.setTargetAtTime(0,t,.04);A.tvS.gain.setTargetAtTime(0,t,.02);}
   else{const vw=VOW[(Math.random()*VOW.length)|0];A.tvF.forEach((f,i)=>f.frequency.setTargetAtTime(vw[i]*rand(.92,1.08),t,.03));if(Math.random()<.03)G.tvHi=!G.tvHi;A.tvO.frequency.setTargetAtTime(rand(105,165)*(G.tvHi?1.45:1),t,.05);
    A.tvAM.gain.setTargetAtTime(rand(.5,1),t,.02);A.tvS.gain.setTargetAtTime(Math.random()<.25?rand(.15,.35):0,t,.015);}}
- const fd=dist(L.x,L.y,FREEZER.x,FREEZER.y)/TS;A.flyG.gain.setTargetAtTime(G.ended?0:clamp(1-fd/4.5,0,1)*.007*(.6+.4*Math.sin(G.time*2.1)),t,.1);}
+ const fd=dist(L.x,L.y,FLY.x,FLY.y)/TS;A.flyG.gain.setTargetAtTime(G.ended?0:clamp(1-fd/4.5,0,1)*.007*(.6+.4*Math.sin(G.time*2.1)),t,.1);}
 // ---- ID check ----
 function idPortrait(){const c=$('idph'),g=c.getContext('2d'),p=PAL_SUSPECT;g.clearRect(0,0,18,22);P(g,0,0,18,22,'#9fb2c0');P(g,0,16,18,6,'#8a9cab');
  P(g,3,15,12,7,p.body);P(g,7,12,4,4,shadeC(p.skin,-12));P(g,5,4,8,10,p.skin);P(g,4,6,1,4,p.skin);P(g,13,6,1,4,p.skin);P(g,5,2,8,4,p.hair);P(g,4,3,2,4,p.hair);P(g,12,3,2,3,p.hair);
@@ -388,19 +381,19 @@ function startCall(){audioInit();Object.assign(CALLS,{on:true,i:-1,t:-1.6,dur:0,
 function stopCall(){CALLS.on=false;if(A.callG&&A.ctx&&false){A.callG.gain.setTargetAtTime(0,A.ctx.currentTime,.05);A.callAM.gain.setTargetAtTime(0,A.ctx.currentTime,.02);}}
 function callUpdate(dt){if(!CALLS.on)return;CALLS.t+=dt;const t=A.ctx&&A.ctx.currentTime;
  if(CALLS.i<0||CALLS.t>=CALLS.dur){if(CALLS.t<0)return;CALLS.i++;CALLS.t=0;
-  if(CALLS.i>=CALL.length){CALLS.on=false;CALLS.ended=true;$('callwho').textContent='POŁĄCZENIE ZAKOŃCZONE';const p=document.createElement('p');p.className='x';p.textContent='[rozmowa zakończona · 01:04]';$('calltx').appendChild(p);
+  if(CALLS.i>=LD().nb.call.length){CALLS.on=false;CALLS.ended=true;$('callwho').textContent='POŁĄCZENIE ZAKOŃCZONE';const p=document.createElement('p');p.className='x';p.textContent='[koniec nagrania]';$('calltx').appendChild(p);
    if(A.ctx){const o=ui(.06);for(let k=0;k<3;k++)tone(o,t+.3+k*.5,.25,{f:480,g:.3});}return;}
-  const[w,txt]=CALL[CALLS.i];CALLS.dur=.9+txt.length*.062+.55;CALLS.w=w;
-  const box=$('calltx');[...box.children].forEach(e=>e.classList.remove('cur'));const p=document.createElement('p');p.className=(w==='D'?'d':'c')+' cur';p.innerHTML='<b>'+CALLW[w]+'</b>'+txt;box.appendChild(p);box.scrollTop=box.scrollHeight;
-  $('callwho').textContent='● '+CALLW[w];$('callwho').className=w==='D'?'d':'';if(A.ctx&&A.callG){A.callVib.gain.setTargetAtTime(w==='C'?7:2,t,.1);A.callVib.context&&0;}}
+  const[w,txt]=LD().nb.call[CALLS.i];CALLS.dur=.9+txt.length*.062+.55;CALLS.w=w;
+  const box=$('calltx');[...box.children].forEach(e=>e.classList.remove('cur'));const p=document.createElement('p');p.className=(w==='D'?'d':'c')+' cur';p.innerHTML='<b>'+LD().nb.who[w]+'</b>'+txt;box.appendChild(p);box.scrollTop=box.scrollHeight;
+  $('callwho').textContent='● '+LD().nb.who[w];$('callwho').className=w==='D'?'d':'';if(A.ctx&&A.callG){A.callVib.gain.setTargetAtTime(w==='C'?7:2,t,.1);A.callVib.context&&0;}}
  const speaking=CALLS.t<CALLS.dur-.55;CALLS.syl-=dt;
  if(CALLS.syl<=0){const pause=!speaking||Math.random()<.12;CALLS.syl=pause?rand(.15,.35):rand(.08,.17);CALLS.amp=pause?0:rand(.5,1);
   if(A.ctx&&A.callG){if(pause){A.callAM.gain.setTargetAtTime(0,t,.03);A.callS.gain.setTargetAtTime(0,t,.02);}
    else{const vw=VOW[(Math.random()*VOW.length)|0],k=CALLS.w==='C'?1.12:1;A.callF.forEach((f,i)=>f.frequency.setTargetAtTime(vw[i]*k*rand(.92,1.08),t,.03));A.callO.frequency.setTargetAtTime((CALLS.w==='C'?rand(215,265):rand(170,200)),t,.05);A.callAM.gain.setTargetAtTime(CALLS.amp,t,.02);A.callS.gain.setTargetAtTime(Math.random()<.25?.25:0,t,.015);}}}
- const s=$('calltime');if(s){const sec=14+(G._callClock=(G._callClock||0)+dt);s.textContent='05:52:'+String(Math.floor(sec)%60).padStart(2,'0');}}
+ const s=$('calltime');if(s){const ck=LD().nb.clock,sec=ck[2]+(G._callClock=(G._callClock||0)+dt);s.textContent=String(ck[0]).padStart(2,'0')+':'+String(ck[1]+Math.floor(sec/60)).padStart(2,'0')+':'+String(Math.floor(sec)%60).padStart(2,'0');}}
 
 
-function nbBackground(){const c=$('nbbg'),g=c.getContext('2d'),wf=worldFull();g.imageSmoothingEnabled=false;g.fillStyle='#000';g.fillRect(0,0,c.width,c.height);g.drawImage(wf,27*16,34.2*16,24*16,13.5*16,0,0,c.width,c.height);}
+function nbBackground(){const c=$('nbbg'),g=c.getContext('2d'),wf=worldFull();g.imageSmoothingEnabled=false;g.fillStyle='#000';g.fillRect(0,0,c.width,c.height);const b=LD().nb.bg;g.drawImage(wf,b[0]*16,b[1]*16,b[2]*16,b[3]*16,0,0,c.width,c.height);}
 function drawWave(){const c=$('wave'),g=c.getContext('2d'),W=c.width,H=c.height;g.clearRect(0,0,W,H);
  const col=CALLS.w==='D'?'111,208,192':'224,176,96',a=CALLS.on&&CALLS.amp?CALLS.amp:0,t=performance.now();
  g.strokeStyle='rgba('+col+',.95)';g.lineWidth=2.4;g.shadowColor='rgba('+col+',.7)';g.shadowBlur=8;g.beginPath();

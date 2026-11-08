@@ -81,15 +81,15 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
 .mm-gr.sc-dim{background:radial-gradient(circle at -5% -10%,rgba(40,80,255,.12),transparent 45%),radial-gradient(circle at 108% 0,rgba(230,40,40,.08),transparent 45%),linear-gradient(180deg,rgba(0,0,0,.8),rgba(0,0,0,.86) 60%,rgba(0,0,0,.95))}
 .sc-top{z-index:3}.sc-modes{display:flex;align-items:center;gap:calc(var(--u)*3)}
 .sc-m{background:none;border:0;border-bottom:1px solid transparent;padding:0 0 calc(var(--u)*1);font-family:inherit;font-size:calc(var(--u)*3.6);letter-spacing:.32em;color:#6c7684;cursor:pointer}.sc-m.sel{color:#fff;border-bottom-color:#3d6bff}
-.sc-row{position:absolute;left:calc(var(--u)*36);right:calc(var(--u)*36);top:calc(var(--u)*52);display:flex;gap:calc(var(--u)*8)}
-.sc-card{flex:1;position:relative;padding:calc(var(--u)*7) calc(var(--u)*7) calc(var(--u)*6);background:rgba(8,10,14,.82);border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:background .25s,border-color .25s,transform .25s;min-height:calc(var(--u)*92)}
+.sc-row{position:absolute;left:calc(var(--u)*36);right:calc(var(--u)*36);top:calc(var(--u)*40);display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--u)*5)}
+.sc-card{position:relative;padding:calc(var(--u)*5) calc(var(--u)*6) calc(var(--u)*10);background:rgba(8,10,14,.82);border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:background .25s,border-color .25s,transform .25s;min-height:calc(var(--u)*62)}
 .sc-card:before{content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:2px;background:transparent}
 .sc-card:hover{background:rgba(14,18,24,.7)}
 .sc-card.sel1{background:rgba(16,22,32,.78);border-color:rgba(120,150,255,.28);transform:translateY(calc(var(--u)*-1.5))}.sc-card.sel1:before{background:linear-gradient(90deg,#3d6bff,#e0302a)}
-.sc-card .n{font-weight:200;font-size:calc(var(--u)*17);line-height:1;color:#8fb0f2;letter-spacing:.06em;text-shadow:0 0 calc(var(--u)*5) rgba(70,120,255,.4)}
-.sc-card .tt{margin-top:calc(var(--u)*5);font-weight:300;font-size:calc(var(--u)*7.4);letter-spacing:.12em;color:#eceef0;text-transform:uppercase}
+.sc-card .n{font-weight:200;font-size:calc(var(--u)*12);line-height:1;color:#8fb0f2;letter-spacing:.06em;text-shadow:0 0 calc(var(--u)*5) rgba(70,120,255,.4)}
+.sc-card .tt{margin-top:calc(var(--u)*3);font-weight:300;font-size:calc(var(--u)*6);letter-spacing:.12em;color:#eceef0;text-transform:uppercase}
 .sc-card .fa{margin-top:calc(var(--u)*2);font-size:calc(var(--u)*3.3);letter-spacing:.3em;color:#c9a860;text-transform:uppercase}
-.sc-card .ds{margin-top:calc(var(--u)*5);font-size:calc(var(--u)*4.3);line-height:1.55;color:#9aa2ac}
+.sc-card .ds{margin-top:calc(var(--u)*3);font-size:calc(var(--u)*3.8);line-height:1.55;color:#9aa2ac}
 .sc-card .st{position:absolute;left:calc(var(--u)*7);bottom:calc(var(--u)*5);font-size:calc(var(--u)*3.2);letter-spacing:.3em;color:#5d6773}.sc-card .st.ok{color:#3fd08a}
 .sc-card.lock{opacity:.45;pointer-events:auto;cursor:not-allowed}.sc-card.lock .n{color:#5d6773;text-shadow:none}
 .sc-hint{position:absolute;left:calc(var(--u)*36);bottom:calc(var(--u)*56);font-size:calc(var(--u)*3.8);color:#6c7684;font-style:italic}
@@ -219,9 +219,12 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
   <div class="mm-gr sc-dim"></div><div class="mm-lb mm-lt"></div><div class="mm-lb mm-lbb"></div>
   <div class="nb-top sc-top"><span><i></i>WYBÓR ZGŁOSZENIA</span><span class="sc-modes">TRYB&nbsp;&nbsp;<button class="sc-m sel" id="mode1">SOLO</button><button class="sc-m" id="mode2">CO-OP</button></span></div>
   <div class="sc-row">
-   <div class="sc-card sel1" id="sc1"><div class="n">01</div><div class="tt">214 Oakridge Lane</div><div class="fa">Ridgefield PD · Patrol 2-Adam-14</div><div class="ds">Jesienny poranek na przedmieściu. Sąsiadka słyszała krzyki i dwa huki. Dwóch funkcjonariuszy jedzie sprawdzić zgłoszenie.</div><div class="st ok">● DOSTĘPNE</div></div>
-   <div class="sc-card lock" id="sc2"><div class="n">02</div><div class="tt">St. Dymphna</div><div class="fa">Ridgefield PD · S.W.A.T.</div><div class="ds">Noc, ulewa. Uzbrojona grupa opanowała skrzydło administracyjne szpitala psychiatrycznego i przetrzymuje dyrektora.</div><div class="st">ZABLOKOWANE</div></div>
-   <div class="sc-card lock" id="sc3"><div class="n">03</div><div class="tt">Union Station</div><div class="fa">Ridgefield PD · S.W.A.T.</div><div class="ds">Scenariusz w przygotowaniu.</div><div class="st">WKRÓTCE</div></div>
+   <div class="sc-card sel1" id="sc1"><div class="n">01</div><div class="tt">214 Oakridge Lane</div><div class="fa">Ridgefield PD · Patrol 2-Adam-14</div><div class="ds">Jesienny poranek na przedmieściu. Sąsiadka słyszała krzyki i dwa huki.</div><div class="st ok">● DOSTĘPNE</div></div>
+   <div class="sc-card" id="sc2"><div class="n">02</div><div class="tt">Mile Marker 41</div><div class="fa">Ridgefield PD · Patrol 2-Adam-14</div><div class="ds">Noc, pusta droga stanowa. Rutynowe zatrzymanie za zepsute światło. Kierowca jest zbyt spokojny.</div><div class="st ok">● DOSTĘPNE</div></div>
+   <div class="sc-card" id="sc3"><div class="n">03</div><div class="tt">Pine Court, Apt 3B</div><div class="fa">Ridgefield PD · Patrol 2-Adam-14</div><div class="ds">Córka z innego stanu prosi o sprawdzenie matki. Telewizor gra na cały regulator.</div><div class="st ok">● DOSTĘPNE</div></div>
+   <div class="sc-card" id="sc4"><div class="n">04</div><div class="tt">Starlight Motel, Room 12</div><div class="fa">Patrol 2-Adam-14 → S.W.A.T.</div><div class="ds">Mężczyzna z bronią zabarykadowany w pokoju z kobietą. Ewakuacja, negocjacje, wejście.</div><div class="st ok">● DOSTĘPNE</div></div>
+   <div class="sc-card" id="sc5"><div class="n">05</div><div class="tt">Terminal B</div><div class="fa">Ridgefield Regional Airport PD</div><div class="ds">Pozostawiona walizka przy bramkach. Nikt się nie przyznaje.</div><div class="st ok">● DOSTĘPNE</div></div>
+   <div class="sc-card lock" id="sc6"><div class="n">06</div><div class="tt">St. Dymphna</div><div class="fa">Ridgefield PD · S.W.A.T.</div><div class="ds">Noc, ulewa. Uzbrojona grupa opanowała skrzydło szpitala psychiatrycznego.</div><div class="st">ZABLOKOWANE</div></div>
   </div>
   <div class="sc-hint" id="modehint">Pozostali członkowie oddziału są sterowani przez AI i wykonują twoje rozkazy.</div>
   <div class="mm-nav"><button class="mm-i on" id="scen-next">ODPRAWA</button><button class="mm-i" data-go="menu">WRÓĆ</button><span class="mm-r">← → WYBÓR · ENTER</span></div>

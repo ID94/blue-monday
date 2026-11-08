@@ -191,7 +191,7 @@ function ambient(outdoor,hum,tension,menu,heli){if(!A.ctx||!A.rainG)return;const
   const lfo=c.createOscillator();lfo.type='sawtooth';lfo.frequency.value=11.5;const lg=c.createGain();lg.gain.value=.5;lfo.connect(lg);lg.connect(am.gain);hs.connect(hl);hl.connect(am);am.connect(A.heliG);
   const wh=c.createOscillator();wh.frequency.value=1870;const wg=c.createGain();wg.gain.value=.012;wh.connect(wg);wg.connect(A.heliG);A.heliG.connect(A.master);hs.start();lfo.start();wh.start();}
  A.tensG.gain.setTargetAtTime(menu?.06:.035+tension*.09,t,1.5);A.heliG.gain.setTargetAtTime(menu?0:(heli||0),t,1);
- const morn=!menu&&G.lvl==='house';if(menu||G.lvl!=='house'||!G.running){for(const k of ['dreadG','tvG','flyG'])if(A[k])A[k].gain.setTargetAtTime(0,t,.6);}A.rainG.gain.setTargetAtTime(menu?.03:morn?0:(outdoor?.075:.02),t,.6);
+ const morn=!menu&&isPat()&&W8()!=='rain';if(menu||!G.running||!LD().sounds){for(const k of ['dreadG','tvG','flyG'])if(A[k])A[k].gain.setTargetAtTime(0,t,.6);}A.rainG.gain.setTargetAtTime(menu?.03:morn?0:(outdoor?.075:.02),t,.6);
  A.windG.gain.setTargetAtTime(menu?.08:(outdoor?(morn?.12:.16):.07),t,.8);
  A.droneG.gain.setTargetAtTime(menu?.035:.045+tension*.06,t,1);
  A.humG.gain.setTargetAtTime(hum*.02,t,.1);if(A.scanG)A.scanG.gain.setTargetAtTime(menu?.16:0,t,menu?1.5:.4);}
@@ -204,7 +204,7 @@ function loadVoices(){if(!('speechSynthesis' in window))return;const vs=speechSy
 if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices;}
 function say(who,text,o={}){radio(who,text,Object.assign({},o,{say:1}));}
 function radio(who,text,o={}){
- if(G.lvl==='house'&&!o.radio&&G.squad&&G.squad.some(s=>s&&s.name===who))o.say=1;
+ if(isPat()&&!o.radio&&G.squad&&G.squad.some(s=>s&&s.name===who))o.say=1;
  if(R.q.some(m=>m.text===text))return;
  if(!o.prio&&R.q.length>2)return;
  const m={who,text,o};if(o.prio)R.q.unshift(m);else R.q.push(m);pump();}

@@ -90,4 +90,4 @@ function buildGear(){const box=$('gear-cards');if(!G.load)G.load=defaultLoad();b
   d.querySelectorAll('.seg span[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k;let v=b.dataset.v;if(k==='ram')v=v==='true';L[k]=v;SND.click();buildGear();});
   box.appendChild(d);});}
 // ================= NOKTOWIZJA =================
-function toggleNVG(){if(G.lvl==='house'){toast('Brak noktowizora — tylko latarki');return;}G.nvg=!G.nvg;toast(G.nvg?'NOKTOWIZJA — latarki zgaszone':'LATARKI — lepiej widać, ale was też');if(A.ctx){const o=ui(.15),t0=A.ctx.currentTime;tone(o,t0,G.nvg?.5:.08,{f:G.nvg?6000:1500,f2:G.nvg?9000:900,g:.25});}logEv(G.nvg?'Oddział przechodzi na noktowizję':'Oddział włącza latarki');}
+function toggleNVG(){if(isPat()&&!LD().nvg){toast('Brak noktowizora — tylko latarki');return;}G.nvg=!G.nvg;toast(G.nvg?'NOKTOWIZJA — latarki zgaszone':'LATARKI — lepiej widać, ale was też');if(A.ctx){const o=ui(.15),t0=A.ctx.currentTime;tone(o,t0,G.nvg?.5:.08,{f:G.nvg?6000:1500,f2:G.nvg?9000:900,g:.25});}logEv(G.nvg?'Oddział przechodzi na noktowizję':'Oddział włącza latarki');}

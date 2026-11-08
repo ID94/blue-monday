@@ -91,7 +91,7 @@ function ability(u){if(u.patrol){shout(u);return;}switch(u.spec){
  case'tech':{const d=frontDoor(u);if(!d||d.broken||d.open>.5){const a=u.ang;u.action={t:0,dur:.5,label:'Peryskop',pose:'kneel',done:()=>startMirror(u,a)};break;}u.action={t:0,dur:1,label:'Kamera światłowodowa',pose:'kneel',done:()=>snakeCam(d,u)};break;}
  case'medic':{const t=healTarget(u);if(t)startHeal(u,t);else if(u.wounded&&!u.treated)startHeal(u,u);else sedate(u);break;}
  case'scout':{if(u.flash<=0){toast('Brak granatów');return;}let tx=u.x+Math.cos(u.ang)*TS*5,ty=u.y+Math.sin(u.ang)*TS*5;if(u.human===1){tx=G.mouse.wx;ty=G.mouse.wy;}throwNade(u,tx,ty);break;}}}
-function interactInfo(u){if(G.lvl==='house'){const h=houseInteract(u);if(h)return h;}const fx=u.x+Math.cos(u.ang)*9,fy=u.y+Math.sin(u.ang)*9;let best=null,bd=20;
+function interactInfo(u){if(isPat()&&LD().interact){const h=LD().interact(u);if(h)return h;}const fx=u.x+Math.cos(u.ang)*9,fy=u.y+Math.sin(u.ang)*9;let best=null,bd=20;
  for(const o of G.units){if(o===u||!o.alive||o.team==='squad'||o.pose==='sleep'||o.state==='bed')continue;const d=Math.min(dist(fx,fy,o.x,o.y),dist(u.x,u.y,o.x,o.y)+4);if(d>=bd)continue;let k=null;
   if(o.kind==='director'){if(o.state==='tied')k=['free','Uwolnij zakładnika',1.4];}
   else if(o.team==='enemy'){if(o.state==='surr')k=['cuff','Skuj napastnika',.8];else if(o.stun>0)k=['surr','Na ziemię! (wymuś poddanie)',0];}
@@ -99,7 +99,7 @@ function interactInfo(u){if(G.lvl==='house'){const h=houseInteract(u);if(h)retur
   if(k){bd=d;best={k:k[0],label:k[1],dur:k[2],o};}}
  if(best)return best;
  {const tr=trapNear(u);if(tr){if(u.spec==='tech')return{k:'disarm',label:'Rozbrój pułapkę',dur:2.5,o:tr};return null;}}
- if(G.lvl!=='house'&&u.human&&dist(u.x,u.y,49.5*TS,26.5*TS)<20)return{k:'cctv',label:'Monitoring — kamery szpitala',dur:.4,o:null};
+ if(G.lvl==='hosp'&&u.human&&dist(u.x,u.y,49.5*TS,26.5*TS)<20)return{k:'cctv',label:'Monitoring — kamery szpitala',dur:.4,o:null};
  const d=frontDoor(u);
  if(d&&!d.broken&&!d.charge){if(d.locked&&d.knownLocked)return u.spec==='tech'?{k:'pick',label:'Otwórz wytrychem',dur:2.5,o:d}:{k:'kick',label:'Wyważ kopniakiem',dur:u.spec==='breach'?.6:1.3,o:d};
   return{k:'door',label:d.target?'Zamknij drzwi':'Otwórz drzwi',dur:0,o:d};}
@@ -180,7 +180,7 @@ function updateEnemy(e,dt){if(!e.alive)return;
  case'return':{if(!e.path){e.path=findPath(e.x/TS|0,e.y/TS|0,e.home.x/TS|0,e.home.y/TS|0);if(!e.path){e.state='guard';break;}}
   if(followPath(e,dt,26)){e.path=null;e.state='guard';}look();break;}
  default:e.state=e.home.st;}}
-function raiseAlarm(why){if(G.alarm||G.ended)return;if(G.lvl==='house'){G.alarm=true;return;}G.alarm=true;G.execT=45;logEv('ALARM — napastnicy zaalarmowani ('+why+')');barricade();
+function raiseAlarm(why){if(G.alarm||G.ended)return;if(G.lvl!=='hosp'){G.alarm=true;return;}G.alarm=true;G.execT=45;logEv('ALARM — napastnicy zaalarmowani ('+why+')');barricade();
  radio('TOC',why==='cam'?'Monitoring was wykrył! Porywacz wie, że jesteście w środku. Działajcie szybko!':'Zostaliście wykryci! Porywacz może skrzywdzić zakładnika. Pospieszcie się!',{prio:1});}
 function s_quiet(){const L=leader();return L&&L.quiet;}
 function updateCams(dt){for(const c of LV.cams){c.on=!c.dead;c.det=0;if(G.camv&&G.camv.cam===c)continue;c.a=c.base+Math.sin(G.time*2*Math.PI/9+c.base*3)*.55;}}
@@ -196,7 +196,7 @@ function hostageFollow(h,dt){let L=h.leader;if(!L||!L.alive)L=h.leader=nearestSq
  else if(d<TS*3&&walkLine(h.x,h.y,L.x,L.y,h.r)){moveUnit(h,dt,(L.x-h.x)/d,(L.y-h.y)/d,Math.min(46,d*1.6));h.path=null;}
  else{h.repath-=dt;if(!h.path||h.repath<=0){h.path=findPath(h.x/TS|0,h.y/TS|0,L.x/TS|0,L.y/TS|0);h.repath=.6;}if(h.path)followPath(h,dt,48);else moveUnit(h,dt,0,0,0);}
  if(h.moving)turnTo(h,Math.atan2(h.vy,h.vx),dt,6);}
-function updateCiv(c,dt){if(!c.alive)return;if(c.kind==='suspect'){updateSuspect(c,dt);return;}
+function updateCiv(c,dt){if(!c.alive)return;if(c.upd){if(c.stun>0){c.stun-=dt;moveUnit(c,dt,0,0,0);return;}c.upd(c,dt);return;}if(c.kind==='suspect'){updateSuspect(c,dt);return;}
  if(c.state==='bed'){c.vx=c.vy=0;return;}
  if(c.stun>0){c.stun-=dt;moveUnit(c,dt,0,0,0);return;}
  if(c.state==='work'){moveUnit(c,dt,0,0,0);c.pose='stand';turnTo(c,c.workA+Math.sin(G.time*.35+c.id)*.6,dt,.8);return;}
