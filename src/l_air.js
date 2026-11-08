@@ -90,9 +90,9 @@ function airDebrief(){const H=G.h||{};let sc=0;if(H.evac)sc+=10;if(H.res==='eod'
  patrolDebrief([['Ewakuacja hali',H.evac?'przeprowadzona ('+(H.evacN||0)+' osób)':'nie'],['EOD',H.res==='eod'?'sprawdzenie rentgenem':H.eod?'wezwane':'nie wezwane'],['Właściciel',H.ownerFound?(H.ownerId?'Kevin Doyle — spisany':'odnaleziony'):'nieodnaleziony'],['Procedura',H.res==='opened'?'NARUSZONA — bagaż otwarty przez patrol':'zachowana']],sc);}
 LVL.air={id:'air',patrol:true,lit:.86,weather:'day',ext:'concrete',terrain:airTerrain,windows:airWindows,rooms:ROOMS_AIR,doors:DOORS_AIR,furn:FURN_AIR,lamps:LAMPS_AIR,cams:[],entries:ENTRIES_AIR,
  start:startAir,update:updateAir,interact:airInteract,render:airRender,stress:NOOP,obj:airObj,debrief:airDebrief,
- spawn:E=>spawnPatrolPair(E,['OFC. KOWALSKI','OFC. BRANDT']),
+ crew:{names:['OFC. NAVARRO','OFC. WADE'],uni:{body:'#22304a',legs:'#1a2232',acc:'#d8b048'}},car:{s:'#1e3c8a'},
  wallCol:rb=>{const n=rb>=0?ROOMS[rb].n:'';return n==='Bar Skyline'?['#5a4a3a','#3e3226']:n==='Toalety'?['#7a8688','#5a6668']:['#8a8e92','#5e6266'];},
- win:'Airport 3, przyjęłam. Otwieramy terminal B.',planTitle:'RIDGEFIELD REGIONAL · TERMINAL B',
- nb:{no:'#26-140-0921',pri:'P2',code:'SUSP PKG',small:'MIEJSCE',addr:'RIDGEFIELD REGIONAL<br>TERMINAL B · B4–B6',facts:[['JEDNOSTKA','Airport 3 · Ofc. Kowalski, Ofc. Brandt'],['GODZINA','14:24'],['ZGŁOSZENIE','bagaż bez właściciela']],
+ win:'Airport 3, przyjęłam. Otwieramy terminal B.',planTitle:'MESA DEL SOL REGIONAL · TERMINAL B',
+ nb:{no:'#26-140-0921',pri:'P2',code:'SUSP PKG',small:'MIEJSCE',addr:'MESA DEL SOL REGIONAL<br>TERMINAL B · B4–B6',facts:[['JEDNOSTKA','Airport 3 · Ofc. Navarro, Ofc. Wade'],['GODZINA','14:24'],['ZGŁOSZENIE','bagaż bez właściciela']],
   title:'ZGŁOSZENIE · OCHRONA TERMINALU',clock:[14,21,30],who:{D:'DYSPOZYTOR',C:'OCHRONA'},bg:[7,19,48,27],
   call:[['C','Dispatch, ochrona terminalu B. Mamy pozostawioną walizkę przy bramkach B4.'],['D','Od jak dawna?'],['C','Pasażerowie mówią, że ze dwadzieścia minut. Nikt się nie przyznaje.'],['D','Ktoś jej dotykał?'],['C','Nie, nikt. Stoi przy ławce, rączka wysunięta.'],['D','Przyjęłam. Wysyłam patrol lotniskowy. Nie dotykajcie jej.']]}};

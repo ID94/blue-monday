@@ -87,19 +87,19 @@ F('mailbox',1,1,0,0,(g,x,y)=>{P(g,x+6,y+12,5,2,SH);P(g,x+8,y+4,1,9,'#4a4a4a');P(
 F('hydrant',1,1,1,0,(g,x,y)=>{P(g,x+5,y+11,7,3,SH);P(g,x+6,y+4,5,8,'#a82a20');P(g,x+5,y+6,7,2,'#c03a30');P(g,x+7,y+3,3,1,'#c03a30');});
 F('grill',1,1,1,0,(g,x,y)=>{P(g,x+3,y+12,10,3,SH);P(g,x+4,y+4,9,7,'#2a2a2c');P(g,x+5,y+5,7,1,'#4a4a4c');P(g,x+5,y+7,7,1,'#4a4a4c');P(g,x+4,y+11,1,2,'#222');P(g,x+12,y+11,1,2,'#222');});
 // detailed police cruiser (top-down, facing east)
-F('police',3,2,1,0,(g,x,y)=>{
+F('police',3,2,1,0,(g,x,y)=>{const K=Object.assign({b:'#e6e8ea',hi:'#f6f7f8',lo:'#a8acb0',e:'#16181b',r:'#dfe2e4',rh:'#f0f2f3',rl:'#b8bcc0',s:null},(typeof LD==='function'&&LD().car)||{});
  P(g,x+3,y+24,44,4,SH);
  for(const wx of [8,35]){P(g,x+wx,y+6,7,2,'#0e0e10');P(g,x+wx,y+24,7,2,'#0e0e10');P(g,x+wx+2,y+6,3,1,'#3a3a3e');P(g,x+wx+2,y+25,3,1,'#3a3a3e');}
- P(g,x+2,y+8,44,16,'#e6e8ea');P(g,x+3,y+8,42,1,'#f6f7f8');P(g,x+2,y+23,44,1,'#a8acb0');
- P(g,x+2,y+8,10,16,'#16181b');P(g,x+34,y+8,12,16,'#16181b');P(g,x+3,y+9,8,1,'#2c3036');P(g,x+35,y+9,10,1,'#2c3036');P(g,x+37,y+15,8,1,'#24282c');
+ P(g,x+2,y+8,44,16,K.b);P(g,x+3,y+8,42,1,K.hi);P(g,x+2,y+23,44,1,K.lo);
+ P(g,x+2,y+8,10,16,K.e);P(g,x+34,y+8,12,16,K.e);P(g,x+3,y+9,8,1,'#2c3036');P(g,x+35,y+9,10,1,'#2c3036');P(g,x+37,y+15,8,1,'#24282c');
  P(g,x+46,y+10,2,12,'#2a2c30');P(g,x+46,y+11,1,10,'#44484e');
  P(g,x+45,y+9,1,2,'#f4f0d8');P(g,x+45,y+21,1,2,'#f4f0d8');P(g,x+2,y+9,1,2,'#c0201a');P(g,x+2,y+21,1,2,'#c0201a');
  P(g,x+29,y+9,5,14,'#1a2a38');P(g,x+30,y+10,1,5,'#4a6a84');P(g,x+11,y+10,3,12,'#1a2a38');P(g,x+12,y+11,1,4,'#3a5468');
- P(g,x+14,y+9,15,14,'#dfe2e4');P(g,x+14,y+9,15,1,'#f0f2f3');P(g,x+14,y+22,15,1,'#b8bcc0');
+ P(g,x+14,y+9,15,14,K.r);P(g,x+14,y+9,15,1,K.rh);P(g,x+14,y+22,15,1,K.rl);
  P(g,x+20,y+8,3,16,'#1a1c1f');P(g,x+21,y+9,1,6,'#c4241c');P(g,x+21,y+17,1,6,'#1f4fd0');P(g,x+21,y+15,1,2,'#e8e8e8');
- P(g,x+29,y+6,2,2,'#16181b');P(g,x+29,y+24,2,2,'#16181b');
+ P(g,x+29,y+6,2,2,K.e);P(g,x+29,y+24,2,2,K.e);
  P(g,x+24,y+8,1,1,'#9ca0a4');P(g,x+24,y+23,1,1,'#9ca0a4');P(g,x+16,y+8,3,1,'#c09a28');P(g,x+16,y+23,3,1,'#c09a28');
- P(g,x+40,y+12,1,8,'#22262a');P(g,x+8,y+15,1,1,'#888');});
+ P(g,x+40,y+12,1,8,'#22262a');P(g,x+8,y+15,1,1,'#888');if(K.s){P(g,x+12,y+8,22,1,K.s);P(g,x+12,y+23,22,1,K.s);P(g,x+12,y+7,22,1,K.s);P(g,x+12,y+24,22,1,K.s);}});
 
 // ---- level switch ----
 G.lvl='house';ROOMS=ROOMS_HOUSE;DOORS=DOORS_HOUSE;FURN=FURN_HOUSE;LAMPS=LAMPS_HOUSE;CAMS=[];
@@ -361,7 +361,7 @@ function checkId(u){const H=G.h;H.idChecked=true;const s=H.s;turnTo(s,Math.atan2
  say(u.name,'Poproszę jakiś dokument tożsamości.');say('ETHAN HARTLEY','...Proszę. Prawo jazdy.');
  setTimeout(()=>{if(G.ended)return;idPortrait();$('idcard').classList.add('on');setTimeout(()=>$('idcard').classList.remove('on'),6500);},2600);
  setTimeout(()=>{if(G.ended)return;radio(u.name,'Dispatch, 2-Adam-14. Sprawdźcie osobę: Hartley, Ethan, urodzony czternastego marca dwa tysiące sześć.',{radio:1});
-  setTimeout(()=>{if(!G.ended){radio('DISPATCH','2-Adam-14, Hartley Ethan — bez notowań. Na ten adres zarejestrowany pistolet. Właściciel: Richard Hartley.');logEv('Dispatch: brak notowań, pod adresem zarejestrowana broń ojca');}},5200);},9200);}
+  setTimeout(()=>{if(!G.ended){radio('DISPATCH','2-Adam-14, Hartley Ethan — bez notowań. Na ten adres zarejestrowana broń. Właściciel: Richard Hartley.');logEv('Dispatch: brak notowań, pod adresem zarejestrowana broń ojca');}},5200);},9200);}
 // ---- 911 call briefing ----
 const CALL=[['D','911, jaki jest adres zdarzenia?'],['C','Oakridge Lane, dwieście dziesięć. Ale to nie u mnie... to u sąsiadów, pod dwieście czternaście.'],['D','Dobrze. Co się tam dzieje?'],
  ['C','Słyszałam krzyki. Kobieta krzyczała... a potem były dwa huki. Jakby strzały.'],['D','Kiedy to było?'],['C','Kilka minut temu. Teraz jest zupełnie cicho.'],

@@ -317,7 +317,7 @@ function render(){const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOpera
   else if(f.k==='bang'){c.globalAlpha=1-f.t/f.life;c.fillStyle='#fff';c.beginPath();c.arc(x,y,6+f.t*120,0,7);c.fill();c.globalAlpha=1;}}
  // police lights
  for(const f of LV.furn){if(f.k!=='police'&&f.k!=='ambul')continue;const px=(f.x+f.w/2)*TS-cx,py=(f.y+.6)*TS-cy;if(px<-100||py<-100||px>VW+100||py>VH+100)continue;const on=((G.time*3+f.x)|0)%2;c.globalCompositeOperation='lighter';const g=c.createRadialGradient(px,py,0,px,py,90);g.addColorStop(0,f.k==='ambul'?(on?'rgba(255,40,40,.2)':'rgba(0,0,0,0)'):(on?'rgba(255,40,40,.22)':'rgba(40,80,255,.24)'));g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(px-90,py-90,180,180);c.globalCompositeOperation='source-over';P(c,px-2,py-3,2,2,on?'#ff4040':'#401010');P(c,px,py-3,2,2,on?'#102040':'#4060ff');}
- if(W8()==='morning')drawLeaves(cx,cy);else if(W8()==='rain')drawRain(cx,cy,false);
+ if(W8()==='morning')drawLeaves(cx,cy);else if(W8()==='rain')drawRain(cx,cy,false);else if(isPat())drawWeather(c,cx,cy);
  // cursor & laser
  const u=G.p1;if(u&&u.alive&&!G.ended&&!u.holster){const a=u.ang,d=castRay(u.x,u.y-2,a,TS*14,0,bulletBlock),mx=(u.mzx||u.x)-cx,my=(u.mzy||u.y-8)-cy;
   c.fillStyle='rgba(255,40,30,.45)';for(let t=6;t<d;t+=3)c.fillRect(Math.round(mx+Math.cos(a)*t),Math.round(my+Math.sin(a)*t),1,1);
@@ -328,7 +328,7 @@ function render(){const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOpera
  if(G.lvl==='hosp'){const sx=36*TS+Math.sin(G.time*.13)*230-cx,sy=50*TS+Math.cos(G.time*.19)*70-cy;if(sx>-80&&sy>-80&&sx<VW+80&&sy<VH+80){c.globalCompositeOperation='lighter';const g=c.createRadialGradient(sx,sy,0,sx,sy,46);g.addColorStop(0,'rgba(230,240,255,.22)');g.addColorStop(.7,'rgba(200,215,255,.08)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(sx-46,sy-46,92,92);c.globalCompositeOperation='source-over';}}
  for(const pu of G.police){const sx=pu.x-cx,sy=pu.y-cy;if(sx>-20&&sy>-30&&sx<VW+20&&sy<VH+20)drawHuman(c,pu,sx,sy);}
  // post
- c.globalCompositeOperation='multiply';c.fillStyle=isPat()?weatherTint():'#c4ccd6';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';if(W8()==='morning')morningFx(c,cx,cy);else if(isPat()&&W8()==='night')nightFx(c);else if(isPat())indoorFx(c);
+ c.globalCompositeOperation='multiply';c.fillStyle=isPat()?weatherTint():'#c4ccd6';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';if(W8()==='morning')morningFx(c,cx,cy);else if(isPat())weatherPost(c);
  if(G.lightF>0){c.fillStyle='rgba(200,215,255,'+G.lightF*.12+')';c.fillRect(0,0,VW,VH);}
  if(G.nvg){c.globalCompositeOperation='multiply';c.fillStyle='#6cff84';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='lighter';c.fillStyle='rgba(18,60,24,.28)';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';c.drawImage(GRAIN[(G.time*30+1|0)%4],0,0);c.drawImage(GRAIN[(G.time*30+2|0)%4],1,0);}
  c.drawImage(GRAIN[(G.time*24|0)%4],0,0);c.drawImage(vigC,0,0);
@@ -421,7 +421,7 @@ function drawPlan(cnv,live,entry){const g=cnv.getContext('2d'),S=10;g.setTransfo
 // ================= HUD =================
 let hudCache={};function setH(id,html){if(hudCache[id]!==html){hudCache[id]=html;$(id).innerHTML=html;}}
 const ORD={follow:'ROZKAZ: ZA MNĄ · SZYK KOLUMNOWY',hold:'ROZKAZ: TRZYMAĆ POZYCJĘ',move:'ROZKAZ: RUCH NA POZYCJĘ',op:'ROZKAZ: AKCJA PRZY DRZWIACH'};
-function abText(u){if(u.patrol)return'Q: okrzyk „Police! Don\'t move!”';switch(u.spec){case'lead':return'Q: okrzyk „Policja!”'+(u.shoutCd>0?' ('+Math.ceil(u.shoutCd)+')':'');case'breach':return u.ram?'Q: taran':'Q: ładunek ×'+u.charges;case'tech':return'Q: kamera (drzwi) / peryskop (róg) · E: wytrych';case'medic':return'Q: sedatyw ×'+u.sed;case'scout':return'Q: granat hukowy ×'+u.flash;}return'';}
+function abText(u){if(u.patrol)return'Q: okrzyk „'+((LD().crew&&LD().crew.shout)||'Police! Don\'t move!')+'”';switch(u.spec){case'lead':return'Q: okrzyk „Policja!”'+(u.shoutCd>0?' ('+Math.ceil(u.shoutCd)+')':'');case'breach':return u.ram?'Q: taran':'Q: ładunek ×'+u.charges;case'tech':return'Q: kamera (drzwi) / peryskop (róg) · E: wytrych';case'medic':return'Q: sedatyw ×'+u.sed;case'scout':return'Q: granat hukowy ×'+u.flash;}return'';}
 function wHTML(u){if(!u||!u.alive)return'<div class="wn">—</div>';return'<div class="wn">'+u.name+' · '+u.W.n+'</div><div class="am">'+(u.rel>0?'<small>PRZEŁADOWANIE</small>':u.mag+'<small> / '+u.res+'</small>')+'</div><div class="ab">'+abText(u)+(u.spray?' · G: gaz ×'+u.spray:'')+(u.shield?' · TARCZA':'')+(u.quiet?' · CICHO':'')+'</div>';}
 function updateHUD(){let r='',ri=0;for(const s of SPECS.map((_,i)=>G.squad[i])){const idx=ri++;if(!s)continue;let st;
   if(!s.alive)st='KIA';else if(s.wounded&&!s.treated)st='<span style="color:#ff5a4a">RANNY · '+Math.ceil(s.bleed)+' s</span>';else if(s.stun>0)st='OGŁUSZONY';else if(s.human)st=(s.wounded?'opatrzony · ':'')+s.mag+'/'+s.W.mag;else{const t=s.task;st=s.action?'akcja':t?(t.type==='hold'?'pozycja':t.done?'gotowy':'ruch'):s.post?(s.post.kind==='door'?'pilnuje drzwi':'zabezp. kąt'):'w szyku';st+=' · '+s.mag;}

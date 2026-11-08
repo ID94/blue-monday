@@ -12,12 +12,12 @@ Otwórz `dist/index.html` w przeglądarce (najlepiej Chrome/Edge, ze słuchawkam
 Skleja pliki z `src/` w `dist/index.html`.
 
 ## Scenariusze
-- **01 · 214 Oakridge Lane** — patrol 2-Adam-14, rozpoznanie zgłoszenia na przedmieściu.
-- **02 · Mile Marker 41** — nocne zatrzymanie drogowe na drodze stanowej.
-- **03 · Pine Court, Apt 3B** — sprawdzenie stanu starszej lokatorki.
-- **04 · Starlight Motel, Room 12** — barykada w motelu: patrol, negocjacje, potem wejście S.W.A.T.
-- **05 · Terminal B** — pozostawiony bagaż na lotnisku.
-- **06 · St. Dymphna** — S.W.A.T., odbicie zakładnika w szpitalu psychiatrycznym (zablokowane).
+- **01 · 214 Oakridge Lane** — Ridgefield PD (Connecticut), jesienny poranek.
+- **02 · Mile Marker 41** — Wyoming Highway Patrol, noc i mgła.
+- **03 · Pine Court, Apt 3B** — Chicago PD, śnieżny wieczór.
+- **04 · Starlight Motel, Room 12** — Nye County Sheriff (Nevada), gorąca noc z pyłem.
+- **05 · Terminal B** — Phoenix PD Airport Bureau, upalne popołudnie.
+- **06 · St. Dymphna** — Ridgefield PD S.W.A.T., burza (zablokowane).
 
 ## Struktura `src/`
 | Plik | Zawartość |

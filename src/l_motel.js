@@ -33,8 +33,8 @@ function startMotel(){G.hostage=null;G.deadline=1e9;
  H.mgr=mkNPC({tx:4,ty:32,kind:'clerk',pal:{...PAL.cook,body:'#6a3a3a'},state:'calm',a:Math.PI/2,name:'Ray'});
  H.cr=mkNPC({tx:61,ty:18,kind:'woman',pal:{body:'#8a3a5a',legs:'#2a2a3a',head:'#d8b098',face:'#d8b098',visor:'#2a1a12',hair:'#e0c070',skin:'#d8b098',eyes:1},state:'calm',pose:'kneel',a:Math.PI/2,name:'Crystal',upd:crystalUpd});
  H.dw=mkEnemy({tx:63,ty:19,weap:'ePistol',a:Math.PI/2,st:'guard',pal:{...PAL.boss},name:'Dwayne Pruitt'});
- G.police=[];logEv('2-Adam-14: Starlight Motel, pokój 12 — mężczyzna z bronią');
- setTimeout(()=>{radio('DISPATCH','2-Adam-14, Starlight Motel, pokój dwunasty. Recepcjonista słyszał kłótnię i widział broń. W środku kobieta. Zachowajcie dystans, wsparcie w drodze.');radio(G.p1.name,'Przyjąłem, jesteśmy na parkingu.',{radio:1});},600);}
+ G.police=[];logEv('Nye 7: Starlight Motel, pokój 12 — mężczyzna z bronią');
+ setTimeout(()=>{radio('DISPATCH','Nye 7, Starlight Motel, pokój dwunasty. Recepcjonista słyszał kłótnię i widział broń. W środku kobieta. Zachowajcie dystans, wsparcie w drodze.');radio(G.p1.name,'Przyjąłem, jesteśmy na parkingu.',{radio:1});},600);}
 function guestUpd(c,dt){if(c.state==='go'){if(npcGo(c,dt,5,34,52)){c.state='calm';c.ev=true;G.h.evac++;logEv('Gość ewakuowany do recepcji');}}else{moveUnit(c,dt,0,0,0);npcFace(c,dt,6);}}
 function motelInteract(u){const H=G.h;if(!H)return null;
  if(H.phase===1){
@@ -50,10 +50,10 @@ function evacGuest(u,g){const H=G.h,x=MOT_X0(g.gi)+1,d=LV.doorAt[I(x,21)];knockA
   if(!H.said.ev1){H.said.ev1=1;say(u.name,'Proszę iść do recepcji i tam zostać. Nie przy oknach.');}},1200);}
 function mgrTalk(u){const H=G.h;H.said.mgr=1;logEv('Rozmowa z recepcjonistą');
  say(u.name,'Kto wynajął dwunastkę?');say('RAY (RECEPCJA)','Ona. Kobieta, blondynka. Płaciła gotówką za trzy noce. Jego przywiozła wczoraj w nocy.');
- say('RAY (RECEPCJA)','Kłócili się od rana. Potem on wybiegł do auta, wrócił z pistoletem. Zadzwoniłem.');say(u.name,'Kto jeszcze tu nocuje?');say('RAY (RECEPCJA)','Dziesiątka, jedenastka, trzynastka, czternastka. Reszta pusta.');}
+ say('RAY (RECEPCJA)','Kłócili się od rana. Potem on wybiegł do auta, wrócił z bronią. Zadzwoniłem.');say(u.name,'Kto jeszcze tu nocuje?');say('RAY (RECEPCJA)','Dziesiątka, jedenastka, trzynastka, czternastka. Reszta pusta.');}
 function negMenu(u){const H=G.h,it=[];const D='DWAYNE (ZZA DRZWI)',C='KOBIETA (ZZA DRZWI)';
  const step=(t,tr,lines)=>({t,f:()=>{H.neg++;H.trust+=tr;for(const[w,s]of lines)say(w===1?u.name:w,s);if(tr<0&&H.trust<=-2&&!H.said.warn){H.said.warn=1;setTimeout(()=>{if(G.ended)return;SND.gun('pistol',MOT_X0(11)*TS+40,19*TS);makeNoise(MOT_X0(11)*TS+40,19*TS,20,'shot');say(D,'Następnym razem celuję w drzwi!');logEv('Strzał ostrzegawczy w pokoju 12');},2500);}}});
- if(H.neg===0){it.push(step('„Policja Ridgefield. Nazywam się Miller. Jak masz na imię?”',1,[[D,'...Dwayne. Odejdźcie od drzwi.'],[C,'Proszę! Pomóżcie mi, on ma broń!']]));
+ if(H.neg===0){it.push(step('„Biuro szeryfa. Nazywam się Crane. Jak masz na imię?”',1,[[D,'...Dwayne. Odejdźcie od drzwi.'],[C,'Proszę! Pomóżcie mi, on ma broń!']]));
   it.push(step('„Policja! Wyjdź z rękami do góry!”',-1,[[D,'Spróbujcie wejść, to ją zastrzelę!'],[C,'Nie! Nie róbcie nic!']]));
   it.push(step('„Czy ktoś jest ranny?”',1,[[D,'Nikt. Jeszcze nikt.']]));}
  else if(H.neg===1){it.push(step('„Czego potrzebujesz, Dwayne?”',1,[[D,'Auta. Pełnego baku. I żebyście się wynieśli z parkingu.']]));
@@ -66,8 +66,8 @@ function negMenu(u){const H=G.h,it=[];const D='DWAYNE (ZZA DRZWI)',C='KOBIETA (Z
  if(H.neg>=3&&!H.swatCalled)it.push({t:'Wezwij SWAT (radio)',f:()=>callSwat(u)});
  choiceMenu('Pokój 12 · rozmowa przez drzwi',it);}
 function callSwat(u){const H=G.h;if(H.evac<H.guests.length){const o=G.squad.find(q=>q&&q.alive&&q!==u)||u;say(o.name,'Najpierw wyprowadźmy ludzi z sąsiednich pokoi.');return;}
- H.swatCalled=true;radio(u.name,'Dispatch, 2-Adam-14. Podejrzany zabarykadowany z kobietą, odmawia wyjścia. Goście ewakuowani. Prosimy SWAT.',{radio:1});
- setTimeout(()=>{if(G.ended)return;radio('DISPATCH','Przyjęłam. SWAT Ridgefield w drodze, czas dojazdu dwadzieścia minut. Trzymajcie perymetr.');H.fadeT=0;},3500);}
+ H.swatCalled=true;radio(u.name,'Dispatch, Nye 7. Podejrzany zabarykadowany z kobietą, odmawia wyjścia. Goście ewakuowani. Prosimy SWAT.',{radio:1});
+ setTimeout(()=>{if(G.ended)return;radio('DISPATCH','Przyjęłam. SWAT szeryfa w drodze, czas dojazdu dwadzieścia minut. Trzymajcie perymetr.');H.fadeT=0;},3500);}
 function fadeCard(txt,sub){let el=$('mfade');if(!el){el=document.createElement('div');el.id='mfade';el.style.cssText='position:absolute;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:60;opacity:0;transition:opacity 1.2s;pointer-events:none;font-family:inherit;letter-spacing:.3em;color:#d8d8d0;font-size:calc(var(--u)*2.2)';$('wrap').appendChild(el);}
  el.innerHTML=txt?'<div>'+txt+'</div><div style="font-size:calc(var(--u)*1.2);opacity:.55;margin-top:calc(var(--u)*1.4)">'+(sub||'')+'</div>':'';el.style.opacity=txt?1:0;}
 function swatPhase(){const H=G.h;H.phase=2;radioClear();
@@ -77,7 +77,7 @@ function swatPhase(){const H=G.h;H.phase=2;radioClear();
  SPECS.forEach((s,si)=>{const o=offs[si];const u=new Unit({team:'squad',spec:s.id,name:s.name,role:s.role,weap:s.weap,fov:s.fov,range:s.range,acc:s.acc,pal:PAL.squad,charges:s.id==='breach'?2:0,flash:s.id==='scout'?3:0,sed:s.id==='medic'?4:0,shoutCd:0});applyLoad(u,(G.load||defaultLoad())[si]);
   u.x=E.x*TS+8+fx*o[0]*TS+rx*o[1]*TS;u.y=E.y*TS+fy*o[0]*TS+ry*o[1]*TS;u.ang=E.a;u.heading=E.a;unstick(u);G.squad[si]=u;G.units.push(u);});
  G.p1=G.squad[G.p1Spec||0];G.p1.human=1;if(G.players===2){G.p2=G.squad[G.p2Spec||1];G.p2.human=2;}G.order='follow';G.ops=[];G.cam.x=G.p1.x;G.cam.y=G.p1.y;
- G.h.drawn=true;logEv('SWAT Ridgefield na miejscu');
+ G.h.drawn=true;logEv('SWAT szeryfa na miejscu');
  setTimeout(()=>{radio('SGT. WALKER','Patrol, dzięki. Przejmujemy. Pokój dwunasty, jeden uzbrojony, jedna kobieta w środku.',{radio:1});radio('SGT. WALKER','Hayes, ładunek albo taran na drzwi. Wchodzimy na mój znak.',{radio:1});},1500);}
 function crystalUpd(c,dt){const H=G.h;
  if(c.state==='cuffed'||c.state==='comply'){moveUnit(c,dt,0,0,0);if(c.state==='cuffed'&&!H.said.crc){H.said.crc=1;say('CRYSTAL',H.crStage==='run'?'Puszczaj! To był jego pomysł, nie mój!':'Co wy robicie?! To ja jestem ofiarą!');}return;}
@@ -90,21 +90,21 @@ function crystalArm(c){const H=G.h;H.crStage='armed';const e=new Unit({team:'ene
  G.civs.splice(G.civs.indexOf(c),1);G.units.splice(G.units.indexOf(c),1,e);G.enemies.push(e);H.cr=e;H.gunFound=true;
  say('CRYSTAL','Nie weźmiecie nas żywych!');const o=G.squad.find(q=>q&&q.alive&&!q.human)||G.p1;say(o.name,'Ona ma broń! Łazienka!');logEv('Crystal wyciąga drugą broń z łazienki');}
 function updateMotel(dt){const H=G.h;if(!H||G.ended)return;H.t+=dt;
- if(H.fadeT!=null){H.fadeT+=dt;if(H.fadeT>.1&&!H.said.f1){H.said.f1=1;fadeCard('20 MINUT PÓŹNIEJ','SWAT RIDGEFIELD PD · STARLIGHT MOTEL');}
+ if(H.fadeT!=null){H.fadeT+=dt;if(H.fadeT>.1&&!H.said.f1){H.said.f1=1;fadeCard('20 MINUT PÓŹNIEJ','NYE COUNTY SHERIFF · S.W.A.T.');}
   if(H.fadeT>2.2&&!H.said.f2){H.said.f2=1;swatPhase();}if(H.fadeT>4){fadeCard(null);H.fadeT=null;}}
  if(H.phase===2){const dw=H.dw,cr=H.cr,res=x=>!x.alive||x.state==='cuffed';
   if(H.endT==null&&res(dw)&&res(cr)){H.endT=2.5;}
   if(H.endT!=null){H.endT-=dt;if(H.endT<=0)endMission(true,'Pokój 12 zabezpieczony. '+(dw.alive?'Dwayne Pruitt zatrzymany':'Dwayne Pruitt nie żyje')+', '+(cr.alive?'Crystal zatrzymana':'Crystal nie żyje')+'.');}}}
 function motelRender(c,cx,cy){const H=G.h;const x=22*TS+8-cx,y=25*TS-14-cy;const fl=(Math.sin(G.time*13)>-.85)?1:.4;
  c.globalCompositeOperation='lighter';const g=c.createRadialGradient(x,y,0,x,y,70);g.addColorStop(0,'rgba(255,90,168,'+(.28*fl)+')');g.addColorStop(1,'rgba(255,90,168,0)');c.fillStyle=g;c.fillRect(x-70,y-70,140,140);c.globalCompositeOperation='source-over';}
-function motelObj(){const H=G.h;if(!H)return'';if(H.phase===1)return objRows('2-ADAM-14 · STARLIGHT MOTEL',[[H.evac>=H.guests.length,'Ewakuuj sąsiednie pokoje ('+H.evac+'/'+H.guests.length+')'],[H.neg>0,'Nawiąż kontakt z pokojem 12'],H.neg>=3?[H.swatCalled,'Zdecyduj o dalszych krokach']:null]);
+function motelObj(){const H=G.h;if(!H)return'';if(H.phase===1)return objRows('NYE 7 · STARLIGHT MOTEL',[[H.evac>=H.guests.length,'Ewakuuj sąsiednie pokoje ('+H.evac+'/'+H.guests.length+')'],[H.neg>0,'Nawiąż kontakt z pokojem 12'],H.neg>=3?[H.swatCalled,'Zdecyduj o dalszych krokach']:null]);
  const dw=H.dw,cr=H.cr,res=x=>!x.alive||x.state==='cuffed';return objRows('SWAT · POKÓJ 12',[[res(dw),'Zneutralizuj podejrzanego'],[res(cr),'Zabezpiecz kobietę']]);}
 function motelDebrief(){const H=G.h||{};const dw=H.dw,cr=H.cr;let sc=(H.evac||0)*4+Math.max(0,H.trust||0)*4;if(dw&&dw.alive)sc+=10;if(cr&&cr.alive&&cr.state==='cuffed')sc+=H.crStage==='armed'?5:15;
  patrolDebrief([['Goście ewakuowani',(H.evac||0)+' / 4'],['Negocjacje',(H.neg||0)+' wymiany · zaufanie '+(H.trust||0)],['Dwayne Pruitt',!dw?'—':!dw.alive?'nie żyje':dw.state==='cuffed'?'zatrzymany':'—'],['Crystal',!cr?'—':!cr.alive?'nie żyje':cr.state==='cuffed'?(H.crStage==='armed'?'zatrzymana (uzbrojona)':'zatrzymana zanim sięgnęła po broń'):'—'],['Druga broń',H.gunFound?'zabezpieczona':'—']],sc);}
-LVL.motel={id:'motel',patrol:true,nvg:true,weather:'rain',ext:'stucco',terrain:motelTerrain,windows:motelWindows,rooms:ROOMS_MOTEL,doors:DOORS_MOTEL,furn:FURN_MOTEL,lamps:LAMPS_MOTEL,cams:[],entries:ENTRIES_MOTEL,
+LVL.motel={id:'motel',patrol:true,nvg:true,weather:'dust',crew:{role:'Deputy Sheriff',shout:'Sheriff\'s Office! Don\'t move!',names:['DEP. CRANE','DEP. VEGA'],uni:{body:'#a48c62',legs:'#3a4230',acc:'#d8b048'}},car:{s:'#2e6a3a'},ext:'stucco',terrain:motelTerrain,windows:motelWindows,rooms:ROOMS_MOTEL,doors:DOORS_MOTEL,furn:FURN_MOTEL,lamps:LAMPS_MOTEL,cams:[],entries:ENTRIES_MOTEL,
  start:startMotel,update:updateMotel,interact:motelInteract,render:motelRender,stress:NOOP,obj:motelObj,debrief:motelDebrief,
  wallCol:rb=>{const n=rb>=0?ROOMS[rb].n:'';return n.startsWith('Łazienka')?['#7a8688','#5a6668']:n==='Recepcja'?['#6a5a48','#4a3e30']:['#6e5a52','#4c3e38'];},
- win:'SWAT, przyjęłam. Koroner i detektywi w drodze. Dobra robota.',planTitle:'STARLIGHT MOTEL · HWY 9',
- nb:{no:'#26-130-2217',pri:'P1',code:'245 / 207',small:'ADRES',addr:'STARLIGHT MOTEL<br>POKÓJ 12',facts:[['JEDNOSTKA','2-Adam-14 · potem SWAT'],['GODZINA','23:48'],['ZGŁOSZENIE','mężczyzna z bronią, kobieta w pokoju']],
+ win:'SWAT, przyjęłam. Koroner i detektywi w drodze. Dobra robota.',planTitle:'STARLIGHT MOTEL · US-95',
+ nb:{no:'#26-130-2217',pri:'P1',code:'245 / 207',small:'ADRES',addr:'STARLIGHT MOTEL<br>POKÓJ 12',facts:[['JEDNOSTKA','Nye County Sheriff · Dep. Crane, Dep. Vega'],['GODZINA','23:48'],['ZGŁOSZENIE','mężczyzna z bronią, kobieta w pokoju']],
   title:'911 · ZAPIS ROZMOWY',clock:[23,41,5],who:{D:'DYSPOZYTOR',C:'RECEPCJA'},bg:[2,20,40,22.5],
-  call:[['D','Ridgefield, numer alarmowy.'],['C','Tu Starlight Motel, przy dziewiątce. W dwunastce jest facet z pistoletem.'],['D','Widział pan broń?'],['C','Tak, przyniósł z samochodu. Kłócił się z kobietą od rana. Teraz krzyczy, że nikt nie wyjdzie.'],['D','Ile osób jest w pokoju?'],['C','Dwie. On i ona. Pokój wynajęła ona... płaciła gotówką.'],['D','Proszę zostać w recepcji i zamknąć drzwi. Policja jest w drodze.']]}};
+  call:[['D','Nye County, numer alarmowy.'],['C','Tu Starlight Motel, przy dziewięćdziesiątce piątce. W dwunastce jest facet z bronią.'],['D','Widział pan broń?'],['C','Tak, przyniósł z samochodu. Kłócił się z kobietą od rana. Teraz krzyczy, że nikt nie wyjdzie.'],['D','Ile osób jest w pokoju?'],['C','Dwie. On i ona. Pokój wynajęła ona... płaciła gotówką.'],['D','Proszę zostać w recepcji i zamknąć drzwi. Policja jest w drodze.']]}};

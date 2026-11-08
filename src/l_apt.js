@@ -10,7 +10,7 @@ const DOORS_APT=[[39,23,1],[33,16,1],[39,16],[45,16],[22,23,1],[54,23,1],[65,23,
 const FURN_APT=[];
 {const F_=(...a)=>FURN_APT.push(a);
  // korytarz
- F_('stairs',11,24);F_('stairs',11,25);F_('stairs',11,26);F_('elev',16,24);F_('ladder',27,26);F_('bins',68,24);F_('doormat',39,24);F_('doormat',22,24);F_('doormat',54,24);F_('mail',38,24);F_('mail',40,25);F_('papers',30,26);F_('stain',47,25);
+ F_('stairs',11,24);F_('stairs',11,25);F_('stairs',11,26);F_('elev',16,24);F_('ladder',27,26);F_('bins',68,24);F_('doormat',39,24);F_('slush',13,25);F_('slush',16,25);F_('slush',19,26);F_('slush',23,25);F_('slush',28,25);F_('doormat',22,24);F_('doormat',54,24);F_('mail',38,24);F_('mail',40,25);F_('papers',30,26);F_('stain',47,25);
  // salon
  F_('rug',31,18,4,3);F_('tvOld',31,17);F_('armch',32,19);F_('tableS',34,19);F_('news',30,21);F_('news',30,22);F_('news',31,22);F_('news',36,22);F_('news',36,21);F_('bags',35,17);F_('deadplant',36,17);F_('papers',33,21);F_('bottle',34,20);
  // przedpokój
@@ -35,6 +35,7 @@ function aptTerrain(M,set,fillR,H,V){fillR(0,0,79,57,T.ASPH,'conc');fillR(11,11,
  for(let y=24;y<=26;y++)set(15,y,T.FLOOR);}
 function aptWindows(M,set){for(const x of[14,20,26,32,35,40,46,52,58,65])set(x,10,T.WIN);for(const x of[15,22,30,40,47,57,65])set(x,44,T.WIN);set(70,25,T.WIN);set(10,18,T.WIN);}
 // props
+F('slush',1,1,0,0,(g,x,y)=>{P(g,x+3,y+6,4,6,'rgba(150,170,190,.35)');P(g,x+4,y+7,2,4,'rgba(210,220,235,.3)');P(g,x+9,y+3,4,6,'rgba(150,170,190,.3)');P(g,x+10,y+4,2,4,'rgba(210,220,235,.28)');});
 F('stairs',1,1,0,0,(g,x,y)=>{for(let i=0;i<16;i+=4){P(g,x,y+i,16,3,'#3a3c3e');P(g,x,y+i+3,16,1,'#1e2022');}P(g,x+14,y,2,16,'#5a4a3a');});
 F('elev',1,1,1,1,(g,x,y)=>{P(g,x,y-10,16,25,'#5a5e62');P(g,x+1,y-9,14,23,'#7a7e82');P(g,x+7,y-9,1,23,'#4a4e52');P(g,x+3,y-4,10,5,'#e8e4c8');P(g,x+4,y-3,8,1,'#b02a20');P(g,x+4,y-1,8,1,'#b02a20');});
 F('ladder',1,1,1,0,(g,x,y)=>{P(g,x+3,y-8,2,22,'#8a8a84');P(g,x+11,y-8,2,22,'#8a8a84');for(let i=-6;i<14;i+=4)P(g,x+3,y+i,10,1,'#9a9a94');P(g,x+2,y+13,12,2,SH);});
@@ -64,15 +65,15 @@ function startApt(){G.hostage=null;G.deadline=1e9;
  G.h={t:0,knocked:false,inside:false,tvOn:true,key:false,body:false,clues:CLUES_APT.map(c=>({...c,found:false})),nf:0,said:{},gary:null,gStage:null,endT:null,res:null};
  const s=mkNPC({tx:26,ty:25,kind:'janitor',pal:{...PAL.janitor},state:'idle',a:Math.PI,name:'Alvarez'});G.h.sup=s;
  const b=new Unit({team:'civ',kind:'corpse',pal:{body:'#8a7a9a',legs:'#6a5a7a',head:'#9a8a7a',face:'#9a8a7a',visor:'#2a1a12',hair:'#c8c8c0',eyes:1},r:4});b.alive=false;b.pose='dead';b.deathT=9;b.fallA=-Math.PI/2;b.mseed=17;b.x=APT.body.x;b.y=APT.body.y;G.units.push(b);
- G.police=[];logEv('2-Adam-14: sprawdzenie, Pine Court, mieszkanie 3B');
- setTimeout(()=>{radio('DISPATCH','2-Adam-14, Pine Court Apartments, trzecie piętro, mieszkanie 3B. Sprawdzenie stanu lokatorki, Ruth Hensley, siedemdziesiąt osiem lat.');radio(G.p1.name,'Przyjąłem, jesteśmy na klatce.',{radio:1});},600);}
+ G.police=[];logEv('Beat 1123: sprawdzenie, Pine Court, mieszkanie 3B');
+ setTimeout(()=>{radio('DISPATCH','Beat 1123, Pine Court Apartments, trzecie piętro, mieszkanie 3B. Sprawdzenie stanu lokatorki, Ruth Hensley, siedemdziesiąt osiem lat.');radio(G.p1.name,'Przyjąłem, jesteśmy na klatce.',{radio:1});},600);}
 function aptInteract(u){const H=G.h;if(!H)return null;const d=LV.doorAt[I(39,23)],md=LV.doorAt[I(33,16)];
  if(d&&d.locked&&d.target===0&&nearPt(u,APT.door.x,APT.door.y,22)&&u.y>23*TS)return{k:'house',label:'Drzwi 3B',dur:0,f:aptDoorMenu};
  if(nearPt(u,APT.a3.x,APT.a3.y,20)&&u.y>23*TS&&!H.said.feld)return{k:'house',label:'Zapukaj do 3A',dur:0,f:feldman};
  if(H.sup.alive&&H.sup.state==='idle'&&nearPt(u,H.sup.x,H.sup.y,22)&&!H.said.sup)return{k:'house',label:'Porozmawiaj z dozorcą',dur:0,f:superTalk};
  if(H.tvOn&&nearPt(u,APT.tv.x,APT.tv.y,20))return{k:'house',label:'Wyłącz telewizor',dur:.5,f:()=>{H.tvOn=false;logEv('Telewizor wyłączony');say(u.name,'Cisza... teraz dopiero czuć ten zapach.');}};
  if(md&&md.locked&&nearPt(u,APT.mdoor.x,APT.mdoor.y,20))return H.key?{k:'house',label:'Otwórz kłódkę kluczykiem',dur:1.4,f:()=>openMom(u,false)}:{k:'house',label:'Kłódka — wyważ drzwi',dur:2.6,f:()=>openMom(u,true)};
- if(H.body&&!H.said.bodyLook&&nearPt(u,APT.body.x,APT.body.y,26))return{k:'house',label:'Przyjrzyj się',dur:.8,f:()=>{H.said.bodyLook=1;say(u.name,'To ona. Ruth Hensley. Nie żyje od dawna... tygodnie. Może miesiące.');radio(u.name,'Dispatch, 2-Adam-14. Mamy zwłoki w 3B, prawdopodobnie od kilku miesięcy. Potrzebny koroner i detektywi.',{radio:1});setTimeout(()=>{if(!G.ended)radio('DISPATCH','Przyjęłam, wysyłam. Zabezpieczcie mieszkanie.');},5000);}};
+ if(H.body&&!H.said.bodyLook&&nearPt(u,APT.body.x,APT.body.y,26))return{k:'house',label:'Przyjrzyj się',dur:.8,f:()=>{H.said.bodyLook=1;say(u.name,'To ona. Ruth Hensley. Nie żyje od dawna... tygodnie. Może miesiące.');radio(u.name,'Dispatch, Beat 1123. Mamy zwłoki w 3B, prawdopodobnie od kilku miesięcy. Potrzebny koroner i detektywi.',{radio:1});setTimeout(()=>{if(!G.ended)radio('DISPATCH','Przyjęłam, wysyłam. Zabezpieczcie mieszkanie.');},5000);}};
  const c=clueAt(u,H.clues);if(c)return{k:'house',label:'Przyjrzyj się',dur:.8,f:(u)=>findClueGen(u,c,H)};
  return null;}
 function aptDoorMenu(u){const H=G.h,d=LV.doorAt[I(39,23)];const it=[];
@@ -109,17 +110,22 @@ function updateApt(dt){const H=G.h;if(!H||G.ended)return;H.t+=dt;
 function aptStress(dt,L){tvAudio(L,APT.tv,G.h&&G.h.tvOn?3.2:0,APT.body);
  for(const s of G.squad){if(!s||!s.alive||!s.wounded)continue;s.breathT=(s.breathT||0)-dt;if(s.breathT<=0){s.breathT=2;if(s.human)SND.breath(s.x,s.y,.3);}}}
 function aptRender(c,cx,cy){const H=G.h;if(!H)return;
+ // zimowe światło z ulicy przez okna + śnieg za szybą
+ c.globalCompositeOperation='lighter';for(const[wx,wy,dx,dy]of[[32,10,0,1],[35,10,0,1],[40,10,0,1],[46,10,0,1],[70,25,-1,0],[14,10,0,1],[20,10,0,1]]){const x=wx*TS+8-cx,y=wy*TS+8-cy;if(x<-80||y<-80||x>VW+80||y>VH+80)continue;
+  const g=c.createLinearGradient(x,y,x+dx*56,y+dy*56);g.addColorStop(0,'rgba(120,150,200,.2)');g.addColorStop(1,'rgba(120,150,200,0)');c.fillStyle=g;c.beginPath();if(dy){c.moveTo(x-7,y);c.lineTo(x+7,y);c.lineTo(x+16,y+56);c.lineTo(x-16,y+56);}else{c.moveTo(x,y-7);c.lineTo(x,y+7);c.lineTo(x-56,y+16);c.lineTo(x-56,y-16);}c.fill();
+  for(let k=0;k<5;k++){const t=G.time*(.6+k*.13)+k*1.7+wx,fx=x-6+((k*5+Math.sin(t*2)*2)%12+12)%12,fy=y-6+((t*9)%10);P(c,fx|0,fy|0,1,1,'rgba(230,238,250,.85)');}}
+ c.globalCompositeOperation='source-over';
  if(H.tvOn){const x=APT.tv.x-cx,y=APT.tv.y-cy,ph=(G.time*7|0);c.globalCompositeOperation='lighter';const col=[[120,150,255],[255,210,160],[150,255,190],[220,220,240]][ph%4];const g=c.createRadialGradient(x,y+6,0,x,y+6,52);g.addColorStop(0,'rgba('+col+',.22)');g.addColorStop(1,'rgba('+col+',0)');c.fillStyle=g;c.fillRect(x-52,y-46,104,104);c.globalCompositeOperation='source-over';P(c,x-5,y-10,10,7,'rgba('+col+',.7)');}
  // flies near the body / under the bedroom door
  const fx=APT.body.x-cx,fy=APT.body.y-cy-6,t=G.time;for(let i=0;i<(H.body?9:3);i++){const ox=Math.sin(t*3.1+i*2.3)*12+Math.sin(t*7.7+i)*4,oy=Math.cos(t*2.6+i*1.7)*7+Math.sin(t*9+i)*2;const bx=H.body?fx:APT.mdoor.x-cx,by=H.body?fy:APT.mdoor.y-cy+8;P(c,(bx+ox)|0,(by+oy)|0,1,1,'#0a0a0a');}}
 function aptObj(){const H=G.h;if(!H)return'';const g=H.gary,gd=g&&(g.state==='cuffed'||!g.alive);
- return objRows('2-ADAM-14 · PINE COURT 3B',[[H.inside,'Sprawdź stan lokatorki'],g&&H.gStage&&H.gStage!=='walk'?[gd,'Zatrzymaj Gary’ego Hensleya']:null],H.nf?'<div class="opt">Notatki: '+H.nf+'</div>':'');}
+ return objRows('BEAT 1123 · PINE COURT 3B',[[H.inside,'Sprawdź stan lokatorki'],g&&H.gStage&&H.gStage!=='walk'?[gd,'Zatrzymaj Gary’ego Hensleya']:null],H.nf?'<div class="opt">Notatki: '+H.nf+'</div>':'');}
 function aptDebrief(){const H=G.h||{};const g=H.gary;let sc=H.nf*3;if(g&&g.alive&&g.state==='cuffed')sc+=15;if(H.key)sc+=5;
  patrolDebrief([['Notatki z miejsca',(H.nf||0)+' / '+CLUES_APT.length],['Wejście do 3B',LV.doorAt[I(39,23)]&&LV.doorAt[I(39,23)].broken?'siłą':'—'],['Sypialnia',H.key?'otwarta kluczykiem':H.body?'wyważona':'—'],['Gary Hensley',!g?'—':!g.alive?'nie żyje':g.state==='cuffed'?'zatrzymany':'zbiegł']],sc);}
-LVL.apt={id:'apt',patrol:true,sounds:true,weather:'indoor',ext:'brick',terrain:aptTerrain,windows:aptWindows,rooms:ROOMS_APT,doors:DOORS_APT,furn:FURN_APT,lamps:LAMPS_APT,cams:[],entries:ENTRIES_APT,
+LVL.apt={id:'apt',patrol:true,sounds:true,weather:'snow',crew:{names:['OFC. NOWAK','OFC. BROOKS'],uni:{body:'#7f96b4',legs:'#161c28',acc:'#d8d8d8'}},car:{s:'#2a5ab0'},ext:'brick',terrain:aptTerrain,windows:aptWindows,rooms:ROOMS_APT,doors:DOORS_APT,furn:FURN_APT,lamps:LAMPS_APT,cams:[],entries:ENTRIES_APT,
  start:startApt,update:updateApt,interact:aptInteract,render:aptRender,stress:aptStress,obj:aptObj,debrief:aptDebrief,
  wallCol:rb=>{const n=rb>=0?ROOMS[rb].n:'';return n.startsWith('Korytarz')||n==='Klatka schodowa'?['#5e5a48','#3e3a2e']:n.includes('Ruth')?['#6a5e6a','#4a3e4a']:n.includes('Gary')?['#4e5248','#34382e']:n.includes('Kuchnia')?['#7a7458','#54503a']:n.includes('Łazienka')?['#7a8688','#5a6668']:['#6a5e4a','#4a4032'];},
- win:'2-Adam-14, przyjęłam. Koroner i detektywi są w drodze.',planTitle:'PINE COURT APARTMENTS · III PIĘTRO',
- nb:{no:'#26-121-0388',pri:'P4',code:'WELFARE',small:'ADRES',addr:'PINE COURT APTS<br>MIESZKANIE 3B',facts:[['JEDNOSTKA','2-Adam-14 · Ofc. Miller, Ofc. Ortiz'],['GODZINA','19:30'],['LOKATORKA','Ruth Hensley, 78 l.']],
+ win:'Beat 1123, przyjęłam. Koroner i detektywi są w drodze.',planTitle:'PINE COURT APARTMENTS · III PIĘTRO',
+ nb:{no:'#26-121-0388',pri:'P4',code:'WELFARE',small:'ADRES',addr:'PINE COURT APTS<br>MIESZKANIE 3B',facts:[['JEDNOSTKA','Beat 1123 · Ofc. Nowak, Ofc. Brooks'],['GODZINA','19:30'],['LOKATORKA','Ruth Hensley, 78 l.']],
   title:'911 · ZAPIS ROZMOWY',clock:[19,4,8],who:{D:'DYSPOZYTOR',C:'ZGŁASZAJĄCA'},bg:[10,18,30,16.9],
-  call:[['D','Ridgefield, numer alarmowy. W czym mogę pomóc?'],['C','Dzwonię z Portland. Chodzi o moją mamę, Ruth Hensley. Pine Court, mieszkanie 3B.'],['D','Co się dzieje?'],['C','Nie mogę się do niej dodzwonić od tygodnia. Właściwie... od dawna z nią nie rozmawiałam. Brat mówi, że ma demencję i nie podchodzi do telefonu.'],['D','Brat mieszka z nią?'],['C','Gary... chyba tak. Odkąd stracił pracę. Ode mnie już nie odbiera.'],['D','Wyślemy patrol, żeby sprawdził, czy wszystko w porządku.'],['C','Proszę. Coś jest nie tak. Czuję to.']]}};
+  call:[['D','Chicago, numer alarmowy. W czym mogę pomóc?'],['C','Dzwonię z Portland. Chodzi o moją mamę, Ruth Hensley. Pine Court, mieszkanie 3B.'],['D','Co się dzieje?'],['C','Nie mogę się do niej dodzwonić od tygodnia. Właściwie... od dawna z nią nie rozmawiałam. Brat mówi, że ma demencję i nie podchodzi do telefonu.'],['D','Brat mieszka z nią?'],['C','Gary... chyba tak. Odkąd stracił pracę. Ode mnie już nie odbiera.'],['D','Wyślemy patrol, żeby sprawdził, czy wszystko w porządku.'],['C','Proszę. Coś jest nie tak. Czuję to.']]}};

@@ -3,10 +3,10 @@ const WEAP={
  rifle:{n:'Karabinek M4A1',mag:30,rate:.11,auto:1,spread:.035,range:22,snd:'rifle',rl:2.2,pel:1,noise:22,len:9,thick:1},
  smg:{n:'PM MP5',mag:30,rate:.085,auto:1,spread:.05,range:18,snd:'smg',rl:2,pel:1,noise:18,len:7,thick:1},
  shotgun:{n:'Strzelba M870',mag:7,rate:.75,auto:0,spread:.13,range:11,snd:'shotgun',rl:3,pel:7,noise:24,len:9,thick:1},
- pistol:{n:'Pistolet Glock 17',mag:17,rate:.2,auto:0,spread:.045,range:16,snd:'pistol',rl:1.6,pel:1,noise:16,len:5},
- silenced:{n:'Pistolet z tłumikiem',mag:15,rate:.22,auto:0,spread:.03,range:16,snd:'silenced',rl:1.6,pel:1,noise:3,len:7},
+ pistol:{n:'Glock 17',mag:17,rate:.2,auto:0,spread:.045,range:16,snd:'pistol',rl:1.6,pel:1,noise:16,len:5},
+ silenced:{n:'Broń z tłumikiem',mag:15,rate:.22,auto:0,spread:.03,range:16,snd:'silenced',rl:1.6,pel:1,noise:3,len:7},
  eRifle:{n:'AK',mag:30,rate:.15,auto:1,spread:.085,range:18,snd:'enemy',rl:2.6,pel:1,noise:22,len:9,thick:1},
- ePistol:{n:'Pistolet',mag:12,rate:.4,auto:0,spread:.08,range:14,snd:'epistol',rl:1.8,pel:1,noise:18,len:5},
+ ePistol:{n:'Broń krótka',mag:12,rate:.4,auto:0,spread:.08,range:14,snd:'epistol',rl:1.8,pel:1,noise:18,len:5},
 };
 const SPECS=[
  {id:'lead',name:'SGT. WALKER',role:'Team Leader',weap:'rifle',fov:74,range:9,acc:'#c9b458',ab:'Okrzyk „Policja! Na ziemię!” — cywile się poddają, zaskoczeni lub oszołomieni napastnicy mogą rzucić broń.',ps:'Lider oddziału. Rozkazy, zatrzymania.'},

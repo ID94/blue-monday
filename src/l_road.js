@@ -14,7 +14,7 @@ const ROOMS_ROAD=[];const DOORS_ROAD=[];const FURN_ROAD=[];
  for(let x=2;x<30;x+=1)if(x%5)F_('fence',x,22);
  for(const[x,y]of[[20,35],[52,35],[58,24],[8,35]])F_('puddle',x,y);}
 const LAMPS_ROAD=[[37,32,0,'#f4f0d8',64],[38,33,0,'#f4f0d8',52]];
-const ENTRIES_ROAD=[{n:'State Route 9',s:'Radiowóz za zatrzymanym pojazdem.',x:35.5,y:34.6,a:0,px:35,py:34}];
+const ENTRIES_ROAD=[{n:'Highway 287',s:'Radiowóz za zatrzymanym pojazdem.',x:35.5,y:34.6,a:0,px:35,py:34}];
 function roadTerrain(M,set,fillR,H,V){fillR(0,ROAD_Y0,79,ROAD_Y1,T.ASPH,'asph');fillR(0,24,79,25,T.ASPH,'conc');fillR(0,32,79,33,T.ASPH,'conc');}
 function roadWindows(){}
 F('laneY',1,1,0,0,(g,x,y)=>{P(g,x+2,y+14,11,2,'rgba(200,170,60,.75)');});
@@ -33,8 +33,8 @@ function roadScen(){}
 function startRoad(){G.hostage=null;G.deadline=1e9;
  G.h={stage:'stop',approach:null,docs:false,plates:false,lic:false,k9T:null,knockT:2,knocks:0,peek:false,twist:null,trunk:false,girl:false,drv:null,said:{},t:0,truckT:12,endT:null,res:null};
  G.truck=null;G.car={x:40*TS,y:32*TS,vx:0,vy:0,ang:0,mode:'parked',spr:mkSedan()};carTiles(true);
- G.police=[];logEv('2-Adam-14: zatrzymanie pojazdu, SR-9, mila 41');
- setTimeout(()=>{radio('DISPATCH','2-Adam-14, przyjęłam zatrzymanie o pierwszej dwanaście. Najbliższe wsparcie piętnaście minut od was.');},600);}
+ G.police=[];logEv('WHP 14: zatrzymanie pojazdu, US-287, mila 41');
+ setTimeout(()=>{radio('DISPATCH','WHP 14, przyjęłam zatrzymanie o pierwszej dwanaście. Najbliższe wsparcie piętnaście minut od was.');},600);}
 const RD={drvWin:()=>({x:G.car.x+30,y:G.car.y-8}),pasWin:()=>({x:G.car.x+30,y:G.car.y+40}),rearWin:()=>({x:G.car.x+14,y:G.car.y+40}),trunk:()=>({x:G.car.x-8,y:G.car.y+16}),mdt:()=>({x:34*TS+8,y:34*TS+4})};
 function roadInteract(u){const H=G.h,C=G.car;if(!H)return null;
  if(H.stage==='stop'){
@@ -61,11 +61,11 @@ function showDaleId(){if(G.ended)return;const el=$('idcard');el.innerHTML='<div 
  const c=$('idph'),g=c.getContext('2d');P(g,0,0,18,22,'#a8b4bc');P(g,3,15,12,7,'#4a4a3a');P(g,7,12,4,4,'#b08868');P(g,5,4,8,10,'#c49a7c');P(g,5,2,8,3,'#8a7050');P(g,6,8,2,1,'#2a2a3a');P(g,10,8,2,1,'#2a2a3a');P(g,7,11,4,1,'#8a5a4a');P(g,6,12,6,1,'#7a6a50');
  el.classList.add('on');setTimeout(()=>el.classList.remove('on'),6500);}
 function mdtMenu(u){const H=G.h;const it=[];
- it.push({t:'Sprawdź tablice rejestracyjne',dis:H.plates,f:()=>{H.plates=true;radio(u.name,'Dispatch, 2-Adam-14, proszę sprawdzić tablice Indiany: Lincoln-Mary-siedem-dwa-cztery-jeden.',{radio:1});setTimeout(()=>{if(G.ended)return;radio('DISPATCH','2-Adam-14, tablice na srebrną Toyotę Camry. Właścicielka: Margaret Lindqvist z Millbrook. Zgłoszona jako zaginiona wczoraj wieczorem, razem z córką, Lily, szesnaście lat.');logEv('Dispatch: właścicielka auta i jej córka zaginione');},5200);}});
+ it.push({t:'Sprawdź tablice rejestracyjne',dis:H.plates,f:()=>{H.plates=true;radio(u.name,'Dispatch, WHP 14, proszę sprawdzić tablice Indiany: Lincoln-Mary-siedem-dwa-cztery-jeden.',{radio:1});setTimeout(()=>{if(G.ended)return;radio('DISPATCH','WHP 14, tablice na srebrną Toyotę Camry. Właścicielka: Margaret Lindqvist z Millbrook. Zgłoszona jako zaginiona wczoraj wieczorem, razem z córką, Lily, szesnaście lat.');logEv('Dispatch: właścicielka auta i jej córka zaginione');},5200);}});
  it.push({t:'Sprawdź prawo jazdy kierowcy',dis:!H.docs||H.lic,f:()=>{H.lic=true;radio(u.name,'Dispatch, sprawdźcie osobę: Pruitt, Dale, dziewiąty wrzesień siedemdziesiąt dziewięć.',{radio:1});setTimeout(()=>{if(G.ended)return;radio('DISPATCH','Pruitt Dale, prawo jazdy ważne. Wyrok sprzed ośmiu lat za napaść i pozbawienie wolności. Obecnie bez nakazów.');logEv('Dispatch: kierowca karany za pozbawienie wolności');},5200);}});
  it.push({t:'Wezwij jednostkę K-9',dis:H.k9T!=null,f:()=>{H.k9T=0;radio(u.name,'Dispatch, proszę o jednostkę K-9 na mile czterdzieści jeden.',{radio:1});setTimeout(()=>{if(!G.ended)radio('DISPATCH','K-9 w drodze, będą za około sześć minut.');},4200);logEv('Wezwano K-9');}});
  it.push({t:'Poproś o wsparcie',dis:H.said.bk,f:()=>{H.said.bk=1;radio(u.name,'Dispatch, prośba o drugą jednostkę.',{radio:1});setTimeout(()=>{if(!G.ended)radio('DISPATCH','Najbliższa jednostka to 3-Baker-9, piętnaście minut od was.');},4000);}});
- choiceMenu('Radiowóz 2-Adam-14',it);}
+ choiceMenu('Radiowóz WHP 14',it);}
 function peekBack(u){const H=G.h;H.peek=true;logEv('Dziewczyna na tylnym siedzeniu ma związane ręce');say(u.name,'Dziewczyna z tyłu nie śpi. Patrzy prosto w latarkę... ma taśmę na nadgarstkach.');say('KIEROWCA','Proszę nie świecić jej po oczach. Mówiłem, że jest zmęczona.');}
 function trunkMenu(u){const H=G.h;choiceMenu('Tył pojazdu',[{t:'Nasłuchuj przy bagażniku',f:()=>{trunkKnock(true);say(u.name,'...Coś stuknęło w bagażniku.');}},{t:'„Proszę otworzyć bagażnik.”',f:()=>{say(u.name,'Proszę otworzyć bagażnik.');say('KIEROWCA','Nie ma pan nakazu.');H.said.trunkAsk=1;H.nervous=(H.nervous||0)+1;if(H.plates||H.peek||H.knocks>1)setTimeout(()=>roadTwist(u),1600);}}]);}
 function trunkKnock(force){const H=G.h,tk=RD.trunk();H.knocks++;const o=out(tk.x,tk.y,.5,{rev:.05});if(o&&A.ctx){const t0=A.ctx.currentTime;for(let k=0;k<3;k++){nz(o,t0+k*.2,.07,{brown:1,type:'lowpass',f:300,g:1});tone(o,t0+k*.2,.06,{f:90,f2:60,g:.6});}}
@@ -75,7 +75,7 @@ function roadTwist(u){const H=G.h;if(H.stage!=='stop'||G.ended)return;H.stage='t
  const near=G.squad.some(q=>q&&q.alive&&dist(q.x,q.y,G.car.x+24,G.car.y+16)<TS*2.4);
  H.twist=(near&&Math.random()<.6)||H.said.trunkAsk?'gun':'flee';
  if(H.twist==='gun'){spawnDriver(G.car.x+30,G.car.y-10);say('KIEROWCA','Nie zabierzecie mi ich!');const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Broń! Ma strzelbę!');}
- else{G.car.mode='flee';G.car.vx=40;say('KIEROWCA','...');const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Ucieka! Rusza!');radio(G.p1.name,'Dispatch, 2-Adam-14, pojazd ucieka na wschód, State Route 9!',{radio:1});}
+ else{G.car.mode='flee';G.car.vx=40;say('KIEROWCA','...');const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Ucieka! Rusza!');radio(G.p1.name,'Dispatch, WHP 14, pojazd ucieka na wschód, Highway 287!',{radio:1});}
  logEv(H.twist==='gun'?'Kierowca wyskakuje ze strzelbą':'Kierowca ucieka autem');}
 function spawnDriver(x,y){const H=G.h;const e=mkEnemy({tx:x/TS|0,ty:y/TS|0,weap:'eShot',pal:{body:'#4a4a3a',legs:'#2a2e3a',head:'#c49a7c',face:'#c49a7c',visor:'#2a1a12',hair:'#8a7050',skin:'#c49a7c',eyes:1},name:'Dale Pruitt',kind:'suspect',st:'guard'});
  e.x=x;e.y=y;unstick(e);const q=nearestSquad(e);e.state='search';e.goal={x:q?q.x:x,y:q?q.y:y};e.searchT=6;e.arrived=false;e.react=.45;H.drv=e;return e;}
@@ -117,13 +117,13 @@ function roadRender(c,cx,cy){const C=G.car;if(!C)return;const x=C.x-cx,y=C.y-cy;
  if(G.truck){const t=G.truck,tx=t.x-cx,ty=t.y-cy;c.globalCompositeOperation='source-over';P(c,tx,ty,70,26,'#2a2c30');P(c,tx,ty,14,26,'#4a2a20');P(c,tx+14,ty+2,56,22,'#5a5e64');c.globalCompositeOperation='lighter';const g2=c.createRadialGradient(tx-20,ty+13,0,tx-20,ty+13,60);g2.addColorStop(0,'rgba(255,250,220,.35)');g2.addColorStop(1,'rgba(255,250,220,0)');c.fillStyle=g2;c.fillRect(tx-80,ty-47,120,120);}
  c.globalCompositeOperation='source-over';}
 function roadObj(){const H=G.h;if(!H)return'';const e=H.drv,done=e&&(!e.alive||e.state==='cuffed');
- return objRows('2-ADAM-14 · STATE ROUTE 9',[[H.docs,'Kontrola drogowa'],H.stage==='twist'?[done,'Zatrzymaj kierowcę']:null,H.stage==='twist'&&(H.trunk||H.girl||done)?[H.trunk&&H.girl,'Udziel pomocy pasażerom']:null]);}
+ return objRows('WHP 14 · HIGHWAY 287',[[H.docs,'Kontrola drogowa'],H.stage==='twist'?[done,'Zatrzymaj kierowcę']:null,H.stage==='twist'&&(H.trunk||H.girl||done)?[H.trunk&&H.girl,'Udziel pomocy pasażerom']:null]);}
 function roadDebrief(){const H=G.h||{};const e=H.drv;const drv=!e?'—':!e.alive?'nie żyje':e.state==='cuffed'?'zatrzymany':'zbiegł';
  let sc=0;if(H.approach==='pas')sc+=10;if(H.plates)sc+=10;if(H.peek)sc+=5;if(H.lic)sc+=5;if(e&&e.alive&&e.state==='cuffed')sc+=15;
  patrolDebrief([['Podejście do auta',H.approach==='pas'?'od strony pasażera (bezpieczne)':H.approach==='drv'?'od strony kierowcy (od jezdni)':'—'],['Sprawdzone tablice',H.plates?'tak':'nie'],['Kierowca',drv],['Margaret Lindqvist',H.trunk?'uratowana':'—'],['Lily Lindqvist',H.girl?'uratowana':'—']],sc);}
-LVL.road={id:'road',patrol:true,weather:'night',ext:'none',terrain:roadTerrain,windows:roadWindows,rooms:ROOMS_ROAD,doors:DOORS_ROAD,furn:FURN_ROAD,lamps:LAMPS_ROAD,cams:[],entries:ENTRIES_ROAD,
+LVL.road={id:'road',patrol:true,weather:'fog',crew:{role:'State Trooper',shout:'State Police! Hands!',names:['TPR. HALE','TPR. DIETZ'],uni:{body:'#5c4a34',legs:'#2c2a26',acc:'#d8b048'}},car:{b:'#1c1d20',hi:'#34363a',lo:'#0e0f11',e:'#c8a860',r:'#e4e2da',rh:'#f2f0e8',rl:'#b8b4a8',s:'#c8a860'},ext:'none',terrain:roadTerrain,windows:roadWindows,rooms:ROOMS_ROAD,doors:DOORS_ROAD,furn:FURN_ROAD,lamps:LAMPS_ROAD,cams:[],entries:ENTRIES_ROAD,
  start:startRoad,update:updateRoad,interact:roadInteract,render:roadRender,stress:roadStress,obj:roadObj,debrief:roadDebrief,
- win:'2-Adam-14, przyjęłam. Karetka i detektywi są w drodze. Dobra robota.',planTitle:'STATE ROUTE 9 · MILA 41',
- nb:{no:'#26-119-0112',pri:'P3',code:'10-38',small:'MIEJSCE',addr:'STATE ROUTE 9<br>MILE MARKER 41',facts:[['JEDNOSTKA','2-Adam-14 · Ofc. Miller, Ofc. Ortiz'],['GODZINA','01:12'],['POWÓD','Niesprawne tylne światło']],
-  title:'RADIO · ZAPIS',clock:[1,11,40],who:{D:'DISPATCH',C:'2-ADAM-14'},bg:[26,20,28,15.75],
-  call:[['C','2-Adam-14, zatrzymanie pojazdu, State Route 9 przy mili czterdziestej pierwszej.'],['D','2-Adam-14, przyjęłam. Opis pojazdu?'],['C','Srebrna Toyota Camry, tablice Indiany, Lincoln-Mary-siedem-dwa-cztery-jeden. Kierowca i chyba jeden pasażer z tyłu.'],['D','Przyjęłam, zatrzymanie o pierwszej dwanaście.'],['C','Przyjąłem. Podchodzimy.']]}};
+ win:'WHP 14, przyjęłam. Karetka i detektywi są w drodze. Dobra robota.',planTitle:'HIGHWAY 287 · MILA 41',
+ nb:{no:'#26-119-0112',pri:'P3',code:'10-38',small:'MIEJSCE',addr:'HIGHWAY 287<br>MILE MARKER 41',facts:[['JEDNOSTKA','WHP 14 · Tpr. Hale, Tpr. Dietz'],['GODZINA','01:12'],['POWÓD','Niesprawne tylne światło']],
+  title:'RADIO · ZAPIS',clock:[1,11,40],who:{D:'DISPATCH',C:'WHP 14'},bg:[26,20,28,15.75],
+  call:[['C','WHP 14, zatrzymanie pojazdu, Highway 287 przy mili czterdziestej pierwszej.'],['D','WHP 14, przyjęłam. Opis pojazdu?'],['C','Srebrna Toyota Camry, tablice Indiany, Lincoln-Mary-siedem-dwa-cztery-jeden. Kierowca i chyba jeden pasażer z tyłu.'],['D','Przyjęłam, zatrzymanie o pierwszej dwanaście.'],['C','Przyjąłem. Podchodzimy.']]}};

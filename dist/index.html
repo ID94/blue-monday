@@ -219,12 +219,12 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
   <div class="mm-gr sc-dim"></div><div class="mm-lb mm-lt"></div><div class="mm-lb mm-lbb"></div>
   <div class="nb-top sc-top"><span><i></i>WYBÓR ZGŁOSZENIA</span><span class="sc-modes">TRYB&nbsp;&nbsp;<button class="sc-m sel" id="mode1">SOLO</button><button class="sc-m" id="mode2">CO-OP</button></span></div>
   <div class="sc-row">
-   <div class="sc-card sel1" id="sc1"><div class="n">01</div><div class="tt">214 Oakridge Lane</div><div class="fa">Ridgefield PD · Patrol 2-Adam-14</div><div class="ds">Jesienny poranek na przedmieściu. Sąsiadka słyszała krzyki i dwa huki.</div><div class="st ok">● DOSTĘPNE</div></div>
-   <div class="sc-card" id="sc2"><div class="n">02</div><div class="tt">Mile Marker 41</div><div class="fa">Ridgefield PD · Patrol 2-Adam-14</div><div class="ds">Noc, pusta droga stanowa. Rutynowe zatrzymanie za zepsute światło. Kierowca jest zbyt spokojny.</div><div class="st ok">● DOSTĘPNE</div></div>
-   <div class="sc-card" id="sc3"><div class="n">03</div><div class="tt">Pine Court, Apt 3B</div><div class="fa">Ridgefield PD · Patrol 2-Adam-14</div><div class="ds">Córka z innego stanu prosi o sprawdzenie matki. Telewizor gra na cały regulator.</div><div class="st ok">● DOSTĘPNE</div></div>
-   <div class="sc-card" id="sc4"><div class="n">04</div><div class="tt">Starlight Motel, Room 12</div><div class="fa">Patrol 2-Adam-14 → S.W.A.T.</div><div class="ds">Mężczyzna z bronią zabarykadowany w pokoju z kobietą. Ewakuacja, negocjacje, wejście.</div><div class="st ok">● DOSTĘPNE</div></div>
-   <div class="sc-card" id="sc5"><div class="n">05</div><div class="tt">Terminal B</div><div class="fa">Ridgefield Regional Airport PD</div><div class="ds">Pozostawiona walizka przy bramkach. Nikt się nie przyznaje.</div><div class="st ok">● DOSTĘPNE</div></div>
-   <div class="sc-card lock" id="sc6"><div class="n">06</div><div class="tt">St. Dymphna</div><div class="fa">Ridgefield PD · S.W.A.T.</div><div class="ds">Noc, ulewa. Uzbrojona grupa opanowała skrzydło szpitala psychiatrycznego.</div><div class="st">ZABLOKOWANE</div></div>
+   <div class="sc-card sel1" id="sc1"><div class="n">01</div><div class="tt">214 Oakridge Lane</div><div class="fa">Ridgefield PD · Connecticut</div><div class="ds">Jesienny poranek na przedmieściu. Telefon od sąsiadki.</div><div class="st ok">● DOSTĘPNE</div></div>
+   <div class="sc-card" id="sc2"><div class="n">02</div><div class="tt">Mile Marker 41</div><div class="fa">Wyoming Highway Patrol</div><div class="ds">Noc i gęsta mgła na pustej drodze. Rutynowa kontrola.</div><div class="st ok">● DOSTĘPNE</div></div>
+   <div class="sc-card" id="sc3"><div class="n">03</div><div class="tt">Pine Court, Apt 3B</div><div class="fa">Chicago PD · Illinois</div><div class="ds">Śnieżny wieczór. Ktoś z rodziny prosi, żeby zajrzeć do lokatorki.</div><div class="st ok">● DOSTĘPNE</div></div>
+   <div class="sc-card" id="sc4"><div class="n">04</div><div class="tt">Starlight Motel, Room 12</div><div class="fa">Nye County Sheriff · Nevada</div><div class="ds">Gorąca, wietrzna noc przy autostradzie. Zgłoszenie z recepcji motelu.</div><div class="st ok">● DOSTĘPNE</div></div>
+   <div class="sc-card" id="sc5"><div class="n">05</div><div class="tt">Terminal B</div><div class="fa">Phoenix PD · Airport Bureau</div><div class="ds">Upalne popołudnie. Ochrona terminalu prosi o patrol.</div><div class="st ok">● DOSTĘPNE</div></div>
+   <div class="sc-card lock" id="sc6"><div class="n">06</div><div class="tt">St. Dymphna</div><div class="fa">Ridgefield PD · S.W.A.T.</div><div class="ds">Noc, burza. Szpital psychiatryczny na skraju miasta.</div><div class="st">ZABLOKOWANE</div></div>
   </div>
   <div class="sc-hint" id="modehint">Pozostali członkowie oddziału są sterowani przez AI i wykonują twoje rozkazy.</div>
   <div class="mm-nav"><button class="mm-i on" id="scen-next">ODPRAWA</button><button class="mm-i" data-go="menu">WRÓĆ</button><span class="mm-r">← → WYBÓR · ENTER</span></div>
@@ -257,7 +257,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
  <div id="scr-gear" class="screen hidden">
   <div class="h2">Wyposażenie oddziału</div>
   <div class="row" id="gear-cards"></div>
-  <div class="hint">Kliknij opcję, aby ją wybrać. Ciężka kamizelka: częściej rana zamiast śmierci, wolniej · Tarcza: zatrzymuje kule z przodu, tylko pistolet · Gaz: klawisz G, obezwładnia z bliska · Taran: otwiera każde drzwi, głośno</div>
+  <div class="hint">Kliknij opcję, aby ją wybrać. Ciężka kamizelka: częściej rana zamiast śmierci, wolniej · Tarcza: zatrzymuje kule z przodu, tylko broń krótka · Gaz: klawisz G, obezwładnia z bliska · Taran: otwiera każde drzwi, głośno</div>
   <div class="row" style="margin-top:calc(var(--u)*5)"><button class="btn" id="gear-back">‹ Odprawa</button><button class="btn" id="go-mission">Rozpocznij operację</button></div>
  </div>
  <div id="scr-ctrl" class="screen hidden">
@@ -491,7 +491,7 @@ function ambient(outdoor,hum,tension,menu,heli){if(!A.ctx||!A.rainG)return;const
   const lfo=c.createOscillator();lfo.type='sawtooth';lfo.frequency.value=11.5;const lg=c.createGain();lg.gain.value=.5;lfo.connect(lg);lg.connect(am.gain);hs.connect(hl);hl.connect(am);am.connect(A.heliG);
   const wh=c.createOscillator();wh.frequency.value=1870;const wg=c.createGain();wg.gain.value=.012;wh.connect(wg);wg.connect(A.heliG);A.heliG.connect(A.master);hs.start();lfo.start();wh.start();}
  A.tensG.gain.setTargetAtTime(menu?.06:.035+tension*.09,t,1.5);A.heliG.gain.setTargetAtTime(menu?0:(heli||0),t,1);
- const morn=!menu&&isPat()&&W8()!=='rain';if(menu||!G.running||!LD().sounds){for(const k of ['dreadG','tvG','flyG'])if(A[k])A[k].gain.setTargetAtTime(0,t,.6);}A.rainG.gain.setTargetAtTime(menu?.03:morn?0:(outdoor?.075:.02),t,.6);
+ const morn=!menu&&isPat()&&W8()!=='rain';if(menu||!G.running||!LD().sounds){for(const k of ['dreadG','tvG','flyG'])if(A[k])A[k].gain.setTargetAtTime(0,t,.6);}const wnd=!menu&&isPat()&&(W8()==='dust'||W8()==='snow'||W8()==='fog');A.rainG.gain.setTargetAtTime(menu?.03:wnd?(outdoor?.035:.008):morn?0:(outdoor?.075:.02),t,.6);
  A.windG.gain.setTargetAtTime(menu?.08:(outdoor?(morn?.12:.16):.07),t,.8);
  A.droneG.gain.setTargetAtTime(menu?.035:.045+tension*.06,t,1);
  A.humG.gain.setTargetAtTime(hum*.02,t,.1);if(A.scanG)A.scanG.gain.setTargetAtTime(menu?.16:0,t,menu?1.5:.4);}
@@ -880,10 +880,10 @@ const WEAP={
  rifle:{n:'Karabinek M4A1',mag:30,rate:.11,auto:1,spread:.035,range:22,snd:'rifle',rl:2.2,pel:1,noise:22,len:9,thick:1},
  smg:{n:'PM MP5',mag:30,rate:.085,auto:1,spread:.05,range:18,snd:'smg',rl:2,pel:1,noise:18,len:7,thick:1},
  shotgun:{n:'Strzelba M870',mag:7,rate:.75,auto:0,spread:.13,range:11,snd:'shotgun',rl:3,pel:7,noise:24,len:9,thick:1},
- pistol:{n:'Pistolet Glock 17',mag:17,rate:.2,auto:0,spread:.045,range:16,snd:'pistol',rl:1.6,pel:1,noise:16,len:5},
- silenced:{n:'Pistolet z tłumikiem',mag:15,rate:.22,auto:0,spread:.03,range:16,snd:'silenced',rl:1.6,pel:1,noise:3,len:7},
+ pistol:{n:'Glock 17',mag:17,rate:.2,auto:0,spread:.045,range:16,snd:'pistol',rl:1.6,pel:1,noise:16,len:5},
+ silenced:{n:'Broń z tłumikiem',mag:15,rate:.22,auto:0,spread:.03,range:16,snd:'silenced',rl:1.6,pel:1,noise:3,len:7},
  eRifle:{n:'AK',mag:30,rate:.15,auto:1,spread:.085,range:18,snd:'enemy',rl:2.6,pel:1,noise:22,len:9,thick:1},
- ePistol:{n:'Pistolet',mag:12,rate:.4,auto:0,spread:.08,range:14,snd:'epistol',rl:1.8,pel:1,noise:18,len:5},
+ ePistol:{n:'Broń krótka',mag:12,rate:.4,auto:0,spread:.08,range:14,snd:'epistol',rl:1.8,pel:1,noise:18,len:5},
 };
 const SPECS=[
  {id:'lead',name:'SGT. WALKER',role:'Team Leader',weap:'rifle',fov:74,range:9,acc:'#c9b458',ab:'Okrzyk „Policja! Na ziemię!” — cywile się poddają, zaskoczeni lub oszołomieni napastnicy mogą rzucić broń.',ps:'Lider oddziału. Rozkazy, zatrzymania.'},
@@ -1702,19 +1702,19 @@ F('mailbox',1,1,0,0,(g,x,y)=>{P(g,x+6,y+12,5,2,SH);P(g,x+8,y+4,1,9,'#4a4a4a');P(
 F('hydrant',1,1,1,0,(g,x,y)=>{P(g,x+5,y+11,7,3,SH);P(g,x+6,y+4,5,8,'#a82a20');P(g,x+5,y+6,7,2,'#c03a30');P(g,x+7,y+3,3,1,'#c03a30');});
 F('grill',1,1,1,0,(g,x,y)=>{P(g,x+3,y+12,10,3,SH);P(g,x+4,y+4,9,7,'#2a2a2c');P(g,x+5,y+5,7,1,'#4a4a4c');P(g,x+5,y+7,7,1,'#4a4a4c');P(g,x+4,y+11,1,2,'#222');P(g,x+12,y+11,1,2,'#222');});
 // detailed police cruiser (top-down, facing east)
-F('police',3,2,1,0,(g,x,y)=>{
+F('police',3,2,1,0,(g,x,y)=>{const K=Object.assign({b:'#e6e8ea',hi:'#f6f7f8',lo:'#a8acb0',e:'#16181b',r:'#dfe2e4',rh:'#f0f2f3',rl:'#b8bcc0',s:null},(typeof LD==='function'&&LD().car)||{});
  P(g,x+3,y+24,44,4,SH);
  for(const wx of [8,35]){P(g,x+wx,y+6,7,2,'#0e0e10');P(g,x+wx,y+24,7,2,'#0e0e10');P(g,x+wx+2,y+6,3,1,'#3a3a3e');P(g,x+wx+2,y+25,3,1,'#3a3a3e');}
- P(g,x+2,y+8,44,16,'#e6e8ea');P(g,x+3,y+8,42,1,'#f6f7f8');P(g,x+2,y+23,44,1,'#a8acb0');
- P(g,x+2,y+8,10,16,'#16181b');P(g,x+34,y+8,12,16,'#16181b');P(g,x+3,y+9,8,1,'#2c3036');P(g,x+35,y+9,10,1,'#2c3036');P(g,x+37,y+15,8,1,'#24282c');
+ P(g,x+2,y+8,44,16,K.b);P(g,x+3,y+8,42,1,K.hi);P(g,x+2,y+23,44,1,K.lo);
+ P(g,x+2,y+8,10,16,K.e);P(g,x+34,y+8,12,16,K.e);P(g,x+3,y+9,8,1,'#2c3036');P(g,x+35,y+9,10,1,'#2c3036');P(g,x+37,y+15,8,1,'#24282c');
  P(g,x+46,y+10,2,12,'#2a2c30');P(g,x+46,y+11,1,10,'#44484e');
  P(g,x+45,y+9,1,2,'#f4f0d8');P(g,x+45,y+21,1,2,'#f4f0d8');P(g,x+2,y+9,1,2,'#c0201a');P(g,x+2,y+21,1,2,'#c0201a');
  P(g,x+29,y+9,5,14,'#1a2a38');P(g,x+30,y+10,1,5,'#4a6a84');P(g,x+11,y+10,3,12,'#1a2a38');P(g,x+12,y+11,1,4,'#3a5468');
- P(g,x+14,y+9,15,14,'#dfe2e4');P(g,x+14,y+9,15,1,'#f0f2f3');P(g,x+14,y+22,15,1,'#b8bcc0');
+ P(g,x+14,y+9,15,14,K.r);P(g,x+14,y+9,15,1,K.rh);P(g,x+14,y+22,15,1,K.rl);
  P(g,x+20,y+8,3,16,'#1a1c1f');P(g,x+21,y+9,1,6,'#c4241c');P(g,x+21,y+17,1,6,'#1f4fd0');P(g,x+21,y+15,1,2,'#e8e8e8');
- P(g,x+29,y+6,2,2,'#16181b');P(g,x+29,y+24,2,2,'#16181b');
+ P(g,x+29,y+6,2,2,K.e);P(g,x+29,y+24,2,2,K.e);
  P(g,x+24,y+8,1,1,'#9ca0a4');P(g,x+24,y+23,1,1,'#9ca0a4');P(g,x+16,y+8,3,1,'#c09a28');P(g,x+16,y+23,3,1,'#c09a28');
- P(g,x+40,y+12,1,8,'#22262a');P(g,x+8,y+15,1,1,'#888');});
+ P(g,x+40,y+12,1,8,'#22262a');P(g,x+8,y+15,1,1,'#888');if(K.s){P(g,x+12,y+8,22,1,K.s);P(g,x+12,y+23,22,1,K.s);P(g,x+12,y+7,22,1,K.s);P(g,x+12,y+24,22,1,K.s);}});
 
 // ---- level switch ----
 G.lvl='house';ROOMS=ROOMS_HOUSE;DOORS=DOORS_HOUSE;FURN=FURN_HOUSE;LAMPS=LAMPS_HOUSE;CAMS=[];
@@ -1976,7 +1976,7 @@ function checkId(u){const H=G.h;H.idChecked=true;const s=H.s;turnTo(s,Math.atan2
  say(u.name,'Poproszę jakiś dokument tożsamości.');say('ETHAN HARTLEY','...Proszę. Prawo jazdy.');
  setTimeout(()=>{if(G.ended)return;idPortrait();$('idcard').classList.add('on');setTimeout(()=>$('idcard').classList.remove('on'),6500);},2600);
  setTimeout(()=>{if(G.ended)return;radio(u.name,'Dispatch, 2-Adam-14. Sprawdźcie osobę: Hartley, Ethan, urodzony czternastego marca dwa tysiące sześć.',{radio:1});
-  setTimeout(()=>{if(!G.ended){radio('DISPATCH','2-Adam-14, Hartley Ethan — bez notowań. Na ten adres zarejestrowany pistolet. Właściciel: Richard Hartley.');logEv('Dispatch: brak notowań, pod adresem zarejestrowana broń ojca');}},5200);},9200);}
+  setTimeout(()=>{if(!G.ended){radio('DISPATCH','2-Adam-14, Hartley Ethan — bez notowań. Na ten adres zarejestrowana broń. Właściciel: Richard Hartley.');logEv('Dispatch: brak notowań, pod adresem zarejestrowana broń ojca');}},5200);},9200);}
 // ---- 911 call briefing ----
 const CALL=[['D','911, jaki jest adres zdarzenia?'],['C','Oakridge Lane, dwieście dziesięć. Ale to nie u mnie... to u sąsiadów, pod dwieście czternaście.'],['D','Dobrze. Co się tam dzieje?'],
  ['C','Słyszałam krzyki. Kobieta krzyczała... a potem były dwa huki. Jakby strzały.'],['D','Kiedy to było?'],['C','Kilka minut temu. Teraz jest zupełnie cicho.'],
@@ -2030,19 +2030,19 @@ LVL.house={id:'house',patrol:true,sounds:true,weather:'morning',autumn:true,ext:
  nb:{no:'#26-118-0457',pri:'P1',code:'10-71',small:'ADRES ZDARZENIA',addr:'214 OAKRIDGE<br>LANE',facts:[['JEDNOSTKA','2-Adam-14 · Ofc. Miller, Ofc. Ortiz'],['GODZINA','06:40'],['ZADANIE','Sprawdzić zgłoszenie']],
   title:'911 · ZAPIS ROZMOWY',clock:[5,52,14],who:{D:'DYSPOZYTOR',C:'ZGŁASZAJĄCA'},bg:[27,34.2,24,13.5],get call(){return CALL;}}};
 function setLevel(l){G.lvl=l;const d=LD();
- ROOMS=d.rooms;DOORS=d.doors;FURN=d.furn;LAMPS=d.lamps;CAMS=d.cams||[];ENTRIES=d.entries;G.entry=0;OUTM=null;INM=null;SUNM=null;
+ ROOMS=d.rooms;DOORS=d.doors;FURN=d.furn;LAMPS=d.lamps;CAMS=d.cams||[];ENTRIES=d.entries;G.entry=0;OUTM=null;SNOWC=null;INM=null;SUNM=null;
  buildMap();bakeWorld();LV.doorRows=null;_wf=null;G.devs=null;}
 // ---- outdoor mask (daylight / moonlight reaches outdoor tiles) ----
 function buildOUTM(){OUTM=document.createElement('canvas');OUTM.width=MW*TS;OUTM.height=MH*TS;const og=OUTM.getContext('2d');og.fillStyle='#fff';
  const od=(x,y)=>{const t=tAt(x,y);return t===T.GRASS||t===T.ASPH;};
  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=tAt(x,y);if(od(x,y))og.fillRect(x*TS,y*TS,TS,TS);else if((t===T.WALL||t===T.WIN)&&od(x,y+1))og.fillRect(x*TS,(y-1)*TS+4,TS,TS+12);}}
-function weatherAlpha(){return{morning:.76,night:.18,rain:.1,indoor:.3,day:.8}[W8()]||0;}
-function weatherTint(){return{morning:'#cfccc6',night:'#6f7a92',rain:'#8a94a8',indoor:'#bdb8b0',day:'#e2ddd4'}[W8()]||'#c4ccd6';}
+function weatherAlpha(){return{morning:.76,night:.18,rain:.1,indoor:.3,day:.8,fog:.22,snow:.5,dust:.2}[W8()]||0;}
+function weatherTint(){return{morning:'#cfccc6',night:'#6f7a92',rain:'#8a94a8',indoor:'#bdb8b0',day:'#ece2d0',fog:'#8e949a',snow:'#b4bccc',dust:'#c09a7a'}[W8()]||'#c4ccd6';}
 function nightFx(c){const v=c.createRadialGradient(VW/2,VH/2,VH*.3,VW/2,VH/2,VW*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(2,3,8,.55)');c.fillStyle=v;c.fillRect(0,0,VW,VH);}
 function indoorFx(c){const v=c.createRadialGradient(VW/2,VH/2,VH*.35,VW/2,VH/2,VW*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(4,3,2,.45)');c.fillStyle=v;c.fillRect(0,0,VW,VH);}
 // ---- shared patrol helpers ----
-function spawnPatrolPair(E,names){const L=[{spec:'lead',name:(names&&names[0])||'OFC. MILLER',pal:PAL.patrolA,o:[0,-.5]},{spec:'scout',name:(names&&names[1])||'OFC. ORTIZ',pal:PAL.patrolB,o:[-.9,.6]}];
- L.forEach((d,i)=>{const u=new Unit({team:'squad',spec:d.spec,name:d.name,role:'Patrol Officer',weap:'pistol',fov:84,range:10,acc:'#d8b048',pal:d.pal,patrol:true,charges:0,flash:0,sed:0,shoutCd:0,armor:'light',spray:2});
+function spawnPatrolPair(E,names){const cr=LD().crew||{};names=names||cr.names;const pA=cr.uni?Object.assign({},PAL.patrolA,cr.uni):PAL.patrolA,pB=cr.uni?Object.assign({},PAL.patrolB,cr.uni):PAL.patrolB;const L=[{spec:'lead',name:(names&&names[0])||'OFC. MILLER',pal:pA,o:[0,-.5]},{spec:'scout',name:(names&&names[1])||'OFC. ORTIZ',pal:pB,o:[-.9,.6]}];
+ L.forEach((d,i)=>{const u=new Unit({team:'squad',spec:d.spec,name:d.name,role:cr.role||'Patrol Officer',weap:'pistol',fov:84,range:10,acc:'#d8b048',pal:d.pal,patrol:true,charges:0,flash:0,sed:0,shoutCd:0,armor:'light',spray:2});
   u.x=E.x*TS+8+d.o[1]*TS;u.y=E.y*TS-d.o[0]*TS;u.ang=E.a;u.heading=E.a;u.holster=!E.drawn;unstick(u);G.squad[i]=u;G.units.push(u);});}
 function mkNPC(o){const u=new Unit(Object.assign({team:'civ',r:4,state:'idle'},o));u.x=o.tx*TS+8;u.y=o.ty*TS+8;u.ang=o.a||0;u.room=LV.room[I(o.tx,o.ty)];G.civs.push(u);G.units.push(u);return u;}
 function mkEnemy(o){const e=new Unit(Object.assign({team:'enemy',fov:115,range:8,name:'Podejrzany'},o));e.x=o.tx*TS+8;e.y=o.ty*TS+8;e.ang=o.a||0;e.home={x:e.x,y:e.y,a:e.ang,st:o.st||'guard'};e.state=e.home.st;G.enemies.push(e);G.units.push(e);return e;}
@@ -2082,6 +2082,26 @@ function extWall(g,x,y,tx,ty,r){const k=LD().ext;
  else if(k==='concrete'){P(g,x,y,16,WH,'#6e7276');for(let i=0;i<16;i+=8)P(g,x+i,y,1,WH,'#5a5e62');P(g,x,y,16,1,'#8e9296');P(g,x,y+WH-1,16,1,'#3a3e42');}
  else{P(g,x,y,16,WH,'#3a3d40');P(g,x,y,16,1,'#55595e');}}
 
+// ---- extra weather: fog / snow / dust ----
+const WXP=[];for(let i=0;i<150;i++)WXP.push({x:Math.random()*VW,y:Math.random()*VH,s:Math.random(),ph:Math.random()*6.28});
+const FOGB=[];for(let i=0;i<14;i++)FOGB.push({x:Math.random()*1.4-.2,y:Math.random()*1.4-.2,r:50+Math.random()*70,v:.004+Math.random()*.006});
+var SNOWC=null;
+function snowCover(){if(SNOWC||!OUTM)return SNOWC;SNOWC=document.createElement('canvas');SNOWC.width=OUTM.width;SNOWC.height=OUTM.height;const g=SNOWC.getContext('2d');g.drawImage(OUTM,0,0);g.globalCompositeOperation='source-in';g.fillStyle='rgba(225,232,242,.42)';g.fillRect(0,0,SNOWC.width,SNOWC.height);
+ g.globalCompositeOperation='source-atop';const r=rng(7);for(let i=0;i<2600;i++){g.fillStyle=r()<.5?'rgba(255,255,255,.35)':'rgba(170,185,205,.3)';g.fillRect(r()*SNOWC.width|0,r()*SNOWC.height|0,2,1);}return SNOWC;}
+function drawWeather(c,cx,cy){const w=W8(),dt=1/60;
+ if(w==='snow'){const sc=snowCover();if(sc)c.drawImage(sc,cx,cy,VW,VH,0,0,VW,VH);const wind=6+Math.sin(G.time*.2)*8;
+  for(const p of WXP){p.ph+=dt*(1+p.s);p.y+=(12+p.s*20)*dt;p.x+=(wind+Math.sin(p.ph)*6)*dt;if(p.y>VH+2){p.y=-2;p.x=Math.random()*VW;}if(p.x>VW+2)p.x=-2;if(p.x<-2)p.x=VW+2;if(!isOutdoor(p.x+cx,p.y+cy+6))continue;c.fillStyle=p.s>.6?'rgba(240,244,250,.9)':'rgba(220,228,240,.6)';c.fillRect(p.x|0,p.y|0,p.s>.75?2:1,p.s>.75?2:1);}}
+ else if(w==='dust'){const wind=70+Math.sin(G.time*.4)*40;
+  for(const p of WXP){p.x+=(wind*(.5+p.s))*dt;p.y+=Math.sin(p.ph+=dt*2)*6*dt+4*dt;if(p.x>VW+2){p.x=-2;p.y=Math.random()*VH;}if(p.y>VH)p.y=0;if(!isOutdoor(p.x+cx,p.y+cy+6))continue;c.fillStyle=p.s>.5?'rgba(200,160,110,.5)':'rgba(160,120,80,.4)';c.fillRect(p.x|0,p.y|0,p.s>.8?2:1,1);}
+  if(((G.time*.13)%1)<.02&&Math.random()<.5){}}
+ else if(w==='fog'){c.globalCompositeOperation='lighter';for(const b of FOGB){b.x+=b.v*dt;if(b.x>1.3)b.x=-.3;const x=b.x*VW-(cx*.15)%VW,y=b.y*VH,g=c.createRadialGradient(x,y,0,x,y,b.r);g.addColorStop(0,'rgba(90,96,104,.16)');g.addColorStop(1,'rgba(90,96,104,0)');c.fillStyle=g;c.fillRect(x-b.r,y-b.r,b.r*2,b.r*2);}c.globalCompositeOperation='source-over';}}
+function weatherPost(c){const w=W8();
+ if(w==='fog'){c.fillStyle='rgba(120,128,138,.13)';c.fillRect(0,0,VW,VH);nightFx(c);}
+ else if(w==='dust'){c.fillStyle='rgba(60,30,10,.08)';c.fillRect(0,0,VW,VH);nightFx(c);}
+ else if(w==='snow'){c.fillStyle='rgba(150,170,200,.06)';c.fillRect(0,0,VW,VH);indoorFx(c);}
+ else if(w==='day'){}
+ else if(w==='night')nightFx(c);else indoorFx(c);}
+
 // ================= MISSION 02: MILE MARKER 41 (night traffic stop) =================
 WEAP.eShot={n:'Strzelba',mag:5,rate:.95,auto:0,spread:.14,range:10,snd:'shotgun',rl:3,pel:7,noise:24,len:9,thick:1};
 const ROAD_Y0=26,ROAD_Y1=31;
@@ -2097,7 +2117,7 @@ const ROOMS_ROAD=[];const DOORS_ROAD=[];const FURN_ROAD=[];
  for(let x=2;x<30;x+=1)if(x%5)F_('fence',x,22);
  for(const[x,y]of[[20,35],[52,35],[58,24],[8,35]])F_('puddle',x,y);}
 const LAMPS_ROAD=[[37,32,0,'#f4f0d8',64],[38,33,0,'#f4f0d8',52]];
-const ENTRIES_ROAD=[{n:'State Route 9',s:'Radiowóz za zatrzymanym pojazdem.',x:35.5,y:34.6,a:0,px:35,py:34}];
+const ENTRIES_ROAD=[{n:'Highway 287',s:'Radiowóz za zatrzymanym pojazdem.',x:35.5,y:34.6,a:0,px:35,py:34}];
 function roadTerrain(M,set,fillR,H,V){fillR(0,ROAD_Y0,79,ROAD_Y1,T.ASPH,'asph');fillR(0,24,79,25,T.ASPH,'conc');fillR(0,32,79,33,T.ASPH,'conc');}
 function roadWindows(){}
 F('laneY',1,1,0,0,(g,x,y)=>{P(g,x+2,y+14,11,2,'rgba(200,170,60,.75)');});
@@ -2116,8 +2136,8 @@ function roadScen(){}
 function startRoad(){G.hostage=null;G.deadline=1e9;
  G.h={stage:'stop',approach:null,docs:false,plates:false,lic:false,k9T:null,knockT:2,knocks:0,peek:false,twist:null,trunk:false,girl:false,drv:null,said:{},t:0,truckT:12,endT:null,res:null};
  G.truck=null;G.car={x:40*TS,y:32*TS,vx:0,vy:0,ang:0,mode:'parked',spr:mkSedan()};carTiles(true);
- G.police=[];logEv('2-Adam-14: zatrzymanie pojazdu, SR-9, mila 41');
- setTimeout(()=>{radio('DISPATCH','2-Adam-14, przyjęłam zatrzymanie o pierwszej dwanaście. Najbliższe wsparcie piętnaście minut od was.');},600);}
+ G.police=[];logEv('WHP 14: zatrzymanie pojazdu, US-287, mila 41');
+ setTimeout(()=>{radio('DISPATCH','WHP 14, przyjęłam zatrzymanie o pierwszej dwanaście. Najbliższe wsparcie piętnaście minut od was.');},600);}
 const RD={drvWin:()=>({x:G.car.x+30,y:G.car.y-8}),pasWin:()=>({x:G.car.x+30,y:G.car.y+40}),rearWin:()=>({x:G.car.x+14,y:G.car.y+40}),trunk:()=>({x:G.car.x-8,y:G.car.y+16}),mdt:()=>({x:34*TS+8,y:34*TS+4})};
 function roadInteract(u){const H=G.h,C=G.car;if(!H)return null;
  if(H.stage==='stop'){
@@ -2144,11 +2164,11 @@ function showDaleId(){if(G.ended)return;const el=$('idcard');el.innerHTML='<div 
  const c=$('idph'),g=c.getContext('2d');P(g,0,0,18,22,'#a8b4bc');P(g,3,15,12,7,'#4a4a3a');P(g,7,12,4,4,'#b08868');P(g,5,4,8,10,'#c49a7c');P(g,5,2,8,3,'#8a7050');P(g,6,8,2,1,'#2a2a3a');P(g,10,8,2,1,'#2a2a3a');P(g,7,11,4,1,'#8a5a4a');P(g,6,12,6,1,'#7a6a50');
  el.classList.add('on');setTimeout(()=>el.classList.remove('on'),6500);}
 function mdtMenu(u){const H=G.h;const it=[];
- it.push({t:'Sprawdź tablice rejestracyjne',dis:H.plates,f:()=>{H.plates=true;radio(u.name,'Dispatch, 2-Adam-14, proszę sprawdzić tablice Indiany: Lincoln-Mary-siedem-dwa-cztery-jeden.',{radio:1});setTimeout(()=>{if(G.ended)return;radio('DISPATCH','2-Adam-14, tablice na srebrną Toyotę Camry. Właścicielka: Margaret Lindqvist z Millbrook. Zgłoszona jako zaginiona wczoraj wieczorem, razem z córką, Lily, szesnaście lat.');logEv('Dispatch: właścicielka auta i jej córka zaginione');},5200);}});
+ it.push({t:'Sprawdź tablice rejestracyjne',dis:H.plates,f:()=>{H.plates=true;radio(u.name,'Dispatch, WHP 14, proszę sprawdzić tablice Indiany: Lincoln-Mary-siedem-dwa-cztery-jeden.',{radio:1});setTimeout(()=>{if(G.ended)return;radio('DISPATCH','WHP 14, tablice na srebrną Toyotę Camry. Właścicielka: Margaret Lindqvist z Millbrook. Zgłoszona jako zaginiona wczoraj wieczorem, razem z córką, Lily, szesnaście lat.');logEv('Dispatch: właścicielka auta i jej córka zaginione');},5200);}});
  it.push({t:'Sprawdź prawo jazdy kierowcy',dis:!H.docs||H.lic,f:()=>{H.lic=true;radio(u.name,'Dispatch, sprawdźcie osobę: Pruitt, Dale, dziewiąty wrzesień siedemdziesiąt dziewięć.',{radio:1});setTimeout(()=>{if(G.ended)return;radio('DISPATCH','Pruitt Dale, prawo jazdy ważne. Wyrok sprzed ośmiu lat za napaść i pozbawienie wolności. Obecnie bez nakazów.');logEv('Dispatch: kierowca karany za pozbawienie wolności');},5200);}});
  it.push({t:'Wezwij jednostkę K-9',dis:H.k9T!=null,f:()=>{H.k9T=0;radio(u.name,'Dispatch, proszę o jednostkę K-9 na mile czterdzieści jeden.',{radio:1});setTimeout(()=>{if(!G.ended)radio('DISPATCH','K-9 w drodze, będą za około sześć minut.');},4200);logEv('Wezwano K-9');}});
  it.push({t:'Poproś o wsparcie',dis:H.said.bk,f:()=>{H.said.bk=1;radio(u.name,'Dispatch, prośba o drugą jednostkę.',{radio:1});setTimeout(()=>{if(!G.ended)radio('DISPATCH','Najbliższa jednostka to 3-Baker-9, piętnaście minut od was.');},4000);}});
- choiceMenu('Radiowóz 2-Adam-14',it);}
+ choiceMenu('Radiowóz WHP 14',it);}
 function peekBack(u){const H=G.h;H.peek=true;logEv('Dziewczyna na tylnym siedzeniu ma związane ręce');say(u.name,'Dziewczyna z tyłu nie śpi. Patrzy prosto w latarkę... ma taśmę na nadgarstkach.');say('KIEROWCA','Proszę nie świecić jej po oczach. Mówiłem, że jest zmęczona.');}
 function trunkMenu(u){const H=G.h;choiceMenu('Tył pojazdu',[{t:'Nasłuchuj przy bagażniku',f:()=>{trunkKnock(true);say(u.name,'...Coś stuknęło w bagażniku.');}},{t:'„Proszę otworzyć bagażnik.”',f:()=>{say(u.name,'Proszę otworzyć bagażnik.');say('KIEROWCA','Nie ma pan nakazu.');H.said.trunkAsk=1;H.nervous=(H.nervous||0)+1;if(H.plates||H.peek||H.knocks>1)setTimeout(()=>roadTwist(u),1600);}}]);}
 function trunkKnock(force){const H=G.h,tk=RD.trunk();H.knocks++;const o=out(tk.x,tk.y,.5,{rev:.05});if(o&&A.ctx){const t0=A.ctx.currentTime;for(let k=0;k<3;k++){nz(o,t0+k*.2,.07,{brown:1,type:'lowpass',f:300,g:1});tone(o,t0+k*.2,.06,{f:90,f2:60,g:.6});}}
@@ -2158,7 +2178,7 @@ function roadTwist(u){const H=G.h;if(H.stage!=='stop'||G.ended)return;H.stage='t
  const near=G.squad.some(q=>q&&q.alive&&dist(q.x,q.y,G.car.x+24,G.car.y+16)<TS*2.4);
  H.twist=(near&&Math.random()<.6)||H.said.trunkAsk?'gun':'flee';
  if(H.twist==='gun'){spawnDriver(G.car.x+30,G.car.y-10);say('KIEROWCA','Nie zabierzecie mi ich!');const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Broń! Ma strzelbę!');}
- else{G.car.mode='flee';G.car.vx=40;say('KIEROWCA','...');const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Ucieka! Rusza!');radio(G.p1.name,'Dispatch, 2-Adam-14, pojazd ucieka na wschód, State Route 9!',{radio:1});}
+ else{G.car.mode='flee';G.car.vx=40;say('KIEROWCA','...');const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Ucieka! Rusza!');radio(G.p1.name,'Dispatch, WHP 14, pojazd ucieka na wschód, Highway 287!',{radio:1});}
  logEv(H.twist==='gun'?'Kierowca wyskakuje ze strzelbą':'Kierowca ucieka autem');}
 function spawnDriver(x,y){const H=G.h;const e=mkEnemy({tx:x/TS|0,ty:y/TS|0,weap:'eShot',pal:{body:'#4a4a3a',legs:'#2a2e3a',head:'#c49a7c',face:'#c49a7c',visor:'#2a1a12',hair:'#8a7050',skin:'#c49a7c',eyes:1},name:'Dale Pruitt',kind:'suspect',st:'guard'});
  e.x=x;e.y=y;unstick(e);const q=nearestSquad(e);e.state='search';e.goal={x:q?q.x:x,y:q?q.y:y};e.searchT=6;e.arrived=false;e.react=.45;H.drv=e;return e;}
@@ -2200,16 +2220,16 @@ function roadRender(c,cx,cy){const C=G.car;if(!C)return;const x=C.x-cx,y=C.y-cy;
  if(G.truck){const t=G.truck,tx=t.x-cx,ty=t.y-cy;c.globalCompositeOperation='source-over';P(c,tx,ty,70,26,'#2a2c30');P(c,tx,ty,14,26,'#4a2a20');P(c,tx+14,ty+2,56,22,'#5a5e64');c.globalCompositeOperation='lighter';const g2=c.createRadialGradient(tx-20,ty+13,0,tx-20,ty+13,60);g2.addColorStop(0,'rgba(255,250,220,.35)');g2.addColorStop(1,'rgba(255,250,220,0)');c.fillStyle=g2;c.fillRect(tx-80,ty-47,120,120);}
  c.globalCompositeOperation='source-over';}
 function roadObj(){const H=G.h;if(!H)return'';const e=H.drv,done=e&&(!e.alive||e.state==='cuffed');
- return objRows('2-ADAM-14 · STATE ROUTE 9',[[H.docs,'Kontrola drogowa'],H.stage==='twist'?[done,'Zatrzymaj kierowcę']:null,H.stage==='twist'&&(H.trunk||H.girl||done)?[H.trunk&&H.girl,'Udziel pomocy pasażerom']:null]);}
+ return objRows('WHP 14 · HIGHWAY 287',[[H.docs,'Kontrola drogowa'],H.stage==='twist'?[done,'Zatrzymaj kierowcę']:null,H.stage==='twist'&&(H.trunk||H.girl||done)?[H.trunk&&H.girl,'Udziel pomocy pasażerom']:null]);}
 function roadDebrief(){const H=G.h||{};const e=H.drv;const drv=!e?'—':!e.alive?'nie żyje':e.state==='cuffed'?'zatrzymany':'zbiegł';
  let sc=0;if(H.approach==='pas')sc+=10;if(H.plates)sc+=10;if(H.peek)sc+=5;if(H.lic)sc+=5;if(e&&e.alive&&e.state==='cuffed')sc+=15;
  patrolDebrief([['Podejście do auta',H.approach==='pas'?'od strony pasażera (bezpieczne)':H.approach==='drv'?'od strony kierowcy (od jezdni)':'—'],['Sprawdzone tablice',H.plates?'tak':'nie'],['Kierowca',drv],['Margaret Lindqvist',H.trunk?'uratowana':'—'],['Lily Lindqvist',H.girl?'uratowana':'—']],sc);}
-LVL.road={id:'road',patrol:true,weather:'night',ext:'none',terrain:roadTerrain,windows:roadWindows,rooms:ROOMS_ROAD,doors:DOORS_ROAD,furn:FURN_ROAD,lamps:LAMPS_ROAD,cams:[],entries:ENTRIES_ROAD,
+LVL.road={id:'road',patrol:true,weather:'fog',crew:{role:'State Trooper',shout:'State Police! Hands!',names:['TPR. HALE','TPR. DIETZ'],uni:{body:'#5c4a34',legs:'#2c2a26',acc:'#d8b048'}},car:{b:'#1c1d20',hi:'#34363a',lo:'#0e0f11',e:'#c8a860',r:'#e4e2da',rh:'#f2f0e8',rl:'#b8b4a8',s:'#c8a860'},ext:'none',terrain:roadTerrain,windows:roadWindows,rooms:ROOMS_ROAD,doors:DOORS_ROAD,furn:FURN_ROAD,lamps:LAMPS_ROAD,cams:[],entries:ENTRIES_ROAD,
  start:startRoad,update:updateRoad,interact:roadInteract,render:roadRender,stress:roadStress,obj:roadObj,debrief:roadDebrief,
- win:'2-Adam-14, przyjęłam. Karetka i detektywi są w drodze. Dobra robota.',planTitle:'STATE ROUTE 9 · MILA 41',
- nb:{no:'#26-119-0112',pri:'P3',code:'10-38',small:'MIEJSCE',addr:'STATE ROUTE 9<br>MILE MARKER 41',facts:[['JEDNOSTKA','2-Adam-14 · Ofc. Miller, Ofc. Ortiz'],['GODZINA','01:12'],['POWÓD','Niesprawne tylne światło']],
-  title:'RADIO · ZAPIS',clock:[1,11,40],who:{D:'DISPATCH',C:'2-ADAM-14'},bg:[26,20,28,15.75],
-  call:[['C','2-Adam-14, zatrzymanie pojazdu, State Route 9 przy mili czterdziestej pierwszej.'],['D','2-Adam-14, przyjęłam. Opis pojazdu?'],['C','Srebrna Toyota Camry, tablice Indiany, Lincoln-Mary-siedem-dwa-cztery-jeden. Kierowca i chyba jeden pasażer z tyłu.'],['D','Przyjęłam, zatrzymanie o pierwszej dwanaście.'],['C','Przyjąłem. Podchodzimy.']]}};
+ win:'WHP 14, przyjęłam. Karetka i detektywi są w drodze. Dobra robota.',planTitle:'HIGHWAY 287 · MILA 41',
+ nb:{no:'#26-119-0112',pri:'P3',code:'10-38',small:'MIEJSCE',addr:'HIGHWAY 287<br>MILE MARKER 41',facts:[['JEDNOSTKA','WHP 14 · Tpr. Hale, Tpr. Dietz'],['GODZINA','01:12'],['POWÓD','Niesprawne tylne światło']],
+  title:'RADIO · ZAPIS',clock:[1,11,40],who:{D:'DISPATCH',C:'WHP 14'},bg:[26,20,28,15.75],
+  call:[['C','WHP 14, zatrzymanie pojazdu, Highway 287 przy mili czterdziestej pierwszej.'],['D','WHP 14, przyjęłam. Opis pojazdu?'],['C','Srebrna Toyota Camry, tablice Indiany, Lincoln-Mary-siedem-dwa-cztery-jeden. Kierowca i chyba jeden pasażer z tyłu.'],['D','Przyjęłam, zatrzymanie o pierwszej dwanaście.'],['C','Przyjąłem. Podchodzimy.']]}};
 
 // ================= MISSION 03: WELFARE CHECK, APT 3B =================
 const ROOMS_APT=[
@@ -2222,7 +2242,7 @@ const DOORS_APT=[[39,23,1],[33,16,1],[39,16],[45,16],[22,23,1],[54,23,1],[65,23,
 const FURN_APT=[];
 {const F_=(...a)=>FURN_APT.push(a);
  // korytarz
- F_('stairs',11,24);F_('stairs',11,25);F_('stairs',11,26);F_('elev',16,24);F_('ladder',27,26);F_('bins',68,24);F_('doormat',39,24);F_('doormat',22,24);F_('doormat',54,24);F_('mail',38,24);F_('mail',40,25);F_('papers',30,26);F_('stain',47,25);
+ F_('stairs',11,24);F_('stairs',11,25);F_('stairs',11,26);F_('elev',16,24);F_('ladder',27,26);F_('bins',68,24);F_('doormat',39,24);F_('slush',13,25);F_('slush',16,25);F_('slush',19,26);F_('slush',23,25);F_('slush',28,25);F_('doormat',22,24);F_('doormat',54,24);F_('mail',38,24);F_('mail',40,25);F_('papers',30,26);F_('stain',47,25);
  // salon
  F_('rug',31,18,4,3);F_('tvOld',31,17);F_('armch',32,19);F_('tableS',34,19);F_('news',30,21);F_('news',30,22);F_('news',31,22);F_('news',36,22);F_('news',36,21);F_('bags',35,17);F_('deadplant',36,17);F_('papers',33,21);F_('bottle',34,20);
  // przedpokój
@@ -2247,6 +2267,7 @@ function aptTerrain(M,set,fillR,H,V){fillR(0,0,79,57,T.ASPH,'conc');fillR(11,11,
  for(let y=24;y<=26;y++)set(15,y,T.FLOOR);}
 function aptWindows(M,set){for(const x of[14,20,26,32,35,40,46,52,58,65])set(x,10,T.WIN);for(const x of[15,22,30,40,47,57,65])set(x,44,T.WIN);set(70,25,T.WIN);set(10,18,T.WIN);}
 // props
+F('slush',1,1,0,0,(g,x,y)=>{P(g,x+3,y+6,4,6,'rgba(150,170,190,.35)');P(g,x+4,y+7,2,4,'rgba(210,220,235,.3)');P(g,x+9,y+3,4,6,'rgba(150,170,190,.3)');P(g,x+10,y+4,2,4,'rgba(210,220,235,.28)');});
 F('stairs',1,1,0,0,(g,x,y)=>{for(let i=0;i<16;i+=4){P(g,x,y+i,16,3,'#3a3c3e');P(g,x,y+i+3,16,1,'#1e2022');}P(g,x+14,y,2,16,'#5a4a3a');});
 F('elev',1,1,1,1,(g,x,y)=>{P(g,x,y-10,16,25,'#5a5e62');P(g,x+1,y-9,14,23,'#7a7e82');P(g,x+7,y-9,1,23,'#4a4e52');P(g,x+3,y-4,10,5,'#e8e4c8');P(g,x+4,y-3,8,1,'#b02a20');P(g,x+4,y-1,8,1,'#b02a20');});
 F('ladder',1,1,1,0,(g,x,y)=>{P(g,x+3,y-8,2,22,'#8a8a84');P(g,x+11,y-8,2,22,'#8a8a84');for(let i=-6;i<14;i+=4)P(g,x+3,y+i,10,1,'#9a9a94');P(g,x+2,y+13,12,2,SH);});
@@ -2276,15 +2297,15 @@ function startApt(){G.hostage=null;G.deadline=1e9;
  G.h={t:0,knocked:false,inside:false,tvOn:true,key:false,body:false,clues:CLUES_APT.map(c=>({...c,found:false})),nf:0,said:{},gary:null,gStage:null,endT:null,res:null};
  const s=mkNPC({tx:26,ty:25,kind:'janitor',pal:{...PAL.janitor},state:'idle',a:Math.PI,name:'Alvarez'});G.h.sup=s;
  const b=new Unit({team:'civ',kind:'corpse',pal:{body:'#8a7a9a',legs:'#6a5a7a',head:'#9a8a7a',face:'#9a8a7a',visor:'#2a1a12',hair:'#c8c8c0',eyes:1},r:4});b.alive=false;b.pose='dead';b.deathT=9;b.fallA=-Math.PI/2;b.mseed=17;b.x=APT.body.x;b.y=APT.body.y;G.units.push(b);
- G.police=[];logEv('2-Adam-14: sprawdzenie, Pine Court, mieszkanie 3B');
- setTimeout(()=>{radio('DISPATCH','2-Adam-14, Pine Court Apartments, trzecie piętro, mieszkanie 3B. Sprawdzenie stanu lokatorki, Ruth Hensley, siedemdziesiąt osiem lat.');radio(G.p1.name,'Przyjąłem, jesteśmy na klatce.',{radio:1});},600);}
+ G.police=[];logEv('Beat 1123: sprawdzenie, Pine Court, mieszkanie 3B');
+ setTimeout(()=>{radio('DISPATCH','Beat 1123, Pine Court Apartments, trzecie piętro, mieszkanie 3B. Sprawdzenie stanu lokatorki, Ruth Hensley, siedemdziesiąt osiem lat.');radio(G.p1.name,'Przyjąłem, jesteśmy na klatce.',{radio:1});},600);}
 function aptInteract(u){const H=G.h;if(!H)return null;const d=LV.doorAt[I(39,23)],md=LV.doorAt[I(33,16)];
  if(d&&d.locked&&d.target===0&&nearPt(u,APT.door.x,APT.door.y,22)&&u.y>23*TS)return{k:'house',label:'Drzwi 3B',dur:0,f:aptDoorMenu};
  if(nearPt(u,APT.a3.x,APT.a3.y,20)&&u.y>23*TS&&!H.said.feld)return{k:'house',label:'Zapukaj do 3A',dur:0,f:feldman};
  if(H.sup.alive&&H.sup.state==='idle'&&nearPt(u,H.sup.x,H.sup.y,22)&&!H.said.sup)return{k:'house',label:'Porozmawiaj z dozorcą',dur:0,f:superTalk};
  if(H.tvOn&&nearPt(u,APT.tv.x,APT.tv.y,20))return{k:'house',label:'Wyłącz telewizor',dur:.5,f:()=>{H.tvOn=false;logEv('Telewizor wyłączony');say(u.name,'Cisza... teraz dopiero czuć ten zapach.');}};
  if(md&&md.locked&&nearPt(u,APT.mdoor.x,APT.mdoor.y,20))return H.key?{k:'house',label:'Otwórz kłódkę kluczykiem',dur:1.4,f:()=>openMom(u,false)}:{k:'house',label:'Kłódka — wyważ drzwi',dur:2.6,f:()=>openMom(u,true)};
- if(H.body&&!H.said.bodyLook&&nearPt(u,APT.body.x,APT.body.y,26))return{k:'house',label:'Przyjrzyj się',dur:.8,f:()=>{H.said.bodyLook=1;say(u.name,'To ona. Ruth Hensley. Nie żyje od dawna... tygodnie. Może miesiące.');radio(u.name,'Dispatch, 2-Adam-14. Mamy zwłoki w 3B, prawdopodobnie od kilku miesięcy. Potrzebny koroner i detektywi.',{radio:1});setTimeout(()=>{if(!G.ended)radio('DISPATCH','Przyjęłam, wysyłam. Zabezpieczcie mieszkanie.');},5000);}};
+ if(H.body&&!H.said.bodyLook&&nearPt(u,APT.body.x,APT.body.y,26))return{k:'house',label:'Przyjrzyj się',dur:.8,f:()=>{H.said.bodyLook=1;say(u.name,'To ona. Ruth Hensley. Nie żyje od dawna... tygodnie. Może miesiące.');radio(u.name,'Dispatch, Beat 1123. Mamy zwłoki w 3B, prawdopodobnie od kilku miesięcy. Potrzebny koroner i detektywi.',{radio:1});setTimeout(()=>{if(!G.ended)radio('DISPATCH','Przyjęłam, wysyłam. Zabezpieczcie mieszkanie.');},5000);}};
  const c=clueAt(u,H.clues);if(c)return{k:'house',label:'Przyjrzyj się',dur:.8,f:(u)=>findClueGen(u,c,H)};
  return null;}
 function aptDoorMenu(u){const H=G.h,d=LV.doorAt[I(39,23)];const it=[];
@@ -2321,20 +2342,25 @@ function updateApt(dt){const H=G.h;if(!H||G.ended)return;H.t+=dt;
 function aptStress(dt,L){tvAudio(L,APT.tv,G.h&&G.h.tvOn?3.2:0,APT.body);
  for(const s of G.squad){if(!s||!s.alive||!s.wounded)continue;s.breathT=(s.breathT||0)-dt;if(s.breathT<=0){s.breathT=2;if(s.human)SND.breath(s.x,s.y,.3);}}}
 function aptRender(c,cx,cy){const H=G.h;if(!H)return;
+ // zimowe światło z ulicy przez okna + śnieg za szybą
+ c.globalCompositeOperation='lighter';for(const[wx,wy,dx,dy]of[[32,10,0,1],[35,10,0,1],[40,10,0,1],[46,10,0,1],[70,25,-1,0],[14,10,0,1],[20,10,0,1]]){const x=wx*TS+8-cx,y=wy*TS+8-cy;if(x<-80||y<-80||x>VW+80||y>VH+80)continue;
+  const g=c.createLinearGradient(x,y,x+dx*56,y+dy*56);g.addColorStop(0,'rgba(120,150,200,.2)');g.addColorStop(1,'rgba(120,150,200,0)');c.fillStyle=g;c.beginPath();if(dy){c.moveTo(x-7,y);c.lineTo(x+7,y);c.lineTo(x+16,y+56);c.lineTo(x-16,y+56);}else{c.moveTo(x,y-7);c.lineTo(x,y+7);c.lineTo(x-56,y+16);c.lineTo(x-56,y-16);}c.fill();
+  for(let k=0;k<5;k++){const t=G.time*(.6+k*.13)+k*1.7+wx,fx=x-6+((k*5+Math.sin(t*2)*2)%12+12)%12,fy=y-6+((t*9)%10);P(c,fx|0,fy|0,1,1,'rgba(230,238,250,.85)');}}
+ c.globalCompositeOperation='source-over';
  if(H.tvOn){const x=APT.tv.x-cx,y=APT.tv.y-cy,ph=(G.time*7|0);c.globalCompositeOperation='lighter';const col=[[120,150,255],[255,210,160],[150,255,190],[220,220,240]][ph%4];const g=c.createRadialGradient(x,y+6,0,x,y+6,52);g.addColorStop(0,'rgba('+col+',.22)');g.addColorStop(1,'rgba('+col+',0)');c.fillStyle=g;c.fillRect(x-52,y-46,104,104);c.globalCompositeOperation='source-over';P(c,x-5,y-10,10,7,'rgba('+col+',.7)');}
  // flies near the body / under the bedroom door
  const fx=APT.body.x-cx,fy=APT.body.y-cy-6,t=G.time;for(let i=0;i<(H.body?9:3);i++){const ox=Math.sin(t*3.1+i*2.3)*12+Math.sin(t*7.7+i)*4,oy=Math.cos(t*2.6+i*1.7)*7+Math.sin(t*9+i)*2;const bx=H.body?fx:APT.mdoor.x-cx,by=H.body?fy:APT.mdoor.y-cy+8;P(c,(bx+ox)|0,(by+oy)|0,1,1,'#0a0a0a');}}
 function aptObj(){const H=G.h;if(!H)return'';const g=H.gary,gd=g&&(g.state==='cuffed'||!g.alive);
- return objRows('2-ADAM-14 · PINE COURT 3B',[[H.inside,'Sprawdź stan lokatorki'],g&&H.gStage&&H.gStage!=='walk'?[gd,'Zatrzymaj Gary’ego Hensleya']:null],H.nf?'<div class="opt">Notatki: '+H.nf+'</div>':'');}
+ return objRows('BEAT 1123 · PINE COURT 3B',[[H.inside,'Sprawdź stan lokatorki'],g&&H.gStage&&H.gStage!=='walk'?[gd,'Zatrzymaj Gary’ego Hensleya']:null],H.nf?'<div class="opt">Notatki: '+H.nf+'</div>':'');}
 function aptDebrief(){const H=G.h||{};const g=H.gary;let sc=H.nf*3;if(g&&g.alive&&g.state==='cuffed')sc+=15;if(H.key)sc+=5;
  patrolDebrief([['Notatki z miejsca',(H.nf||0)+' / '+CLUES_APT.length],['Wejście do 3B',LV.doorAt[I(39,23)]&&LV.doorAt[I(39,23)].broken?'siłą':'—'],['Sypialnia',H.key?'otwarta kluczykiem':H.body?'wyważona':'—'],['Gary Hensley',!g?'—':!g.alive?'nie żyje':g.state==='cuffed'?'zatrzymany':'zbiegł']],sc);}
-LVL.apt={id:'apt',patrol:true,sounds:true,weather:'indoor',ext:'brick',terrain:aptTerrain,windows:aptWindows,rooms:ROOMS_APT,doors:DOORS_APT,furn:FURN_APT,lamps:LAMPS_APT,cams:[],entries:ENTRIES_APT,
+LVL.apt={id:'apt',patrol:true,sounds:true,weather:'snow',crew:{names:['OFC. NOWAK','OFC. BROOKS'],uni:{body:'#7f96b4',legs:'#161c28',acc:'#d8d8d8'}},car:{s:'#2a5ab0'},ext:'brick',terrain:aptTerrain,windows:aptWindows,rooms:ROOMS_APT,doors:DOORS_APT,furn:FURN_APT,lamps:LAMPS_APT,cams:[],entries:ENTRIES_APT,
  start:startApt,update:updateApt,interact:aptInteract,render:aptRender,stress:aptStress,obj:aptObj,debrief:aptDebrief,
  wallCol:rb=>{const n=rb>=0?ROOMS[rb].n:'';return n.startsWith('Korytarz')||n==='Klatka schodowa'?['#5e5a48','#3e3a2e']:n.includes('Ruth')?['#6a5e6a','#4a3e4a']:n.includes('Gary')?['#4e5248','#34382e']:n.includes('Kuchnia')?['#7a7458','#54503a']:n.includes('Łazienka')?['#7a8688','#5a6668']:['#6a5e4a','#4a4032'];},
- win:'2-Adam-14, przyjęłam. Koroner i detektywi są w drodze.',planTitle:'PINE COURT APARTMENTS · III PIĘTRO',
- nb:{no:'#26-121-0388',pri:'P4',code:'WELFARE',small:'ADRES',addr:'PINE COURT APTS<br>MIESZKANIE 3B',facts:[['JEDNOSTKA','2-Adam-14 · Ofc. Miller, Ofc. Ortiz'],['GODZINA','19:30'],['LOKATORKA','Ruth Hensley, 78 l.']],
+ win:'Beat 1123, przyjęłam. Koroner i detektywi są w drodze.',planTitle:'PINE COURT APARTMENTS · III PIĘTRO',
+ nb:{no:'#26-121-0388',pri:'P4',code:'WELFARE',small:'ADRES',addr:'PINE COURT APTS<br>MIESZKANIE 3B',facts:[['JEDNOSTKA','Beat 1123 · Ofc. Nowak, Ofc. Brooks'],['GODZINA','19:30'],['LOKATORKA','Ruth Hensley, 78 l.']],
   title:'911 · ZAPIS ROZMOWY',clock:[19,4,8],who:{D:'DYSPOZYTOR',C:'ZGŁASZAJĄCA'},bg:[10,18,30,16.9],
-  call:[['D','Ridgefield, numer alarmowy. W czym mogę pomóc?'],['C','Dzwonię z Portland. Chodzi o moją mamę, Ruth Hensley. Pine Court, mieszkanie 3B.'],['D','Co się dzieje?'],['C','Nie mogę się do niej dodzwonić od tygodnia. Właściwie... od dawna z nią nie rozmawiałam. Brat mówi, że ma demencję i nie podchodzi do telefonu.'],['D','Brat mieszka z nią?'],['C','Gary... chyba tak. Odkąd stracił pracę. Ode mnie już nie odbiera.'],['D','Wyślemy patrol, żeby sprawdził, czy wszystko w porządku.'],['C','Proszę. Coś jest nie tak. Czuję to.']]}};
+  call:[['D','Chicago, numer alarmowy. W czym mogę pomóc?'],['C','Dzwonię z Portland. Chodzi o moją mamę, Ruth Hensley. Pine Court, mieszkanie 3B.'],['D','Co się dzieje?'],['C','Nie mogę się do niej dodzwonić od tygodnia. Właściwie... od dawna z nią nie rozmawiałam. Brat mówi, że ma demencję i nie podchodzi do telefonu.'],['D','Brat mieszka z nią?'],['C','Gary... chyba tak. Odkąd stracił pracę. Ode mnie już nie odbiera.'],['D','Wyślemy patrol, żeby sprawdził, czy wszystko w porządku.'],['C','Proszę. Coś jest nie tak. Czuję to.']]}};
 
 // ================= MISSION 04: STARLIGHT MOTEL, ROOM 12 (patrol → SWAT) =================
 const MOT_X0=i=>6+i*5; // room i (0-based) interior x0..x0+3
@@ -2370,8 +2396,8 @@ function startMotel(){G.hostage=null;G.deadline=1e9;
  H.mgr=mkNPC({tx:4,ty:32,kind:'clerk',pal:{...PAL.cook,body:'#6a3a3a'},state:'calm',a:Math.PI/2,name:'Ray'});
  H.cr=mkNPC({tx:61,ty:18,kind:'woman',pal:{body:'#8a3a5a',legs:'#2a2a3a',head:'#d8b098',face:'#d8b098',visor:'#2a1a12',hair:'#e0c070',skin:'#d8b098',eyes:1},state:'calm',pose:'kneel',a:Math.PI/2,name:'Crystal',upd:crystalUpd});
  H.dw=mkEnemy({tx:63,ty:19,weap:'ePistol',a:Math.PI/2,st:'guard',pal:{...PAL.boss},name:'Dwayne Pruitt'});
- G.police=[];logEv('2-Adam-14: Starlight Motel, pokój 12 — mężczyzna z bronią');
- setTimeout(()=>{radio('DISPATCH','2-Adam-14, Starlight Motel, pokój dwunasty. Recepcjonista słyszał kłótnię i widział broń. W środku kobieta. Zachowajcie dystans, wsparcie w drodze.');radio(G.p1.name,'Przyjąłem, jesteśmy na parkingu.',{radio:1});},600);}
+ G.police=[];logEv('Nye 7: Starlight Motel, pokój 12 — mężczyzna z bronią');
+ setTimeout(()=>{radio('DISPATCH','Nye 7, Starlight Motel, pokój dwunasty. Recepcjonista słyszał kłótnię i widział broń. W środku kobieta. Zachowajcie dystans, wsparcie w drodze.');radio(G.p1.name,'Przyjąłem, jesteśmy na parkingu.',{radio:1});},600);}
 function guestUpd(c,dt){if(c.state==='go'){if(npcGo(c,dt,5,34,52)){c.state='calm';c.ev=true;G.h.evac++;logEv('Gość ewakuowany do recepcji');}}else{moveUnit(c,dt,0,0,0);npcFace(c,dt,6);}}
 function motelInteract(u){const H=G.h;if(!H)return null;
  if(H.phase===1){
@@ -2387,10 +2413,10 @@ function evacGuest(u,g){const H=G.h,x=MOT_X0(g.gi)+1,d=LV.doorAt[I(x,21)];knockA
   if(!H.said.ev1){H.said.ev1=1;say(u.name,'Proszę iść do recepcji i tam zostać. Nie przy oknach.');}},1200);}
 function mgrTalk(u){const H=G.h;H.said.mgr=1;logEv('Rozmowa z recepcjonistą');
  say(u.name,'Kto wynajął dwunastkę?');say('RAY (RECEPCJA)','Ona. Kobieta, blondynka. Płaciła gotówką za trzy noce. Jego przywiozła wczoraj w nocy.');
- say('RAY (RECEPCJA)','Kłócili się od rana. Potem on wybiegł do auta, wrócił z pistoletem. Zadzwoniłem.');say(u.name,'Kto jeszcze tu nocuje?');say('RAY (RECEPCJA)','Dziesiątka, jedenastka, trzynastka, czternastka. Reszta pusta.');}
+ say('RAY (RECEPCJA)','Kłócili się od rana. Potem on wybiegł do auta, wrócił z bronią. Zadzwoniłem.');say(u.name,'Kto jeszcze tu nocuje?');say('RAY (RECEPCJA)','Dziesiątka, jedenastka, trzynastka, czternastka. Reszta pusta.');}
 function negMenu(u){const H=G.h,it=[];const D='DWAYNE (ZZA DRZWI)',C='KOBIETA (ZZA DRZWI)';
  const step=(t,tr,lines)=>({t,f:()=>{H.neg++;H.trust+=tr;for(const[w,s]of lines)say(w===1?u.name:w,s);if(tr<0&&H.trust<=-2&&!H.said.warn){H.said.warn=1;setTimeout(()=>{if(G.ended)return;SND.gun('pistol',MOT_X0(11)*TS+40,19*TS);makeNoise(MOT_X0(11)*TS+40,19*TS,20,'shot');say(D,'Następnym razem celuję w drzwi!');logEv('Strzał ostrzegawczy w pokoju 12');},2500);}}});
- if(H.neg===0){it.push(step('„Policja Ridgefield. Nazywam się Miller. Jak masz na imię?”',1,[[D,'...Dwayne. Odejdźcie od drzwi.'],[C,'Proszę! Pomóżcie mi, on ma broń!']]));
+ if(H.neg===0){it.push(step('„Biuro szeryfa. Nazywam się Crane. Jak masz na imię?”',1,[[D,'...Dwayne. Odejdźcie od drzwi.'],[C,'Proszę! Pomóżcie mi, on ma broń!']]));
   it.push(step('„Policja! Wyjdź z rękami do góry!”',-1,[[D,'Spróbujcie wejść, to ją zastrzelę!'],[C,'Nie! Nie róbcie nic!']]));
   it.push(step('„Czy ktoś jest ranny?”',1,[[D,'Nikt. Jeszcze nikt.']]));}
  else if(H.neg===1){it.push(step('„Czego potrzebujesz, Dwayne?”',1,[[D,'Auta. Pełnego baku. I żebyście się wynieśli z parkingu.']]));
@@ -2403,8 +2429,8 @@ function negMenu(u){const H=G.h,it=[];const D='DWAYNE (ZZA DRZWI)',C='KOBIETA (Z
  if(H.neg>=3&&!H.swatCalled)it.push({t:'Wezwij SWAT (radio)',f:()=>callSwat(u)});
  choiceMenu('Pokój 12 · rozmowa przez drzwi',it);}
 function callSwat(u){const H=G.h;if(H.evac<H.guests.length){const o=G.squad.find(q=>q&&q.alive&&q!==u)||u;say(o.name,'Najpierw wyprowadźmy ludzi z sąsiednich pokoi.');return;}
- H.swatCalled=true;radio(u.name,'Dispatch, 2-Adam-14. Podejrzany zabarykadowany z kobietą, odmawia wyjścia. Goście ewakuowani. Prosimy SWAT.',{radio:1});
- setTimeout(()=>{if(G.ended)return;radio('DISPATCH','Przyjęłam. SWAT Ridgefield w drodze, czas dojazdu dwadzieścia minut. Trzymajcie perymetr.');H.fadeT=0;},3500);}
+ H.swatCalled=true;radio(u.name,'Dispatch, Nye 7. Podejrzany zabarykadowany z kobietą, odmawia wyjścia. Goście ewakuowani. Prosimy SWAT.',{radio:1});
+ setTimeout(()=>{if(G.ended)return;radio('DISPATCH','Przyjęłam. SWAT szeryfa w drodze, czas dojazdu dwadzieścia minut. Trzymajcie perymetr.');H.fadeT=0;},3500);}
 function fadeCard(txt,sub){let el=$('mfade');if(!el){el=document.createElement('div');el.id='mfade';el.style.cssText='position:absolute;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:60;opacity:0;transition:opacity 1.2s;pointer-events:none;font-family:inherit;letter-spacing:.3em;color:#d8d8d0;font-size:calc(var(--u)*2.2)';$('wrap').appendChild(el);}
  el.innerHTML=txt?'<div>'+txt+'</div><div style="font-size:calc(var(--u)*1.2);opacity:.55;margin-top:calc(var(--u)*1.4)">'+(sub||'')+'</div>':'';el.style.opacity=txt?1:0;}
 function swatPhase(){const H=G.h;H.phase=2;radioClear();
@@ -2414,7 +2440,7 @@ function swatPhase(){const H=G.h;H.phase=2;radioClear();
  SPECS.forEach((s,si)=>{const o=offs[si];const u=new Unit({team:'squad',spec:s.id,name:s.name,role:s.role,weap:s.weap,fov:s.fov,range:s.range,acc:s.acc,pal:PAL.squad,charges:s.id==='breach'?2:0,flash:s.id==='scout'?3:0,sed:s.id==='medic'?4:0,shoutCd:0});applyLoad(u,(G.load||defaultLoad())[si]);
   u.x=E.x*TS+8+fx*o[0]*TS+rx*o[1]*TS;u.y=E.y*TS+fy*o[0]*TS+ry*o[1]*TS;u.ang=E.a;u.heading=E.a;unstick(u);G.squad[si]=u;G.units.push(u);});
  G.p1=G.squad[G.p1Spec||0];G.p1.human=1;if(G.players===2){G.p2=G.squad[G.p2Spec||1];G.p2.human=2;}G.order='follow';G.ops=[];G.cam.x=G.p1.x;G.cam.y=G.p1.y;
- G.h.drawn=true;logEv('SWAT Ridgefield na miejscu');
+ G.h.drawn=true;logEv('SWAT szeryfa na miejscu');
  setTimeout(()=>{radio('SGT. WALKER','Patrol, dzięki. Przejmujemy. Pokój dwunasty, jeden uzbrojony, jedna kobieta w środku.',{radio:1});radio('SGT. WALKER','Hayes, ładunek albo taran na drzwi. Wchodzimy na mój znak.',{radio:1});},1500);}
 function crystalUpd(c,dt){const H=G.h;
  if(c.state==='cuffed'||c.state==='comply'){moveUnit(c,dt,0,0,0);if(c.state==='cuffed'&&!H.said.crc){H.said.crc=1;say('CRYSTAL',H.crStage==='run'?'Puszczaj! To był jego pomysł, nie mój!':'Co wy robicie?! To ja jestem ofiarą!');}return;}
@@ -2427,24 +2453,24 @@ function crystalArm(c){const H=G.h;H.crStage='armed';const e=new Unit({team:'ene
  G.civs.splice(G.civs.indexOf(c),1);G.units.splice(G.units.indexOf(c),1,e);G.enemies.push(e);H.cr=e;H.gunFound=true;
  say('CRYSTAL','Nie weźmiecie nas żywych!');const o=G.squad.find(q=>q&&q.alive&&!q.human)||G.p1;say(o.name,'Ona ma broń! Łazienka!');logEv('Crystal wyciąga drugą broń z łazienki');}
 function updateMotel(dt){const H=G.h;if(!H||G.ended)return;H.t+=dt;
- if(H.fadeT!=null){H.fadeT+=dt;if(H.fadeT>.1&&!H.said.f1){H.said.f1=1;fadeCard('20 MINUT PÓŹNIEJ','SWAT RIDGEFIELD PD · STARLIGHT MOTEL');}
+ if(H.fadeT!=null){H.fadeT+=dt;if(H.fadeT>.1&&!H.said.f1){H.said.f1=1;fadeCard('20 MINUT PÓŹNIEJ','NYE COUNTY SHERIFF · S.W.A.T.');}
   if(H.fadeT>2.2&&!H.said.f2){H.said.f2=1;swatPhase();}if(H.fadeT>4){fadeCard(null);H.fadeT=null;}}
  if(H.phase===2){const dw=H.dw,cr=H.cr,res=x=>!x.alive||x.state==='cuffed';
   if(H.endT==null&&res(dw)&&res(cr)){H.endT=2.5;}
   if(H.endT!=null){H.endT-=dt;if(H.endT<=0)endMission(true,'Pokój 12 zabezpieczony. '+(dw.alive?'Dwayne Pruitt zatrzymany':'Dwayne Pruitt nie żyje')+', '+(cr.alive?'Crystal zatrzymana':'Crystal nie żyje')+'.');}}}
 function motelRender(c,cx,cy){const H=G.h;const x=22*TS+8-cx,y=25*TS-14-cy;const fl=(Math.sin(G.time*13)>-.85)?1:.4;
  c.globalCompositeOperation='lighter';const g=c.createRadialGradient(x,y,0,x,y,70);g.addColorStop(0,'rgba(255,90,168,'+(.28*fl)+')');g.addColorStop(1,'rgba(255,90,168,0)');c.fillStyle=g;c.fillRect(x-70,y-70,140,140);c.globalCompositeOperation='source-over';}
-function motelObj(){const H=G.h;if(!H)return'';if(H.phase===1)return objRows('2-ADAM-14 · STARLIGHT MOTEL',[[H.evac>=H.guests.length,'Ewakuuj sąsiednie pokoje ('+H.evac+'/'+H.guests.length+')'],[H.neg>0,'Nawiąż kontakt z pokojem 12'],H.neg>=3?[H.swatCalled,'Zdecyduj o dalszych krokach']:null]);
+function motelObj(){const H=G.h;if(!H)return'';if(H.phase===1)return objRows('NYE 7 · STARLIGHT MOTEL',[[H.evac>=H.guests.length,'Ewakuuj sąsiednie pokoje ('+H.evac+'/'+H.guests.length+')'],[H.neg>0,'Nawiąż kontakt z pokojem 12'],H.neg>=3?[H.swatCalled,'Zdecyduj o dalszych krokach']:null]);
  const dw=H.dw,cr=H.cr,res=x=>!x.alive||x.state==='cuffed';return objRows('SWAT · POKÓJ 12',[[res(dw),'Zneutralizuj podejrzanego'],[res(cr),'Zabezpiecz kobietę']]);}
 function motelDebrief(){const H=G.h||{};const dw=H.dw,cr=H.cr;let sc=(H.evac||0)*4+Math.max(0,H.trust||0)*4;if(dw&&dw.alive)sc+=10;if(cr&&cr.alive&&cr.state==='cuffed')sc+=H.crStage==='armed'?5:15;
  patrolDebrief([['Goście ewakuowani',(H.evac||0)+' / 4'],['Negocjacje',(H.neg||0)+' wymiany · zaufanie '+(H.trust||0)],['Dwayne Pruitt',!dw?'—':!dw.alive?'nie żyje':dw.state==='cuffed'?'zatrzymany':'—'],['Crystal',!cr?'—':!cr.alive?'nie żyje':cr.state==='cuffed'?(H.crStage==='armed'?'zatrzymana (uzbrojona)':'zatrzymana zanim sięgnęła po broń'):'—'],['Druga broń',H.gunFound?'zabezpieczona':'—']],sc);}
-LVL.motel={id:'motel',patrol:true,nvg:true,weather:'rain',ext:'stucco',terrain:motelTerrain,windows:motelWindows,rooms:ROOMS_MOTEL,doors:DOORS_MOTEL,furn:FURN_MOTEL,lamps:LAMPS_MOTEL,cams:[],entries:ENTRIES_MOTEL,
+LVL.motel={id:'motel',patrol:true,nvg:true,weather:'dust',crew:{role:'Deputy Sheriff',shout:'Sheriff\'s Office! Don\'t move!',names:['DEP. CRANE','DEP. VEGA'],uni:{body:'#a48c62',legs:'#3a4230',acc:'#d8b048'}},car:{s:'#2e6a3a'},ext:'stucco',terrain:motelTerrain,windows:motelWindows,rooms:ROOMS_MOTEL,doors:DOORS_MOTEL,furn:FURN_MOTEL,lamps:LAMPS_MOTEL,cams:[],entries:ENTRIES_MOTEL,
  start:startMotel,update:updateMotel,interact:motelInteract,render:motelRender,stress:NOOP,obj:motelObj,debrief:motelDebrief,
  wallCol:rb=>{const n=rb>=0?ROOMS[rb].n:'';return n.startsWith('Łazienka')?['#7a8688','#5a6668']:n==='Recepcja'?['#6a5a48','#4a3e30']:['#6e5a52','#4c3e38'];},
- win:'SWAT, przyjęłam. Koroner i detektywi w drodze. Dobra robota.',planTitle:'STARLIGHT MOTEL · HWY 9',
- nb:{no:'#26-130-2217',pri:'P1',code:'245 / 207',small:'ADRES',addr:'STARLIGHT MOTEL<br>POKÓJ 12',facts:[['JEDNOSTKA','2-Adam-14 · potem SWAT'],['GODZINA','23:48'],['ZGŁOSZENIE','mężczyzna z bronią, kobieta w pokoju']],
+ win:'SWAT, przyjęłam. Koroner i detektywi w drodze. Dobra robota.',planTitle:'STARLIGHT MOTEL · US-95',
+ nb:{no:'#26-130-2217',pri:'P1',code:'245 / 207',small:'ADRES',addr:'STARLIGHT MOTEL<br>POKÓJ 12',facts:[['JEDNOSTKA','Nye County Sheriff · Dep. Crane, Dep. Vega'],['GODZINA','23:48'],['ZGŁOSZENIE','mężczyzna z bronią, kobieta w pokoju']],
   title:'911 · ZAPIS ROZMOWY',clock:[23,41,5],who:{D:'DYSPOZYTOR',C:'RECEPCJA'},bg:[2,20,40,22.5],
-  call:[['D','Ridgefield, numer alarmowy.'],['C','Tu Starlight Motel, przy dziewiątce. W dwunastce jest facet z pistoletem.'],['D','Widział pan broń?'],['C','Tak, przyniósł z samochodu. Kłócił się z kobietą od rana. Teraz krzyczy, że nikt nie wyjdzie.'],['D','Ile osób jest w pokoju?'],['C','Dwie. On i ona. Pokój wynajęła ona... płaciła gotówką.'],['D','Proszę zostać w recepcji i zamknąć drzwi. Policja jest w drodze.']]}};
+  call:[['D','Nye County, numer alarmowy.'],['C','Tu Starlight Motel, przy dziewięćdziesiątce piątce. W dwunastce jest facet z bronią.'],['D','Widział pan broń?'],['C','Tak, przyniósł z samochodu. Kłócił się z kobietą od rana. Teraz krzyczy, że nikt nie wyjdzie.'],['D','Ile osób jest w pokoju?'],['C','Dwie. On i ona. Pokój wynajęła ona... płaciła gotówką.'],['D','Proszę zostać w recepcji i zamknąć drzwi. Policja jest w drodze.']]}};
 
 // ================= MISSION 05: TERMINAL B — UNATTENDED BAG =================
 const ROOMS_AIR=[R_('Hala odlotów B',7,20,73,36,'lino'),R_('Posterunek policji lotniska',7,9,16,18,'lino'),R_('Toalety',30,9,36,18,'tileW'),R_('Bar Skyline',50,9,62,18,'wood'),R_('Kiosk',18,9,28,18,'lino'),R_('Zaplecze',64,9,73,18,'conc')];
@@ -2537,10 +2563,10 @@ function airDebrief(){const H=G.h||{};let sc=0;if(H.evac)sc+=10;if(H.res==='eod'
  patrolDebrief([['Ewakuacja hali',H.evac?'przeprowadzona ('+(H.evacN||0)+' osób)':'nie'],['EOD',H.res==='eod'?'sprawdzenie rentgenem':H.eod?'wezwane':'nie wezwane'],['Właściciel',H.ownerFound?(H.ownerId?'Kevin Doyle — spisany':'odnaleziony'):'nieodnaleziony'],['Procedura',H.res==='opened'?'NARUSZONA — bagaż otwarty przez patrol':'zachowana']],sc);}
 LVL.air={id:'air',patrol:true,lit:.86,weather:'day',ext:'concrete',terrain:airTerrain,windows:airWindows,rooms:ROOMS_AIR,doors:DOORS_AIR,furn:FURN_AIR,lamps:LAMPS_AIR,cams:[],entries:ENTRIES_AIR,
  start:startAir,update:updateAir,interact:airInteract,render:airRender,stress:NOOP,obj:airObj,debrief:airDebrief,
- spawn:E=>spawnPatrolPair(E,['OFC. KOWALSKI','OFC. BRANDT']),
+ crew:{names:['OFC. NAVARRO','OFC. WADE'],uni:{body:'#22304a',legs:'#1a2232',acc:'#d8b048'}},car:{s:'#1e3c8a'},
  wallCol:rb=>{const n=rb>=0?ROOMS[rb].n:'';return n==='Bar Skyline'?['#5a4a3a','#3e3226']:n==='Toalety'?['#7a8688','#5a6668']:['#8a8e92','#5e6266'];},
- win:'Airport 3, przyjęłam. Otwieramy terminal B.',planTitle:'RIDGEFIELD REGIONAL · TERMINAL B',
- nb:{no:'#26-140-0921',pri:'P2',code:'SUSP PKG',small:'MIEJSCE',addr:'RIDGEFIELD REGIONAL<br>TERMINAL B · B4–B6',facts:[['JEDNOSTKA','Airport 3 · Ofc. Kowalski, Ofc. Brandt'],['GODZINA','14:24'],['ZGŁOSZENIE','bagaż bez właściciela']],
+ win:'Airport 3, przyjęłam. Otwieramy terminal B.',planTitle:'MESA DEL SOL REGIONAL · TERMINAL B',
+ nb:{no:'#26-140-0921',pri:'P2',code:'SUSP PKG',small:'MIEJSCE',addr:'MESA DEL SOL REGIONAL<br>TERMINAL B · B4–B6',facts:[['JEDNOSTKA','Airport 3 · Ofc. Navarro, Ofc. Wade'],['GODZINA','14:24'],['ZGŁOSZENIE','bagaż bez właściciela']],
   title:'ZGŁOSZENIE · OCHRONA TERMINALU',clock:[14,21,30],who:{D:'DYSPOZYTOR',C:'OCHRONA'},bg:[7,19,48,27],
   call:[['C','Dispatch, ochrona terminalu B. Mamy pozostawioną walizkę przy bramkach B4.'],['D','Od jak dawna?'],['C','Pasażerowie mówią, że ze dwadzieścia minut. Nikt się nie przyznaje.'],['D','Ktoś jej dotykał?'],['C','Nie, nikt. Stoi przy ławce, rączka wysunięta.'],['D','Przyjęłam. Wysyłam patrol lotniskowy. Nie dotykajcie jej.']]}};
 // ================= MISSION SETUP =================
@@ -2862,7 +2888,7 @@ function render(){const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOpera
   else if(f.k==='bang'){c.globalAlpha=1-f.t/f.life;c.fillStyle='#fff';c.beginPath();c.arc(x,y,6+f.t*120,0,7);c.fill();c.globalAlpha=1;}}
  // police lights
  for(const f of LV.furn){if(f.k!=='police'&&f.k!=='ambul')continue;const px=(f.x+f.w/2)*TS-cx,py=(f.y+.6)*TS-cy;if(px<-100||py<-100||px>VW+100||py>VH+100)continue;const on=((G.time*3+f.x)|0)%2;c.globalCompositeOperation='lighter';const g=c.createRadialGradient(px,py,0,px,py,90);g.addColorStop(0,f.k==='ambul'?(on?'rgba(255,40,40,.2)':'rgba(0,0,0,0)'):(on?'rgba(255,40,40,.22)':'rgba(40,80,255,.24)'));g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(px-90,py-90,180,180);c.globalCompositeOperation='source-over';P(c,px-2,py-3,2,2,on?'#ff4040':'#401010');P(c,px,py-3,2,2,on?'#102040':'#4060ff');}
- if(W8()==='morning')drawLeaves(cx,cy);else if(W8()==='rain')drawRain(cx,cy,false);
+ if(W8()==='morning')drawLeaves(cx,cy);else if(W8()==='rain')drawRain(cx,cy,false);else if(isPat())drawWeather(c,cx,cy);
  // cursor & laser
  const u=G.p1;if(u&&u.alive&&!G.ended&&!u.holster){const a=u.ang,d=castRay(u.x,u.y-2,a,TS*14,0,bulletBlock),mx=(u.mzx||u.x)-cx,my=(u.mzy||u.y-8)-cy;
   c.fillStyle='rgba(255,40,30,.45)';for(let t=6;t<d;t+=3)c.fillRect(Math.round(mx+Math.cos(a)*t),Math.round(my+Math.sin(a)*t),1,1);
@@ -2873,7 +2899,7 @@ function render(){const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOpera
  if(G.lvl==='hosp'){const sx=36*TS+Math.sin(G.time*.13)*230-cx,sy=50*TS+Math.cos(G.time*.19)*70-cy;if(sx>-80&&sy>-80&&sx<VW+80&&sy<VH+80){c.globalCompositeOperation='lighter';const g=c.createRadialGradient(sx,sy,0,sx,sy,46);g.addColorStop(0,'rgba(230,240,255,.22)');g.addColorStop(.7,'rgba(200,215,255,.08)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(sx-46,sy-46,92,92);c.globalCompositeOperation='source-over';}}
  for(const pu of G.police){const sx=pu.x-cx,sy=pu.y-cy;if(sx>-20&&sy>-30&&sx<VW+20&&sy<VH+20)drawHuman(c,pu,sx,sy);}
  // post
- c.globalCompositeOperation='multiply';c.fillStyle=isPat()?weatherTint():'#c4ccd6';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';if(W8()==='morning')morningFx(c,cx,cy);else if(isPat()&&W8()==='night')nightFx(c);else if(isPat())indoorFx(c);
+ c.globalCompositeOperation='multiply';c.fillStyle=isPat()?weatherTint():'#c4ccd6';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';if(W8()==='morning')morningFx(c,cx,cy);else if(isPat())weatherPost(c);
  if(G.lightF>0){c.fillStyle='rgba(200,215,255,'+G.lightF*.12+')';c.fillRect(0,0,VW,VH);}
  if(G.nvg){c.globalCompositeOperation='multiply';c.fillStyle='#6cff84';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='lighter';c.fillStyle='rgba(18,60,24,.28)';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';c.drawImage(GRAIN[(G.time*30+1|0)%4],0,0);c.drawImage(GRAIN[(G.time*30+2|0)%4],1,0);}
  c.drawImage(GRAIN[(G.time*24|0)%4],0,0);c.drawImage(vigC,0,0);
@@ -2966,7 +2992,7 @@ function drawPlan(cnv,live,entry){const g=cnv.getContext('2d'),S=10;g.setTransfo
 // ================= HUD =================
 let hudCache={};function setH(id,html){if(hudCache[id]!==html){hudCache[id]=html;$(id).innerHTML=html;}}
 const ORD={follow:'ROZKAZ: ZA MNĄ · SZYK KOLUMNOWY',hold:'ROZKAZ: TRZYMAĆ POZYCJĘ',move:'ROZKAZ: RUCH NA POZYCJĘ',op:'ROZKAZ: AKCJA PRZY DRZWIACH'};
-function abText(u){if(u.patrol)return'Q: okrzyk „Police! Don\'t move!”';switch(u.spec){case'lead':return'Q: okrzyk „Policja!”'+(u.shoutCd>0?' ('+Math.ceil(u.shoutCd)+')':'');case'breach':return u.ram?'Q: taran':'Q: ładunek ×'+u.charges;case'tech':return'Q: kamera (drzwi) / peryskop (róg) · E: wytrych';case'medic':return'Q: sedatyw ×'+u.sed;case'scout':return'Q: granat hukowy ×'+u.flash;}return'';}
+function abText(u){if(u.patrol)return'Q: okrzyk „'+((LD().crew&&LD().crew.shout)||'Police! Don\'t move!')+'”';switch(u.spec){case'lead':return'Q: okrzyk „Policja!”'+(u.shoutCd>0?' ('+Math.ceil(u.shoutCd)+')':'');case'breach':return u.ram?'Q: taran':'Q: ładunek ×'+u.charges;case'tech':return'Q: kamera (drzwi) / peryskop (róg) · E: wytrych';case'medic':return'Q: sedatyw ×'+u.sed;case'scout':return'Q: granat hukowy ×'+u.flash;}return'';}
 function wHTML(u){if(!u||!u.alive)return'<div class="wn">—</div>';return'<div class="wn">'+u.name+' · '+u.W.n+'</div><div class="am">'+(u.rel>0?'<small>PRZEŁADOWANIE</small>':u.mag+'<small> / '+u.res+'</small>')+'</div><div class="ab">'+abText(u)+(u.spray?' · G: gaz ×'+u.spray:'')+(u.shield?' · TARCZA':'')+(u.quiet?' · CICHO':'')+'</div>';}
 function updateHUD(){let r='',ri=0;for(const s of SPECS.map((_,i)=>G.squad[i])){const idx=ri++;if(!s)continue;let st;
   if(!s.alive)st='KIA';else if(s.wounded&&!s.treated)st='<span style="color:#ff5a4a">RANNY · '+Math.ceil(s.bleed)+' s</span>';else if(s.stun>0)st='OGŁUSZONY';else if(s.human)st=(s.wounded?'opatrzony · ':'')+s.mag+'/'+s.W.mag;else{const t=s.task;st=s.action?'akcja':t?(t.type==='hold'?'pozycja':t.done?'gotowy':'ruch'):s.post?(s.post.kind==='door'?'pilnuje drzwi':'zabezp. kąt'):'w szyku';st+=' · '+s.mag;}
