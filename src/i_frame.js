@@ -39,6 +39,7 @@ function nearPt(u,x,y,r){const fx=u.x+Math.cos(u.ang)*8,fy=u.y+Math.sin(u.ang)*8
 function anySquadNear(x,y,r){return G.squad.some(q=>q&&q.alive&&dist(q.x,q.y,x,y)<r);}
 function inRoomName(u,n){const r=LV.room[I(u.x/TS|0,u.y/TS|0)];return r>=0&&ROOMS[r].n===n;}
 function squadInRoom(n){return G.squad.some(q=>q&&q.alive&&inRoomName(q,n));}
+function setHolster(h){let any=false;for(const q of G.squad){if(!q||!q.alive||q.holster===h)continue;q.holster=h;q.hTip=0;q.drawCd=h?0:.45;any=true;}if(!any)return;const u=G.p1;if(u)SND.reload(u.x,u.y,'pistol');toast(h?'Broń w kaburze':'Broń w ręku');if(G.h&&!h)G.h.drawn=true;logEv(h?'Broń schowana':'Funkcjonariusze wyciągają broń');}
 function drawAll(){for(const q of G.squad){if(!q||!q.alive)continue;q.holster=false;q.hTip=0;SND.reload(q.x,q.y,'pistol');}}
 // dialogue choices, shown in the order menu box
 function choiceMenu(title,items){const el=$('ctx');G.ctxItems=items;G.ctxOpen=true;el.innerHTML='<div class="t">'+title+'</div>'+items.map((it,i)=>'<div class="i'+(it.dis?' dis':'')+'" data-i="'+i+'"><k>'+(i+1)+'</k>'+it.t+'</div>').join('');

@@ -61,7 +61,7 @@ function moveUnit(u,dt,wx,wy,spd){if(u.wounded)spd*=u.treated?.85:.62;if(u.shiel
 function unstick(u){if(!collides(u.x,u.y,u.r))return;for(let r=2;r<40;r+=2)for(let a=0;a<6.28;a+=.5){const x=u.x+Math.cos(a)*r,y=u.y+Math.sin(a)*r;if(!collides(x,y,u.r)){u.x=x;u.y=y;return;}}}
 function muzzle(u){return{x:u.x+Math.cos(u.ang)*7,y:u.y-2+Math.sin(u.ang)*7};}
 function startReload(u){if(u.rel>0||u.mag>=u.W.mag||u.res<=0)return;u.rel=u.W.rl;SND.reload(u.x,u.y,u.W.snd);}
-function fire(u){const W=u.W;if(!W||u.rel>0||u.fireCd>0||!u.active())return false;if(u.holster){if(u.human&&!u.hTip){u.hTip=1;toast('Broń w kaburze');}return false;}
+function fire(u){const W=u.W;if(!W||u.rel>0||u.fireCd>0||!u.active())return false;if(u.holster){if(u.human&&!(u.drawCd>0)){setHolster(false);u.drawCd=.45;}return false;}if(u.drawCd>0)return false;
  if(u.mag<=0){if(u.human){SND.dry(u.x,u.y);u.fireCd=.3;}startReload(u);return false;}
  // muzzle inside wall check
  const mz=muzzle(u);if(bulletBlock(mz.x/TS|0,mz.y/TS|0)&&!bulletBlock(u.x/TS|0,(u.y-2)/TS|0)){/*point blank wall*/}

@@ -275,7 +275,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
   <div id="idcard"><div class="idh"><span>RIDGEFIELD COUNTY</span><span>DRIVER LICENSE</span></div><div class="idb"><canvas id="idph" width="18" height="22"></canvas><div class="idf">
    <div><i>DL</i> H460-2271-0314</div><div class="idn">HARTLEY</div><div class="idn2">ETHAN JAMES</div><div><i>DOB</i> 03/14/2006</div><div>214 OAKRIDGE LN<br>RIDGEFIELD</div><div><i>HGT</i> 5'11" &nbsp;<i>EYES</i> BRN &nbsp;<i>SEX</i> M</div><div><i>EXP</i> 03/14/2030</div></div></div><div class="idsig">Ethan Hartley</div></div>
   <div id="toast"></div>
-  <div id="cmdhint">PPM rozkazy · F za mną · H stój · 1–5 / TAB operator · M plan · J notatnik · ESC pauza</div>
+  <div id="cmdhint">LPM / X broń · PPM rozkazy · F za mną · H stój · TAB operator · M plan · J notatnik · ESC pauza</div>
  </div>
  <div id="planov" class="hidden"><canvas id="plancv" width="800" height="580"></canvas></div>
  <div id="ctx" class="hidden"></div>
@@ -338,7 +338,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
   <div class="ct-sub" id="ct-sub">KLAWIATURA + MYSZ</div>
   <div class="ct-grid" id="ctp1"><div class="cg"><h5>RUCH I WALKA</h5><div class="cr"><k>W</k><k>A</k><k>S</k><k>D</k><span>ruch</span></div><div class="cr"><k>MYSZ</k><span>celowanie i kierunek wzroku</span></div><div class="cr"><k>LPM</k><span>strzał</span></div><div class="cr"><k>R</k><span>przeładowanie</span></div><div class="cr"><k>SHIFT</k><span>cichy chód</span></div></div><div class="cg"><h5>INTERAKCJA</h5><div class="cr"><k>E</k><span>interakcja — drzwi, rozmowa, skuwanie, oględziny</span></div><div class="cr"><k>E</k><em>przytrzymaj</em><span>wytrych / wyważenie drzwi</span></div><div class="cr"><k>Q</k><span>umiejętność postaci</span></div><div class="cr"><k>G</k><span>gaz pieprzowy</span></div><div class="cr"><k>T</k><span>zgłoszenie do dowództwa</span></div></div><div class="cg"><h5>ZESPÓŁ</h5><div class="cr"><k>PPM</k><span>menu rozkazów</span></div><div class="cr"><k>F</k><span>za mną</span></div><div class="cr"><k>H</k><span>trzymać pozycję</span></div><div class="cr"><k>SPACJA</k><span>sygnał wejścia</span></div><div class="cr"><k>1–5</k><k>TAB</k><span>przejmij operatora</span></div></div><div class="cg"><h5>POZOSTAŁE</h5><div class="cr"><k>C</k><span>sprawdź róg peryskopem</span></div><div class="cr"><k>N</k><span>noktowizja / latarki</span></div><div class="cr"><k>M</k><em>przytrzymaj</em><span>plan budynku</span></div><div class="cr"><k>ESC</k><span>pauza</span></div></div></div>
   <div class="ct-grid hidden" id="ctp2"><div class="cg"><h5>PAD</h5><div class="cr"><k>L</k><em>gałka</em><span>ruch</span></div><div class="cr"><k>R</k><em>gałka</em><span>celowanie</span></div><div class="cr"><k>RT</k><span>strzał</span></div><div class="cr"><k>A</k><span>interakcja</span></div><div class="cr"><k>X</k><span>umiejętność</span></div><div class="cr"><k>Y</k><span>przeładowanie</span></div><div class="cr"><k>B</k><span>zgłoszenie</span></div><div class="cr"><k>LT</k><span>cichy chód</span></div><div class="cr"><k>RB</k><span>zmiana operatora</span></div></div><div class="cg"><h5>KLAWIATURA</h5><div class="cr"><k>↑</k><k>←</k><k>↓</k><k>→</k><span>ruch — patrzy w kierunku ruchu</span></div><div class="cr"><k>P. SHIFT</k><span>blokada kierunku patrzenia</span></div><div class="cr"><k>ENTER</k><span>strzał</span></div><div class="cr"><k>/</k><span>interakcja</span></div><div class="cr"><k>.</k><span>umiejętność</span></div><div class="cr"><k>,</k><span>przeładowanie</span></div><div class="cr"><k>;</k><span>zgłoszenie</span></div><div class="cr"><k>P. CTRL</k><span>cichy chód</span></div><div class="cr"><k>'</k><span>zmiana operatora</span></div></div><div class="cg"><h5>WSPÓŁPRACA</h5><p>Gracz 1 prowadzi zespół i wydaje rozkazy. Gracz 2 steruje partnerem.</p><p>Kamera jest wspólna — trzymajcie się blisko.</p><p>Gracz 2 ma lekkie wspomaganie celowania.</p></div></div>
-  <div class="ct-note">W misji patrolowej: <b>Q</b> to okrzyk „Police!”, broń wyciąga się w trakcie, nie ma noktowizji ani peryskopu.</div>
+  <div class="ct-note">W misji patrolowej broń jest w kaburze: <b>X</b> lub <b>LPM</b> wyciąga ją, <b>X</b> chowa. <b>Q</b> to okrzyk, nie ma noktowizji ani peryskopu.</div>
   <div class="mm-nav"><button class="mm-i on" data-go="menu">WRÓĆ</button><span class="mm-r">← → GRACZ · ESC</span></div>
  </div>
 
@@ -1024,7 +1024,7 @@ function moveUnit(u,dt,wx,wy,spd){if(u.wounded)spd*=u.treated?.85:.62;if(u.shiel
 function unstick(u){if(!collides(u.x,u.y,u.r))return;for(let r=2;r<40;r+=2)for(let a=0;a<6.28;a+=.5){const x=u.x+Math.cos(a)*r,y=u.y+Math.sin(a)*r;if(!collides(x,y,u.r)){u.x=x;u.y=y;return;}}}
 function muzzle(u){return{x:u.x+Math.cos(u.ang)*7,y:u.y-2+Math.sin(u.ang)*7};}
 function startReload(u){if(u.rel>0||u.mag>=u.W.mag||u.res<=0)return;u.rel=u.W.rl;SND.reload(u.x,u.y,u.W.snd);}
-function fire(u){const W=u.W;if(!W||u.rel>0||u.fireCd>0||!u.active())return false;if(u.holster){if(u.human&&!u.hTip){u.hTip=1;toast('Broń w kaburze');}return false;}
+function fire(u){const W=u.W;if(!W||u.rel>0||u.fireCd>0||!u.active())return false;if(u.holster){if(u.human&&!(u.drawCd>0)){setHolster(false);u.drawCd=.45;}return false;}if(u.drawCd>0)return false;
  if(u.mag<=0){if(u.human){SND.dry(u.x,u.y);u.fireCd=.3;}startReload(u);return false;}
  // muzzle inside wall check
  const mz=muzzle(u);if(bulletBlock(mz.x/TS|0,mz.y/TS|0)&&!bulletBlock(u.x/TS|0,(u.y-2)/TS|0)){/*point blank wall*/}
@@ -2141,6 +2141,7 @@ function nearPt(u,x,y,r){const fx=u.x+Math.cos(u.ang)*8,fy=u.y+Math.sin(u.ang)*8
 function anySquadNear(x,y,r){return G.squad.some(q=>q&&q.alive&&dist(q.x,q.y,x,y)<r);}
 function inRoomName(u,n){const r=LV.room[I(u.x/TS|0,u.y/TS|0)];return r>=0&&ROOMS[r].n===n;}
 function squadInRoom(n){return G.squad.some(q=>q&&q.alive&&inRoomName(q,n));}
+function setHolster(h){let any=false;for(const q of G.squad){if(!q||!q.alive||q.holster===h)continue;q.holster=h;q.hTip=0;q.drawCd=h?0:.45;any=true;}if(!any)return;const u=G.p1;if(u)SND.reload(u.x,u.y,'pistol');toast(h?'Broń w kaburze':'Broń w ręku');if(G.h&&!h)G.h.drawn=true;logEv(h?'Broń schowana':'Funkcjonariusze wyciągają broń');}
 function drawAll(){for(const q of G.squad){if(!q||!q.alive)continue;q.holster=false;q.hTip=0;SND.reload(q.x,q.y,'pistol');}}
 // dialogue choices, shown in the order menu box
 function choiceMenu(title,items){const el=$('ctx');G.ctxItems=items;G.ctxOpen=true;el.innerHTML='<div class="t">'+title+'</div>'+items.map((it,i)=>'<div class="i'+(it.dis?' dis':'')+'" data-i="'+i+'"><k>'+(i+1)+'</k>'+it.t+'</div>').join('');
@@ -2732,7 +2733,7 @@ addEventListener('keydown',e=>{if(['Tab','ArrowUp','ArrowDown','ArrowLeft','Arro
  if(e.code==='KeyN')toggleNVG();
  if(e.code==='KeyC'&&G.p1&&G.p1.alive){if(G.p1.spec==='tech'){if(!G.camv){const a=G.p1.ang;G.p1.action={t:0,dur:.5,label:'Peryskop',pose:'kneel',done:()=>startMirror(G.p1,a)};}}else orderCorner();}
  if(e.code==='Space'){const w=G.ops.filter(o=>o.wait&&!o.go);if(w.length){w.forEach(o=>o.go=true);radio(G.p1?G.p1.name:'ALFA','Wszystkie zespoły: wejście, wejście, wejście!',{prio:1});logEv('Sygnał do wejścia ('+w.map(o=>teamName(o.team)).join(' + ')+')');}}
- if(e.code==='KeyM')G.map=true;if(e.code==='KeyJ'&&G.running&&!G.paused)$('obj').classList.toggle('fold');});
+ if(e.code==='KeyM')G.map=true;if(e.code==='KeyJ'&&G.running&&!G.paused)$('obj').classList.toggle('fold');if(e.code==='KeyX'&&G.running&&!G.paused&&G.p1&&G.p1.alive&&!G.ended)setHolster(!G.p1.holster);});
 addEventListener('keyup',e=>{K[e.code]=false;if(e.code==='KeyM')G.map=false;});
 addEventListener('blur',()=>{for(const k in K)K[k]=false;G.mouse.down=false;});
 const wrap=$('wrap');
@@ -2976,6 +2977,7 @@ function render(){const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOpera
  for(const f of LV.furn){if(f.k!=='police'&&f.k!=='ambul')continue;const px=(f.x+f.w/2)*TS-cx,py=(f.y+.6)*TS-cy;if(px<-100||py<-100||px>VW+100||py>VH+100)continue;const on=((G.time*3+f.x)|0)%2;c.globalCompositeOperation='lighter';const g=c.createRadialGradient(px,py,0,px,py,90);g.addColorStop(0,f.k==='ambul'?(on?'rgba(255,40,40,.2)':'rgba(0,0,0,0)'):(on?'rgba(255,40,40,.22)':'rgba(40,80,255,.24)'));g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(px-90,py-90,180,180);c.globalCompositeOperation='source-over';P(c,px-2,py-3,2,2,on?'#ff4040':'#401010');P(c,px,py-3,2,2,on?'#102040':'#4060ff');}
  if(W8()==='morning')drawLeaves(cx,cy);else if(W8()==='rain')drawRain(cx,cy,false);else if(isPat())drawWeather(c,cx,cy);
  // cursor & laser
+ {const u=G.p1;if(u&&u.alive&&!G.ended&&u.holster){const x=Math.round(G.mouse.sx),y=Math.round(G.mouse.sy);c.strokeStyle='rgba(0,0,0,.55)';c.lineWidth=2;c.beginPath();c.arc(x+.5,y+.5,3,0,6.283);c.stroke();c.strokeStyle='rgba(232,228,212,.75)';c.lineWidth=1;c.beginPath();c.arc(x+.5,y+.5,3,0,6.283);c.stroke();}}
  const u=G.p1;if(u&&u.alive&&!G.ended&&!u.holster){const a=u.ang,d=castRay(u.x,u.y-2,a,TS*14,0,bulletBlock),mx=(u.mzx||u.x)-cx,my=(u.mzy||u.y-8)-cy;
   c.fillStyle='rgba(255,40,30,.45)';for(let t=6;t<d;t+=3)c.fillRect(Math.round(mx+Math.cos(a)*t),Math.round(my+Math.sin(a)*t),1,1);
   const x=Math.round(G.mouse.sx),y=Math.round(G.mouse.sy),gap=2+Math.round(Math.hypot(u.vx,u.vy)/14);
@@ -3080,7 +3082,7 @@ let hudCache={};function setH(id,html){if(hudCache[id]!==html){hudCache[id]=html
 const ORD={follow:'ROZKAZ: ZA MNĄ · SZYK KOLUMNOWY',hold:'ROZKAZ: TRZYMAĆ POZYCJĘ',move:'ROZKAZ: RUCH NA POZYCJĘ',op:'ROZKAZ: AKCJA PRZY DRZWIACH'};
 function abText(u){if(u.patrol)return'Q: okrzyk „'+((LD().crew&&LD().crew.shout)||'Police! Don\'t move!')+'”';switch(u.spec){case'lead':return'Q: okrzyk „Policja!”'+(u.shoutCd>0?' ('+Math.ceil(u.shoutCd)+')':'');case'breach':return u.ram?'Q: taran':'Q: ładunek ×'+u.charges;case'tech':return'Q: kamera (drzwi) / peryskop (róg) · E: wytrych';case'medic':return'Q: sedatyw ×'+u.sed;case'scout':return'Q: granat hukowy ×'+u.flash;}return'';}
 function wHTML(u,pre){if(!u||!u.alive)return'<div class="wn">—</div>';const lt=u.holster?'LATARKA':G.nvg?'NOKTOWIZJA':(isPat()&&!LD().nvg)?'LATARKA':'';let pp='';if(u.W.mag<=40){for(let i=0;i<u.W.mag;i++)pp+='<i'+(i<u.mag&&!(u.rel>0)?'':' class="e"')+'></i>';}
- return'<div class="wn">'+(pre||'')+(u.holster?'BROŃ W KABURZE':u.W.n)+(lt?' · '+lt:'')+'</div><div class="am">'+(u.rel>0?'<small class="rl">PRZEŁADOWANIE</small>':u.mag+' <small>/ '+u.res+'</small>')+'</div>'+(pp?'<div class="pp">'+pp+'</div>':'')+'<div class="ab">'+abText(u).replace(/^Q: /,'Q · ')+(u.spray?' · G gaz ×'+u.spray:'')+(u.shield?' · TARCZA':'')+(u.quiet?' · CICHO':'')+'</div>';}
+ return'<div class="wn">'+(pre||'')+(u.holster?'BROŃ W KABURZE · X':u.W.n)+(lt?' · '+lt:'')+'</div><div class="am">'+(u.rel>0?'<small class="rl">PRZEŁADOWANIE</small>':u.mag+' <small>/ '+u.res+'</small>')+'</div>'+(pp?'<div class="pp">'+pp+'</div>':'')+'<div class="ab">'+abText(u).replace(/^Q: /,'Q · ')+(u.spray?' · G gaz ×'+u.spray:'')+(u.shield?' · TARCZA':'')+(u.quiet?' · CICHO':'')+'</div>';}
 function updateHUD(){let r='',ri=0;for(const s of SPECS.map((_,i)=>G.squad[i])){const idx=ri++;if(!s)continue;let st;
   if(!s.alive)st='KIA';else if(s.wounded&&!s.treated)st='<span style="color:#ff5a4a">RANNY · '+Math.ceil(s.bleed)+' s</span>';else if(s.stun>0)st='OGŁUSZONY';else if(s.human)st=(s.wounded?'opatrzony · ':'')+s.mag+'/'+s.W.mag;else{const t=s.task;st=s.action?'akcja':t?(t.type==='hold'?'pozycja':t.done?'gotowy':'ruch'):s.post?(s.post.kind==='door'?'pilnuje drzwi':'zabezp. kąt'):'w szyku';st+=' · '+s.mag;}
   const hw=!s.alive?0:s.wounded&&!s.treated?35:s.wounded?65:100;r+='<div data-i="'+idx+'" class="m'+(s.human===1?' p1':s.human===2?' p2':'')+(s.alive?'':' kia')+'"><span class="nm">'+s.name+'</span><span class="hb"><i'+(hw<100?' class="w"':'')+' style="width:'+hw+'%"></i></span><span class="st">'+st+'</span></div>';}
@@ -3195,7 +3197,7 @@ function resize(){const s=Math.min(innerWidth/VW,innerHeight/VH);wrap.style.widt
 addEventListener('resize',resize);resize();
 buildMap();bakeWorld();
 let last=performance.now();
-function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(G.running&&!G.paused&&G.squad)for(const q of G.squad)if(q&&q.drawCd>0)q.drawCd-=dt;
  const still=!G.running&&$('scr-menu').classList.contains('hidden');
  try{const blur=G.running||still?'none':'blur(1.6px) saturate(.65) brightness(.75)';if(cv.style.filter!==blur)cv.style.filter=blur;const tf=!G.running?(still?cv.style.transform:menuSway()):tiltOn()?'perspective('+(TILT.p*wrap.clientHeight)+'px) rotateX('+(TILT.th*180/Math.PI)+'deg) scale('+TILT.k+')':'none';if(cv.style.transform!==tf){cv.style.transform=tf;$('monov').style.transform=G.running?'none':tf;}if(G.running){if(!G.paused)update(dt);render();}else{if(!still||!G.menuDrawn){renderMenu(dt);if(still){const c=ctx;c.save();c.setTransform(1,0,0,1,0,0);c.filter='blur(.45px) saturate(.65) brightness(.75)';c.drawImage(cv,0,0);c.restore();}G.menuDrawn=1;}if(!$('scr-brief').classList.contains('hidden')){if(isPat()){callUpdate(dt);drawWave();}else drawPlan($('brief-map'),false,G.entry);}else if(CALLS.on)stopCall();}}catch(err){console.error(err);}
  requestAnimationFrame(frame);}
