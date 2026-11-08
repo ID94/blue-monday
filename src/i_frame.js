@@ -50,9 +50,7 @@ function findClueGen(u,c,H){c.found=true;H.nf=(H.nf||0)+1;logEv(c.msg.split('.')
 // generic patrol debrief
 function patrolDebrief(rows,score){const s=G.stats;score+=G.win?100:0;score-=s.roe*15+s.squadLost*20+s.civKilled*30;if(G.win)score+=Math.max(0,10-Math.floor(s.time/60));
  const rank=!G.win?'F':score>=140?'S':score>=125?'A':score>=105?'B':score>=80?'C':'D';
- $('deb-h').textContent=G.win?'MISJA ZAKOŃCZONA SUKCESEM':'MISJA NIEUDANA';$('deb-h').style.color=G.win?'#7fae6a':'#e0574a';$('deb-r').textContent='OCENA: '+rank;
- $('deb-st').innerHTML=[['Wynik',G.reason],['Czas',fmtT(s.time)],...rows,['Cywile zabici',s.civKilled],['Straty',s.squadLost+' / '+G.squad.filter(Boolean).length],['Ranni / opatrzeni',s.wounded+' / '+s.healed],['Nieuprawnione użycie siły',s.roe],['Oddane strzały',s.shots],['Punkty',score]].map(r=>'<div>'+r[0]+'<span>'+r[1]+'</span></div>').join('');
- $('deb-log').innerHTML='<div class="h">OŚ CZASU</div>'+G.log.map(l=>'<div><span>'+fmtT(l[0])+'</span>'+l[1]+'</div>').join('');showScreen('deb');}
+ debFill(rank,score,[['Czas na miejscu',fmtT(s.time)],...rows,['Cywile zabici',s.civKilled,s.civKilled?'bad':''],['Straty',s.squadLost+' / '+G.squad.filter(Boolean).length,s.squadLost?'bad':''],['Ranni / opatrzeni',s.wounded+' / '+s.healed],['Nieuprawnione użycie siły',s.roe,s.roe?'bad':''],['Oddane strzały',s.shots]]);}
 function objRows(head,rows,extra){const row=(ok,t)=>'<div class="'+(ok?'ok':'no')+'">'+t+'</div>';return'<div class="h">Notatnik · J</div>'+rows.filter(Boolean).map(r=>row(r[0],r[1])).join('')+(extra||'');}
 // ---- cinematic briefing filled from level data ----
 function fillBriefing(){const n=LD().nb;if(!n)return;

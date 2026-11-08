@@ -467,9 +467,9 @@ document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=
  if(G.paused&&g==='menu'){G.paused=false;}showScreen(g==='ctrl'&&G.paused?'ctrl':g);}));
 $('mode1').onclick=()=>{G.players=1;$('mode1').classList.add('sel');$('mode2').classList.remove('sel');$('modehint').textContent='Pozostali członkowie oddziału są sterowani przez AI i wykonują twoje rozkazy.';SND.click();};
 $('mm-coop').onclick=()=>{SND.click();$('mode2').onclick();showScreen('scen');};
-{const navRoot=()=>!$('scr-menu').classList.contains('hidden')?$('scr-menu'):(!$('scr-brief').classList.contains('hidden')&&!$('nb').classList.contains('hidden'))?$('nb'):null;
+{const navRoot=()=>!$('scr-menu').classList.contains('hidden')?$('scr-menu'):!$('scr-deb').classList.contains('hidden')?$('scr-deb'):(!$('scr-brief').classList.contains('hidden')&&!$('nb').classList.contains('hidden'))?$('nb'):null;
  const items=()=>{const r=navRoot();return r?[...r.querySelectorAll('.mm-i')]:[];};document.querySelectorAll('.mm-i').forEach(b=>b.addEventListener('mouseenter',()=>{items().forEach(x=>x.classList.toggle('on',x===b));}));
- addEventListener('keydown',e=>{if(!navRoot()||G.running)return;const it=items(),k=it.findIndex(x=>x.classList.contains('on'));
+ addEventListener('keydown',e=>{if(!navRoot()||(G.running&&$('scr-deb').classList.contains('hidden')))return;const it=items(),k=it.findIndex(x=>x.classList.contains('on'));
   if(e.code==='ArrowRight'||e.code==='KeyD'||e.code==='ArrowLeft'||e.code==='KeyA'){const n=(k+(e.code==='ArrowRight'||e.code==='KeyD'?1:-1)+it.length)%it.length;it.forEach((x,j)=>x.classList.toggle('on',j===n));SND.click&&A.ctx&&SND.click();e.preventDefault();}
   else if(e.code==='Enter'||e.code==='Space'){it[Math.max(0,k)].click();e.preventDefault();e.stopImmediatePropagation();}});}
 function ctTab(n){$('ct1').classList.toggle('sel',n===1);$('ct2').classList.toggle('sel',n===2);$('ctp1').classList.toggle('hidden',n!==1);$('ctp2').classList.toggle('hidden',n!==2);$('ct-sub').textContent=n===1?'KLAWIATURA + MYSZ':'PAD LUB KLAWIATURA · TRYB CO-OP';}
@@ -518,7 +518,7 @@ function fillPause(){const c=$('sc'+(PZ_SC[G.lvl]||1));$('pz-tt').textContent=c?
  document.querySelectorAll('.pz-i').forEach(x=>{x.classList.toggle('on',x.id==='p-res');x.classList.remove('warn');x.querySelector('small').textContent=x.id==='p-res'?'ESC':'';});
  $('pz-sq').innerHTML=G.squad.filter(Boolean).map(s=>'<div class="'+(!s.alive?'k':s.wounded&&!s.treated?'r':'')+'">'+s.name+'<span>'+(!s.alive?'KIA':s.wounded&&!s.treated?'RANNY':s.wounded?'OPATRZONY':'OK')+'</span></div>').join('');
  $('pz-log').innerHTML=(G.log||[]).slice(-5).map(l=>'<div><b>'+fmtT(l[0])+'</b>'+l[1]+'</div>').join('')||'<div>—</div>';}
-$('d-rst').onclick=()=>{startMission();};$('d-menu').onclick=()=>{G.running=false;$('hud').classList.add('hidden');radioClear();showScreen('menu');};
+$('d-rst').onclick=()=>{startMission();};$('d-scen').onclick=()=>{G.running=false;$('hud').classList.add('hidden');radioClear();showScreen('scen');};$('d-menu').onclick=()=>{G.running=false;$('hud').classList.add('hidden');radioClear();showScreen('menu');};
 $('o-vol').oninput=e=>setVol(e.target.value/100);
 const VMODE={static:'trzaski krótkofalówki',tts:'synteza mowy',off:'tylko napisy'};$('o-voice').onclick=()=>{A.voice=A.voice==='static'?'tts':A.voice==='tts'?'off':'static';$('o-voice').textContent='Głos radia: '+VMODE[A.voice];if(A.voice!=='tts'&&'speechSynthesis' in window)speechSynthesis.cancel();SND.click();};
 $('o-tilt').onclick=()=>{G.tilt=G.tilt===false;$('o-tilt').textContent='Kamera pod kątem: '+(G.tilt===false?'wył.':'wł.');SND.click();};
@@ -528,11 +528,14 @@ $('scr-ctrl').querySelector('[data-go]').addEventListener('click',e=>{if(G.pause
 function showDebrief(){$('hud').classList.add('hidden');closeCtx();if(isPat()){LD().debrief();return;}const s=G.stats,ne=G.enemies.length;
  let score=G.win?100:0;score-=s.squadLost*15;score-=s.civKilled*30;score+=s.reports*3;score-=s.roe*15;score+=s.traps*4;score+=(s.eArrest+s.eSed)*6;if(!G.alarm)score+=15;if(G.win)score+=Math.max(0,15-Math.floor(s.time/60)*2);
  const rank=!G.win?'F':score>=125?'S':score>=105?'A':score>=85?'B':score>=60?'C':'D';
- $('deb-h').textContent=G.win?'MISJA ZAKOŃCZONA SUKCESEM':'MISJA NIEUDANA';$('deb-h').style.color=G.win?'#7fae6a':'#e0574a';
- $('deb-r').textContent='OCENA: '+rank;
- $('deb-st').innerHTML=[['Wynik',G.reason],['Czas operacji',fmtT(s.time)],['Napastnicy zabici',s.eKilled+' / '+ne],['Napastnicy zatrzymani',s.eArrest],['Napastnicy uśpieni',s.eSed],['Cywile skuci / uśpieni',s.civSecured],['Cywile zabici',s.civKilled],['Straty w oddziale',s.squadLost+' / '+G.squad.filter(Boolean).length],['Ranni w oddziale / opatrzeni',s.wounded+' / '+s.healed],['Zgłoszenia do dowództwa',s.reports+' / '+(s.reports+G.units.filter(o=>reportable(o)).length)],['Nieuprawnione użycie siły',s.roe],['Oddane strzały',s.shots],['Alarm',G.alarm?'podniesiony':'nie — pełne zaskoczenie'],['Punkty',score]].map(r=>'<div>'+r[0]+'<span>'+r[1]+'</span></div>').join('');
- $('deb-log').innerHTML='<div class="h">OŚ CZASU OPERACJI</div>'+G.log.map(l=>'<div><span>'+fmtT(l[0])+'</span>'+l[1]+'</div>').join('');
- showScreen('deb');}
+ debFill(rank,score,[['Czas operacji',fmtT(s.time)],['Napastnicy zabici',s.eKilled+' / '+ne],['Napastnicy zatrzymani',s.eArrest],['Napastnicy uśpieni',s.eSed],['Cywile skuci / uśpieni',s.civSecured],['Cywile zabici',s.civKilled,s.civKilled?'bad':''],['Straty w oddziale',s.squadLost+' / '+G.squad.filter(Boolean).length,s.squadLost?'bad':''],['Ranni / opatrzeni',s.wounded+' / '+s.healed],['Zgłoszenia do dowództwa',s.reports+' / '+(s.reports+G.units.filter(o=>reportable(o)).length)],['Nieuprawnione użycie siły',s.roe,s.roe?'bad':''],['Oddane strzały',s.shots],['Alarm',G.alarm?'podniesiony':'pełne zaskoczenie',G.alarm?'bad':'good']]);}
+function debFill(rank,score,rows){const sc=$('scr-deb'),c=$('sc'+(PZ_SC[G.lvl]||1));sc.classList.toggle('fail',!G.win);
+ $('deb-h').textContent=G.win?'MISJA ZAKOŃCZONA':'MISJA NIEUDANA';$('deb-h').style.color='';$('db-stat').textContent=G.win?'ZAMKNIĘTE':'NIEUDANE';$('db-no').textContent=(LD().nb&&LD().nb.no)||'#26-097-0042';
+ $('db-tt').textContent=c?c.querySelector('.tt').textContent:'';$('db-fa').textContent=c?c.querySelector('.fa').textContent:'';$('db-rs').textContent=G.reason||'';
+ const r=$('deb-r');r.textContent=rank;r.className='db-rk r-'+rank;$('db-pt').textContent=score+' PKT';$('db-tm').textContent='CZAS '+fmtT(G.stats.time);
+ $('deb-st').innerHTML=rows.map(x=>'<div'+(x[2]?' class="'+x[2]+'"':'')+'>'+x[0]+'<span>'+x[1]+'</span></div>').join('');
+ $('deb-log').innerHTML=G.log.map(l=>'<div><span>'+fmtT(l[0])+'</span>'+l[1]+'</div>').join('');
+ document.querySelectorAll('#scr-deb .mm-i').forEach((x,i)=>x.classList.toggle('on',i===0));showScreen('deb');setTimeout(()=>{const L=$('deb-log');L.scrollTop=L.scrollHeight;},30);}
 
 // ================= LOOP =================
 function resize(){const s=Math.min(innerWidth/VW,innerHeight/VH);wrap.style.width=VW*s+'px';wrap.style.height=VH*s+'px';wrap.style.setProperty('--u',(VW*s/480)+'px');}
