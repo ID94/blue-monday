@@ -41,13 +41,17 @@ class Unit{constructor(o){this.id=UID++;this.x=0;this.y=0;this.vx=0;this.vy=0;th
  Object.assign(this,o);if(this.weap){this.W=WEAP[this.weap];this.mag=this.W.mag;this.res=this.W.mag*(this.team==='squad'?4:2);}}
  active(){return this.alive&&this.stun<=0&&this.pose!=='sleep'&&this.state!=='surr'&&this.state!=='cuffed';}
 }
-function visionPoly(u){const pts=[],R=u.range*TS,r0=TS*1.15,half=u.fov*Math.PI/360,ext=9;
+function nearLamp(u){for(const l of LAMPS||[])if(Math.hypot(l[0]*TS+8-u.x,l[1]*TS+8-u.y)<TS*4.5)return true;return false;}
+function effRange(u){let r=u.range;if(!G.nvg&&G.torchOff&&W8()!=='day'&&!nearLamp(u))r*=.5;return r;}
+function effFov(u){const v=Math.hypot(u.vx||0,u.vy||0);return u.fov*(v>40?.85:v<18?1.1:1);}
+function visionPoly(u){const pts=[],R=effRange(u)*TS,r0=TS*.75,half=effFov(u)*Math.PI/360,ext=9;
  const n=Math.ceil(u.fov/1.6);for(let i=0;i<=n;i++){const a=u.ang-half+2*half*i/n,d=castRay(u.x,u.y,a,R,ext);pts.push(u.x+Math.cos(a)*d,u.y+Math.sin(a)*d);}
  const m=16;for(let i=0;i<=m;i++){const a=u.ang+half+(2*Math.PI-2*half)*i/m,d=castRay(u.x,u.y,a,r0,ext);pts.push(u.x+Math.cos(a)*d,u.y+Math.sin(a)*d);}
  u.vis=pts;}
-function canSee(s,x,y,fov,range){const dx=x-s.x,dy=y-s.y,d=Math.hypot(dx,dy);range=(range||s.range)*TS;if(d>range+6)return false;
- if(d>TS*1.25&&Math.abs(angDiff(s.ang,Math.atan2(dy,dx)))>(fov||s.fov)*Math.PI/360)return false;return losClear(s.x,s.y,x,y);}
+function canSee(s,x,y,fov,range){const dx=x-s.x,dy=y-s.y,d=Math.hypot(dx,dy);range=(range||effRange(s))*TS;if(d>range+6)return false;
+ if(d>TS*.85&&Math.abs(angDiff(s.ang,Math.atan2(dy,dx)))>(fov||effFov(s))*Math.PI/360)return false;return losClear(s.x,s.y,x,y);}
 function seenBySquad(e){for(const s of G.squad)if(s.alive&&canSee(s,e.x,e.y))return true;return false;}
+function seenByHuman(e){for(const s of G.squad)if(s&&s.alive&&s.human&&canSee(s,e.x,e.y))return true;return false;}
 function turnTo(u,a,dt,spd){const d=angDiff(u.ang,a);u.ang+=clamp(d,-spd*dt,spd*dt);}
 function moveUnit(u,dt,wx,wy,spd){if(u.wounded)spd*=u.treated?.85:.62;if(u.shield)spd*=.8;if(u.armor==='heavy')spd*=.9;const k=1-Math.exp(-11*dt);u.vx+=(wx*spd-u.vx)*k;u.vy+=(wy*spd-u.vy)*k;
  if(Math.abs(u.vx)<.5&&!wx)u.vx=0;if(Math.abs(u.vy)<.5&&!wy)u.vy=0;
@@ -113,6 +117,7 @@ function lineSafe(u,t){const ax=u.x,ay=u.y,bx=t.x,by=t.y,L=Math.hypot(bx-ax,by-a
  for(const f of G.units){if(f===u||f===t||!f.alive)continue;if(f.team==='enemy'&&f.active())continue;
   const px=f.x-ax,py=f.y-ay,pr=(px*(bx-ax)+py*(by-ay))/L;if(pr<0||pr>L+8)continue;const pd=Math.abs(px*(by-ay)-py*(bx-ax))/L;if(pd<9)return false;}return true;}
 function makeNoise(x,y,rad,kind,src){
+ if(G.p1&&G.p1.alive&&kind!=='step'&&Math.hypot(x-G.p1.x,y-G.p1.y)<TS*14&&!(src&&src.team==='squad')&&!canSee(G.p1,x,y))(G.pings||(G.pings=[])).push({x,y,t:0,big:1});
  if(src&&src.team==='enemy'&&kind!=='boom')return;
  for(const e of G.enemies){if(!e.active())continue;const d=dist(x,y,e.x,e.y)/TS,l=losClear(x,y,e.x,e.y),eff=l?rad:rad*.5;
   if(d<eff){if(kind==='shot'||kind==='boom'||kind==='kick')raiseAlarm('noise');

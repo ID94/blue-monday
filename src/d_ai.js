@@ -145,7 +145,7 @@ function doGoto(u,dt){const t=u.task;if(t.done){moveUnit(u,dt,0,0,0);return;}
  followPath(u,dt,t.spd||46);if(u.pathFail){u.pathFail=null;t.done=true;}}
 
 // ================= ENEMY AI =================
-function enemyPerceive(e){if(e.state==='flee'&&e.fleeT>10)return;let best=null,bd=1e9;const rg=(G.alarm?10:8)-(G.nvg?2.5:0);
+function enemyPerceive(e){if(e.state==='flee'&&e.fleeT>10)return;let best=null,bd=1e9;const rg=(G.alarm?10:8)-((G.nvg||G.torchOff)?2.5:0);
  for(const s of G.squad){if(!s.alive)continue;const d=dist(e.x,e.y,s.x,s.y);if(d<rg*TS&&canSee(e,s.x,s.y,115,rg)&&d<bd){bd=d;best=s;}}
  if(best){e.seeT=true;e.lostT=0;e.lkx=best.x;e.lky=best.y;
   if(!e.target||e.target!==best&&(!e.target.alive||bd<dist(e.x,e.y,e.target.x,e.target.y)-TS*2)){const none=!e.target;e.target=best;

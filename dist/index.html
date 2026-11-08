@@ -299,7 +299,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
   <div id="idcard"><div class="idh"><span>RIDGEFIELD COUNTY</span><span>DRIVER LICENSE</span></div><div class="idb"><canvas id="idph" width="18" height="22"></canvas><div class="idf">
    <div><i>DL</i> H460-2271-0314</div><div class="idn">HARTLEY</div><div class="idn2">ETHAN JAMES</div><div><i>DOB</i> 03/14/2006</div><div>214 OAKRIDGE LN<br>RIDGEFIELD</div><div><i>HGT</i> 5'11" &nbsp;<i>EYES</i> BRN &nbsp;<i>SEX</i> M</div><div><i>EXP</i> 03/14/2030</div></div></div><div class="idsig">Ethan Hartley</div></div>
   <div id="toast"></div>
-  <div id="cmdhint">LPM / X broń · PPM rozkazy · F za mną · H stój · TAB operator · M plan · J notatnik · ESC pauza</div>
+  <div id="cmdhint">LPM / X broń · L latarka · PPM rozkazy · F za mną · H stój · TAB operator · M plan · J notatnik · ESC pauza</div>
  </div>
  <div id="planov" class="hidden"><canvas id="plancv" width="800" height="580"></canvas></div>
  <div id="ctx" class="hidden"></div>
@@ -362,7 +362,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
   <div class="ct-sub" id="ct-sub">KLAWIATURA + MYSZ</div>
   <div class="ct-grid" id="ctp1"><div class="cg"><h5>RUCH I WALKA</h5><div class="cr"><k>W</k><k>A</k><k>S</k><k>D</k><span>ruch</span></div><div class="cr"><k>MYSZ</k><span>celowanie i kierunek wzroku</span></div><div class="cr"><k>LPM</k><span>strzał</span></div><div class="cr"><k>R</k><span>przeładowanie</span></div><div class="cr"><k>SHIFT</k><span>cichy chód</span></div></div><div class="cg"><h5>INTERAKCJA</h5><div class="cr"><k>E</k><span>interakcja — drzwi, rozmowa, skuwanie, oględziny</span></div><div class="cr"><k>E</k><em>przytrzymaj</em><span>wytrych / wyważenie drzwi</span></div><div class="cr"><k>Q</k><span>umiejętność postaci</span></div><div class="cr"><k>G</k><span>gaz pieprzowy</span></div><div class="cr"><k>T</k><span>zgłoszenie do dowództwa</span></div></div><div class="cg"><h5>ZESPÓŁ</h5><div class="cr"><k>PPM</k><span>menu rozkazów</span></div><div class="cr"><k>F</k><span>za mną</span></div><div class="cr"><k>H</k><span>trzymać pozycję</span></div><div class="cr"><k>SPACJA</k><span>sygnał wejścia</span></div><div class="cr"><k>1–5</k><k>TAB</k><span>przejmij operatora</span></div></div><div class="cg"><h5>POZOSTAŁE</h5><div class="cr"><k>C</k><span>sprawdź róg peryskopem</span></div><div class="cr"><k>N</k><span>noktowizja / latarki</span></div><div class="cr"><k>M</k><em>przytrzymaj</em><span>plan budynku</span></div><div class="cr"><k>ESC</k><span>pauza</span></div></div></div>
   <div class="ct-grid hidden" id="ctp2"><div class="cg"><h5>PAD</h5><div class="cr"><k>L</k><em>gałka</em><span>ruch</span></div><div class="cr"><k>R</k><em>gałka</em><span>celowanie</span></div><div class="cr"><k>RT</k><span>strzał</span></div><div class="cr"><k>A</k><span>interakcja</span></div><div class="cr"><k>X</k><span>umiejętność</span></div><div class="cr"><k>Y</k><span>przeładowanie</span></div><div class="cr"><k>B</k><span>zgłoszenie</span></div><div class="cr"><k>LT</k><span>cichy chód</span></div><div class="cr"><k>RB</k><span>zmiana operatora</span></div></div><div class="cg"><h5>KLAWIATURA</h5><div class="cr"><k>↑</k><k>←</k><k>↓</k><k>→</k><span>ruch — patrzy w kierunku ruchu</span></div><div class="cr"><k>P. SHIFT</k><span>blokada kierunku patrzenia</span></div><div class="cr"><k>ENTER</k><span>strzał</span></div><div class="cr"><k>/</k><span>interakcja</span></div><div class="cr"><k>.</k><span>umiejętność</span></div><div class="cr"><k>,</k><span>przeładowanie</span></div><div class="cr"><k>;</k><span>zgłoszenie</span></div><div class="cr"><k>P. CTRL</k><span>cichy chód</span></div><div class="cr"><k>'</k><span>zmiana operatora</span></div></div><div class="cg"><h5>WSPÓŁPRACA</h5><p>Gracz 1 prowadzi zespół i wydaje rozkazy. Gracz 2 steruje partnerem.</p><p>Kamera jest wspólna — trzymajcie się blisko.</p><p>Gracz 2 ma lekkie wspomaganie celowania.</p></div></div>
-  <div class="ct-note">W misji patrolowej broń jest w kaburze: <b>X</b> lub <b>LPM</b> wyciąga ją, <b>X</b> chowa. <b>Q</b> to okrzyk, nie ma noktowizji ani peryskopu.</div>
+  <div class="ct-note">W misji patrolowej broń jest w kaburze: <b>X</b> lub <b>LPM</b> wyciąga ją, <b>X</b> chowa. <b>L</b> włącza i gasi latarki — bez nich w ciemnych pomieszczeniach widać o połowę bliżej. <b>Q</b> to okrzyk, nie ma noktowizji ani peryskopu.</div>
   <div class="mm-nav"><button class="mm-i on" data-go="menu">WRÓĆ</button><span class="mm-r">← → GRACZ · ESC</span></div>
  </div>
 
@@ -1036,13 +1036,17 @@ class Unit{constructor(o){this.id=UID++;this.x=0;this.y=0;this.vx=0;this.vy=0;th
  Object.assign(this,o);if(this.weap){this.W=WEAP[this.weap];this.mag=this.W.mag;this.res=this.W.mag*(this.team==='squad'?4:2);}}
  active(){return this.alive&&this.stun<=0&&this.pose!=='sleep'&&this.state!=='surr'&&this.state!=='cuffed';}
 }
-function visionPoly(u){const pts=[],R=u.range*TS,r0=TS*1.15,half=u.fov*Math.PI/360,ext=9;
+function nearLamp(u){for(const l of LAMPS||[])if(Math.hypot(l[0]*TS+8-u.x,l[1]*TS+8-u.y)<TS*4.5)return true;return false;}
+function effRange(u){let r=u.range;if(!G.nvg&&G.torchOff&&W8()!=='day'&&!nearLamp(u))r*=.5;return r;}
+function effFov(u){const v=Math.hypot(u.vx||0,u.vy||0);return u.fov*(v>40?.85:v<18?1.1:1);}
+function visionPoly(u){const pts=[],R=effRange(u)*TS,r0=TS*.75,half=effFov(u)*Math.PI/360,ext=9;
  const n=Math.ceil(u.fov/1.6);for(let i=0;i<=n;i++){const a=u.ang-half+2*half*i/n,d=castRay(u.x,u.y,a,R,ext);pts.push(u.x+Math.cos(a)*d,u.y+Math.sin(a)*d);}
  const m=16;for(let i=0;i<=m;i++){const a=u.ang+half+(2*Math.PI-2*half)*i/m,d=castRay(u.x,u.y,a,r0,ext);pts.push(u.x+Math.cos(a)*d,u.y+Math.sin(a)*d);}
  u.vis=pts;}
-function canSee(s,x,y,fov,range){const dx=x-s.x,dy=y-s.y,d=Math.hypot(dx,dy);range=(range||s.range)*TS;if(d>range+6)return false;
- if(d>TS*1.25&&Math.abs(angDiff(s.ang,Math.atan2(dy,dx)))>(fov||s.fov)*Math.PI/360)return false;return losClear(s.x,s.y,x,y);}
+function canSee(s,x,y,fov,range){const dx=x-s.x,dy=y-s.y,d=Math.hypot(dx,dy);range=(range||effRange(s))*TS;if(d>range+6)return false;
+ if(d>TS*.85&&Math.abs(angDiff(s.ang,Math.atan2(dy,dx)))>(fov||effFov(s))*Math.PI/360)return false;return losClear(s.x,s.y,x,y);}
 function seenBySquad(e){for(const s of G.squad)if(s.alive&&canSee(s,e.x,e.y))return true;return false;}
+function seenByHuman(e){for(const s of G.squad)if(s&&s.alive&&s.human&&canSee(s,e.x,e.y))return true;return false;}
 function turnTo(u,a,dt,spd){const d=angDiff(u.ang,a);u.ang+=clamp(d,-spd*dt,spd*dt);}
 function moveUnit(u,dt,wx,wy,spd){if(u.wounded)spd*=u.treated?.85:.62;if(u.shield)spd*=.8;if(u.armor==='heavy')spd*=.9;const k=1-Math.exp(-11*dt);u.vx+=(wx*spd-u.vx)*k;u.vy+=(wy*spd-u.vy)*k;
  if(Math.abs(u.vx)<.5&&!wx)u.vx=0;if(Math.abs(u.vy)<.5&&!wy)u.vy=0;
@@ -1108,6 +1112,7 @@ function lineSafe(u,t){const ax=u.x,ay=u.y,bx=t.x,by=t.y,L=Math.hypot(bx-ax,by-a
  for(const f of G.units){if(f===u||f===t||!f.alive)continue;if(f.team==='enemy'&&f.active())continue;
   const px=f.x-ax,py=f.y-ay,pr=(px*(bx-ax)+py*(by-ay))/L;if(pr<0||pr>L+8)continue;const pd=Math.abs(px*(by-ay)-py*(bx-ax))/L;if(pd<9)return false;}return true;}
 function makeNoise(x,y,rad,kind,src){
+ if(G.p1&&G.p1.alive&&kind!=='step'&&Math.hypot(x-G.p1.x,y-G.p1.y)<TS*14&&!(src&&src.team==='squad')&&!canSee(G.p1,x,y))(G.pings||(G.pings=[])).push({x,y,t:0,big:1});
  if(src&&src.team==='enemy'&&kind!=='boom')return;
  for(const e of G.enemies){if(!e.active())continue;const d=dist(x,y,e.x,e.y)/TS,l=losClear(x,y,e.x,e.y),eff=l?rad:rad*.5;
   if(d<eff){if(kind==='shot'||kind==='boom'||kind==='kick')raiseAlarm('noise');
@@ -1419,7 +1424,7 @@ function doGoto(u,dt){const t=u.task;if(t.done){moveUnit(u,dt,0,0,0);return;}
  followPath(u,dt,t.spd||46);if(u.pathFail){u.pathFail=null;t.done=true;}}
 
 // ================= ENEMY AI =================
-function enemyPerceive(e){if(e.state==='flee'&&e.fleeT>10)return;let best=null,bd=1e9;const rg=(G.alarm?10:8)-(G.nvg?2.5:0);
+function enemyPerceive(e){if(e.state==='flee'&&e.fleeT>10)return;let best=null,bd=1e9;const rg=(G.alarm?10:8)-((G.nvg||G.torchOff)?2.5:0);
  for(const s of G.squad){if(!s.alive)continue;const d=dist(e.x,e.y,s.x,s.y);if(d<rg*TS&&canSee(e,s.x,s.y,115,rg)&&d<bd){bd=d;best=s;}}
  if(best){e.seeT=true;e.lostT=0;e.lkx=best.x;e.lky=best.y;
   if(!e.target||e.target!==best&&(!e.target.alive||bd<dist(e.x,e.y,e.target.x,e.target.y)-TS*2)){const none=!e.target;e.target=best;
@@ -1730,6 +1735,7 @@ function buildGear(){const box=$('gear-cards');if(!G.load)G.load=defaultLoad();b
   d.querySelectorAll('.seg span[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k;let v=b.dataset.v;if(k==='ram')v=v==='true';L[k]=v;SND.click();buildGear();});
   box.appendChild(d);});}
 // ================= NOKTOWIZJA =================
+function toggleTorch(){if(G.nvg){toast('Noktowizja aktywna — latarki zgaszone');return;}G.torchOff=!G.torchOff;toast(G.torchOff?'Latarki zgaszone':'Latarki włączone');if(A.ctx){const o=ui(.12),t0=A.ctx.currentTime;tone(o,t0,.04,{f:2400,f2:1800,g:.3});tone(o,t0+.05,.03,{f:1600,g:.2});}}
 function toggleNVG(){if(isPat()&&!LD().nvg){toast('Brak noktowizora — tylko latarki');return;}G.nvg=!G.nvg;toast(G.nvg?'NOKTOWIZJA — latarki zgaszone':'LATARKI — lepiej widać, ale was też');if(A.ctx){const o=ui(.15),t0=A.ctx.currentTime;tone(o,t0,G.nvg?.5:.08,{f:G.nvg?6000:1500,f2:G.nvg?9000:900,g:.25});}logEv(G.nvg?'Oddział przechodzi na noktowizję':'Oddział włącza latarki');}
 
 // ================= LEVEL 01: KLONOWA 14 (osiedle domów jednorodzinnych) =================
@@ -2804,7 +2810,7 @@ const CIVS=[{x:19,y:19,k:'nurse',st:'hide'},{x:39,y:5,k:'doctor',st:'hide'},{x:4
  {x:9,y:6,k:'patient',st:'wander'},{x:17,y:6,k:'patient',st:'wander'},{x:25,y:6,k:'patient',st:'wander'},{x:27,y:17,k:'patient',st:'wander'},{x:29,y:16,k:'patient',st:'wander'},{x:5,y:17,k:'patient',st:'wander'},{x:4,y:6,k:'patient',st:'wander'}];
 const CORPSES=[[33,14,'guard'],[33,33,'guard'],[54,30,'guard'],[47,12,'orderly'],[60,9,'doctor']];
 const INTEL=[[56,6,'ZAKŁADNIK?'],[37,31,'WARTA?'],[20,34,'?'],[73,29,'?'],[16,11,'?']];
-function startMission(){radioClear();stopCall();buildMap();bakeWorld();LV.doorRows=null;mc.clearRect(0,0,memory.width,memory.height);
+function startMission(){radioClear();G.torchOff=false;G.pings=[];stopCall();buildMap();bakeWorld();LV.doorRows=null;mc.clearRect(0,0,memory.width,memory.height);
  Object.assign(G,{running:true,paused:false,ended:false,time:0,units:[],squad:[],enemies:[],civs:[],fx:[],tracers:[],lights:[],nades:[],ops:[],order:'follow',alarm:false,execT:45,warned:false,
   camv:null,flashW:0,shake:0,obj:{found:false,freed:false},devs:null,babyT:rand(3,6),panicCD:0,log:[],nvg:false,negT:rand(50,80),negBonus:0,negAlarm:0,traps:[],stats:{roe:0,traps:0,reports:0,wounded:0,healed:0,eKilled:0,eArrest:0,eSed:0,civKilled:0,civSecured:0,squadLost:0,shots:0,time:0},press:{},deadline:720,dl:{},blackT:rand(40,70),blackDur:0,scareT:rand(10,20),trail:[],trailOwner:null,postAnchor:null,stillT:0,lightT:rand(6,15),lightF:0,clankT:rand(8,18),heartT:0,p1:null,p2:null,hudT:0});
  if(!ENTRIES[G.entry])G.entry=0;const E=ENTRIES[G.entry],fx=Math.cos(E.a),fy=Math.sin(E.a),rx=-fy,ry=fx,offs=[[0,0],[-1,-.9],[-1,.9],[-2,-.5],[-2,.5]];
@@ -2859,7 +2865,7 @@ addEventListener('keydown',e=>{if(['Tab','ArrowUp','ArrowDown','ArrowLeft','Arro
  if(e.code==='KeyN')toggleNVG();
  if(e.code==='KeyC'&&G.p1&&G.p1.alive){if(G.p1.spec==='tech'){if(!G.camv){const a=G.p1.ang;G.p1.action={t:0,dur:.5,label:'Peryskop',pose:'kneel',done:()=>startMirror(G.p1,a)};}}else orderCorner();}
  if(e.code==='Space'){const w=G.ops.filter(o=>o.wait&&!o.go);if(w.length){w.forEach(o=>o.go=true);radio(G.p1?G.p1.name:'ALFA','Wszystkie zespoły: wejście, wejście, wejście!',{prio:1});logEv('Sygnał do wejścia ('+w.map(o=>teamName(o.team)).join(' + ')+')');}}
- if(e.code==='KeyM')G.map=true;if(e.code==='KeyJ'&&G.running&&!G.paused)$('obj').classList.toggle('fold');if(e.code==='KeyX'&&G.running&&!G.paused&&G.p1&&G.p1.alive&&!G.ended)setHolster(!G.p1.holster);});
+ if(e.code==='KeyM')G.map=true;if(e.code==='KeyJ'&&G.running&&!G.paused)$('obj').classList.toggle('fold');if(e.code==='KeyX'&&G.running&&!G.paused&&G.p1&&G.p1.alive&&!G.ended)setHolster(!G.p1.holster);if(e.code==='KeyL'&&G.running&&!G.paused&&!G.ended)toggleTorch();});
 addEventListener('keyup',e=>{K[e.code]=false;if(e.code==='KeyM')G.map=false;});
 addEventListener('blur',()=>{for(const k in K)K[k]=false;G.mouse.down=false;});
 const wrap=$('wrap');
@@ -2962,7 +2968,9 @@ function update(dt){G.time+=dt;if(!G.ended)G.stats.time+=dt;
   if(G.execT<=0){B.ang=Math.atan2(H.y-B.y,H.x-B.x);SND.gun('epistol',B.x,B.y);G.tracers.push({x0:B.x,y0:B.y-8,x1:H.x,y1:H.y-8,t:0,e:1});kill(H,B,B.ang);}}
  separate();animUnits(dt);
  for(const s of G.squad)if(s.alive){visionPoly(s);mc.fillStyle='#fff';mc.beginPath();polyPath(mc,s.vis,0,0);mc.fill();}else s.vis=null;
- for(const u of G.units){if(u.team==='squad')continue;u.visNow=(u.camSeen===G.time)||seenBySquad(u);if(u.visNow)u.everSeen=true;}
+ for(const u of G.units){if(u.team==='squad')continue;u.visNow=(u.camSeen===G.time)||seenBySquad(u);if(u.visNow)u.everSeen=true;u.visMine=u.camSeen===G.time||(u.visNow&&seenByHuman(u));if(u.visMine&&u.alive){u.seenX=u.x;u.seenY=u.y;u.seenT=G.time;}
+  if(u.alive&&!u.visMine&&G.p1&&G.p1.alive&&Math.hypot(u.vx||0,u.vy||0)>14&&Math.hypot(u.x-G.p1.x,u.y-G.p1.y)<TS*9){u.stepT=(u.stepT||0)-dt;if(u.stepT<=0){u.stepT=.6;(G.pings||(G.pings=[])).push({x:u.x,y:u.y+4,t:0});}}}
+ if(G.pings){for(const p of G.pings)p.t+=dt;G.pings=G.pings.filter(p=>p.t<(p.big?1.1:.75));}
  for(const u of G.units)if(u.kind==='corpse'&&u.visNow&&!u.reported){u.reported=1;if(G.time-(G.corpseT||-99)>6){G.corpseT=G.time;const s=G.squad.find(q=>q.alive&&canSee(q,u.x,u.y));radio(s?s.name:'ALFA',pick(['Mamy ciało. Cywil, nie żyje.','Kolejna ofiara... Dowództwo, potwierdzam zgon.','Ciało na ziemi. Ochroniarz, chyba nie żyje od godziny.','Boże... Następny.']));}}
  if(H&&!G.obj.found&&H.visNow){G.obj.found=true;const s=G.squad.find(q=>q.alive&&canSee(q,H.x,H.y));radio(s?s.name:'ALFA','Widzę zakładnika!',{prio:1});}
 
@@ -3067,7 +3075,7 @@ function render(){const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOpera
  if(LD().render)LD().render(c,cx,cy);
  c.globalCompositeOperation='lighter';
  for(const l of LV.lamps){if(!l.k)continue;const x=l.x-cx,y=l.y-cy;if(x<-l.r||y<-l.r||x>VW+l.r||y>VH+l.r)continue;const g=c.createRadialGradient(x,y,0,x,y,l.r);g.addColorStop(0,hexA(l.col,.13));g.addColorStop(1,hexA(l.col,0));c.fillStyle=g;c.fillRect(x-l.r,y-l.r,l.r*2,l.r*2);}
- if(!G.nvg)for(const s of G.squad){if(!s.alive||!s.vis)continue;const R=s.range*TS,g=c.createRadialGradient(s.x-cx,s.y-cy,0,s.x-cx,s.y-cy,R);g.addColorStop(0,'rgba(255,238,200,.11)');g.addColorStop(1,'rgba(255,238,200,0)');c.fillStyle=g;c.beginPath();polyPath(c,s.vis,cx,cy);c.fill();}
+ if(!G.nvg&&!G.torchOff)for(const s of G.squad){if(!s.alive||!s.vis)continue;const R=effRange(s)*TS,g=c.createRadialGradient(s.x-cx,s.y-cy,0,s.x-cx,s.y-cy,R);g.addColorStop(0,'rgba(255,238,200,.11)');g.addColorStop(1,'rgba(255,238,200,0)');c.fillStyle=g;c.beginPath();polyPath(c,s.vis,cx,cy);c.fill();}
  policeLights(c,cx,cy);
  c.globalCompositeOperation='source-over';
  // monitors glow in security room
@@ -3083,7 +3091,7 @@ function render(){const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOpera
  const mc0=c;{const ec=entCv();ec.clearRect(0,0,VW,VH);}let er=Math.max(0,Math.floor(cy/TS)-1);const eg=entCv();
  for(const u of list){const c=eg;const sx=u.x-cx,sy=u.y-cy;if(sx<-20||sy<-30||sx>VW+20||sy>VH+20)continue;const ur=u.y/TS|0;
   while(er<=ur){eg.globalCompositeOperation='destination-out';rowLayer(eg,er,cx,cy);eg.globalCompositeOperation='source-over';er++;}
-  drawHuman(c,u,sx,sy);
+  const dim=isPat()&&u.team!=='squad'&&u.alive&&!u.visMine;if(dim)c.globalAlpha=.42;drawHuman(c,u,sx,sy);if(dim)c.globalAlpha=1;
   if(u.team==='squad'&&u.alive){const col=u.human===1?'#efe8c8':u.human===2?'#5fc7d6':u.acc;P(c,Math.round(sx)-1,Math.round(sy)+2,3,1,col);if(!u.human)P(c,Math.round(sx)-1,Math.round(sy)+3,3,1,TEAMOF[u.spec]==='red'?'#d04030':'#3a6ae0');if(u.human)P(c,Math.round(sx),Math.round(sy)-22,1,2,col);}
   if(u.alive&&u.team==='enemy'&&u.icoT>0&&u.ico)drawIcon(c,u.ico,Math.round(sx),Math.round(sy)-24,u.ico==='!'?'#ff3b30':'#e8c24a');
   if(G.camv&&u.team!=='squad'&&u.alive&&u.camSeen===G.time&&!seenBySquad(u)){c.strokeStyle='rgba(90,255,140,.7)';c.strokeRect(Math.round(sx)-6.5,Math.round(sy)-18.5,13,20);}}
@@ -3099,6 +3107,9 @@ function render(){const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOpera
   else if(f.k==='smoke'){c.globalAlpha=f.a*(1-f.t/f.life);c.fillStyle=f.c;c.beginPath();c.arc(x,y,f.r,0,7);c.fill();c.globalAlpha=1;}
   else if(f.k==='debris')P(c,x,y,2,1,f.c);
   else if(f.k==='bang'){c.globalAlpha=1-f.t/f.life;c.fillStyle='#fff';c.beginPath();c.arc(x,y,6+f.t*120,0,7);c.fill();c.globalAlpha=1;}}
+ // ostatnio widziane pozycje i dźwięki spoza pola widzenia
+ if(isPat())for(const u of G.units){if(u.team==='squad'||!u.alive||u.visNow||!u.seenT)continue;const t=G.time-u.seenT;if(t>3.5)continue;const sx=u.seenX-cx,sy=u.seenY-cy;if(sx<-20||sy<-30||sx>VW+20||sy>VH+20)continue;c.globalAlpha=.3*(1-t/3.5);const ox=u.x,oy=u.y;u.x=u.seenX;u.y=u.seenY;drawHuman(c,u,sx,sy);u.x=ox;u.y=oy;c.globalAlpha=1;}
+ if(G.pings)for(const p of G.pings){const L=p.big?1.1:.75,k=1-p.t/L,r=(p.big?3:2)+p.t*(p.big?16:9);c.strokeStyle='rgba(230,226,210,'+(.5*k)+')';c.lineWidth=1;c.beginPath();c.ellipse(p.x-cx,p.y-cy,r,r*.55,0,0,6.283);c.stroke();}
  if(LD().over)LD().over(c,cx,cy,1/60);
  // police lights
  for(const f of LV.furn){if(f.k!=='police'&&f.k!=='ambul')continue;const px=(f.x+f.w/2)*TS-cx,py=(f.y+.6)*TS-cy;if(px<-100||py<-100||px>VW+100||py>VH+100)continue;const on=((G.time*3+f.x)|0)%2;c.globalCompositeOperation='lighter';const g=c.createRadialGradient(px,py,0,px,py,90);g.addColorStop(0,f.k==='ambul'?(on?'rgba(255,40,40,.2)':'rgba(0,0,0,0)'):(on?'rgba(255,40,40,.22)':'rgba(40,80,255,.24)'));g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(px-90,py-90,180,180);c.globalCompositeOperation='source-over';P(c,px-2,py-3,2,2,on?'#ff4040':'#401010');P(c,px,py-3,2,2,on?'#102040':'#4060ff');}
@@ -3126,8 +3137,8 @@ function render(){const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOpera
  $('flash').style.opacity=G.flashW>0?Math.min(1,G.flashW*1.3):0;
  if(G.map)drawPlan($('plancv'),true);$('planov').classList.toggle('hidden',!G.map);}
 function drawFog(cx,cy){fg.globalCompositeOperation='source-over';fg.globalAlpha=1;fg.fillStyle='#000';fg.fillRect(0,0,VW,VH);
- fg.globalCompositeOperation='destination-out';fg.globalAlpha=G.nvg?.62:isPat()?(LD().lit||.62):.4;fg.drawImage(memory,cx,cy,VW,VH,0,0,VW,VH);if(isPat()&&OUTM){fg.globalAlpha=weatherAlpha();fg.drawImage(OUTM,cx,cy,VW,VH,0,0,VW,VH);}fg.globalAlpha=1;
- for(const s of G.squad){if(!s.alive||!s.vis)continue;const R=s.range*TS,g=fg.createRadialGradient(s.x-cx,s.y-cy,R*.15,s.x-cx,s.y-cy,R);g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(.7,'rgba(0,0,0,.93)');g.addColorStop(1,'rgba(0,0,0,.55)');fg.fillStyle=g;fg.beginPath();polyPath(fg,s.vis,cx,cy);fg.fill();}
+ fg.globalCompositeOperation='destination-out';fg.globalAlpha=G.nvg?.62:isPat()?(LD().lit||.48):.4;fg.drawImage(memory,cx,cy,VW,VH,0,0,VW,VH);if(isPat()&&OUTM){fg.globalAlpha=weatherAlpha();fg.drawImage(OUTM,cx,cy,VW,VH,0,0,VW,VH);}fg.globalAlpha=1;
+ for(const s of G.squad){if(!s.alive||!s.vis)continue;const k=s.human||!isPat()?1:.5,R=effRange(s)*TS,g=fg.createRadialGradient(s.x-cx,s.y-cy,R*.15,s.x-cx,s.y-cy,R);g.addColorStop(0,'rgba(0,0,0,'+k+')');g.addColorStop(.7,'rgba(0,0,0,'+(.93*k)+')');g.addColorStop(1,'rgba(0,0,0,'+(.55*k)+')');fg.fillStyle=g;if(s.human)fg.filter='blur(1.5px)';fg.beginPath();polyPath(fg,s.vis,cx,cy);fg.fill();fg.filter='none';}
  for(const l of G.lights){const g=fg.createRadialGradient(l.x-cx,l.y-cy,0,l.x-cx,l.y-cy,l.r);g.addColorStop(0,'rgba(0,0,0,.8)');g.addColorStop(1,'rgba(0,0,0,0)');fg.fillStyle=g;fg.fillRect(l.x-cx-l.r,l.y-cy-l.r,l.r*2,l.r*2);}
  if(G.camv&&G.camv.poly){fg.fillStyle='rgba(0,0,0,.9)';fg.beginPath();polyPath(fg,G.camv.poly,cx,cy);fg.fill();}
  fg.globalCompositeOperation='source-over';ctx.drawImage(fogC,0,0);
@@ -3208,7 +3219,7 @@ function drawPlan(cnv,live,entry){const g=cnv.getContext('2d'),S=10;g.setTransfo
 let hudCache={};function setH(id,html){if(hudCache[id]!==html){hudCache[id]=html;$(id).innerHTML=html;}}
 const ORD={follow:'ROZKAZ: ZA MNĄ · SZYK KOLUMNOWY',hold:'ROZKAZ: TRZYMAĆ POZYCJĘ',move:'ROZKAZ: RUCH NA POZYCJĘ',op:'ROZKAZ: AKCJA PRZY DRZWIACH'};
 function abText(u){if(u.patrol)return'Q: okrzyk „'+((LD().crew&&LD().crew.shout)||'Police! Don\'t move!')+'”';switch(u.spec){case'lead':return'Q: okrzyk „Policja!”'+(u.shoutCd>0?' ('+Math.ceil(u.shoutCd)+')':'');case'breach':return u.ram?'Q: taran':'Q: ładunek ×'+u.charges;case'tech':return'Q: kamera (drzwi) / peryskop (róg) · E: wytrych';case'medic':return'Q: sedatyw ×'+u.sed;case'scout':return'Q: granat hukowy ×'+u.flash;}return'';}
-function wHTML(u,pre){if(!u||!u.alive)return'<div class="wn">—</div>';const lt=u.holster?'LATARKA':G.nvg?'NOKTOWIZJA':(isPat()&&!LD().nvg)?'LATARKA':'';let pp='';if(u.W.mag<=40){for(let i=0;i<u.W.mag;i++)pp+='<i'+(i<u.mag&&!(u.rel>0)?'':' class="e"')+'></i>';}
+function wHTML(u,pre){if(!u||!u.alive)return'<div class="wn">—</div>';const lt=G.nvg?'NOKTOWIZJA':G.torchOff?'LATARKA WYŁ. · L':'LATARKA · L';let pp='';if(u.W.mag<=40){for(let i=0;i<u.W.mag;i++)pp+='<i'+(i<u.mag&&!(u.rel>0)?'':' class="e"')+'></i>';}
  return'<div class="wn">'+(pre||'')+(u.holster?'BROŃ W KABURZE · X':u.W.n)+(lt?' · '+lt:'')+'</div><div class="am">'+(u.rel>0?'<small class="rl">PRZEŁADOWANIE</small>':u.mag+' <small>/ '+u.res+'</small>')+'</div>'+(pp?'<div class="pp">'+pp+'</div>':'')+'<div class="ab">'+abText(u).replace(/^Q: /,'Q · ')+(u.spray?' · G gaz ×'+u.spray:'')+(u.shield?' · TARCZA':'')+(u.quiet?' · CICHO':'')+'</div>';}
 function updateHUD(){let r='',ri=0;for(const s of SPECS.map((_,i)=>G.squad[i])){const idx=ri++;if(!s)continue;let st;
   if(!s.alive)st='KIA';else if(s.wounded&&!s.treated)st='<span style="color:#ff5a4a">RANNY · '+Math.ceil(s.bleed)+' s</span>';else if(s.stun>0)st='OGŁUSZONY';else if(s.human)st=(s.wounded?'opatrzony · ':'')+s.mag+'/'+s.W.mag;else{const t=s.task;st=s.action?'akcja':t?(t.type==='hold'?'pozycja':t.done?'gotowy':'ruch'):s.post?(s.post.kind==='door'?'pilnuje drzwi':'zabezp. kąt'):'w szyku';st+=' · '+s.mag;}
