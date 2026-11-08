@@ -75,7 +75,7 @@ addEventListener('keydown',e=>{if(['Tab','ArrowUp','ArrowDown','ArrowLeft','Arro
  if(e.code==='KeyN')toggleNVG();
  if(e.code==='KeyC'&&G.p1&&G.p1.alive){if(G.p1.spec==='tech'){if(!G.camv){const a=G.p1.ang;G.p1.action={t:0,dur:.5,label:'Peryskop',pose:'kneel',done:()=>startMirror(G.p1,a)};}}else orderCorner();}
  if(e.code==='Space'){const w=G.ops.filter(o=>o.wait&&!o.go);if(w.length){w.forEach(o=>o.go=true);radio(G.p1?G.p1.name:'ALFA','Wszystkie zespoły: wejście, wejście, wejście!',{prio:1});logEv('Sygnał do wejścia ('+w.map(o=>teamName(o.team)).join(' + ')+')');}}
- if(e.code==='KeyM')G.map=true;if(e.code==='KeyJ'&&G.running&&!G.paused)$('obj').classList.toggle('fold');if(e.code==='KeyX'&&G.running&&!G.paused&&G.p1&&G.p1.alive&&!G.ended)setHolster(!G.p1.holster);if(e.code==='KeyL'&&G.running&&!G.paused&&!G.ended)toggleTorch();});
+ if(e.code==='KeyM')G.map=true;if(e.code==='KeyJ'&&G.running&&!G.paused)$('obj').classList.toggle('fold');if(e.code==='KeyX'&&G.running&&!G.paused&&G.p1&&G.p1.alive&&!G.ended)setHolster(!G.p1.holster);if(e.code==='KeyV'&&G.running&&!G.paused&&G.p1&&G.p1.alive&&!G.ended)swapWeapon(G.p1);if(e.code==='KeyL'&&G.running&&!G.paused&&!G.ended)toggleTorch();});
 addEventListener('keyup',e=>{K[e.code]=false;if(e.code==='KeyM')G.map=false;});
 addEventListener('blur',()=>{for(const k in K)K[k]=false;G.mouse.down=false;});
 const wrap=$('wrap');
