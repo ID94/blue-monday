@@ -8,7 +8,7 @@ function isPat(){return !!LD().patrol;}
 function W8(){return LD().weather||'rain';}
 const NOOP=()=>{};
 LVL.hosp={id:'hosp',weather:'rain',terrain:hospTerrain,windows:hospWindows,rooms:ROOMS_HOSP,doors:DOORS_HOSP,furn:FURN_HOSP,lamps:LAMPS_HOSP,cams:CAMS_HOSP,get entries(){return ENTRIES_HOSP;}};
-LVL.house={id:'house',patrol:true,sounds:true,weather:'morning',autumn:true,ext:'siding',terrain:houseTerrain,windows:houseWindows,rooms:ROOMS_HOUSE,doors:DOORS_HOUSE,furn:FURN_HOUSE,lamps:LAMPS_HOUSE,cams:[],entries:ENTRIES_HOUSE,
+LVL.house={id:'house',patrol:true,car:{oy:-5,b:'#c9cdd1',hi:'#dde0e3',lo:'#9a9ea2',e:'#c9cdd1',r:'#c2c6ca',rh:'#d6d9dc',rl:'#a4a8ac',s:'#1e3c8a'},sounds:true,weather:'morning',autumn:true,ext:'siding',terrain:houseTerrain,windows:houseWindows,rooms:ROOMS_HOUSE,doors:DOORS_HOUSE,furn:FURN_HOUSE,lamps:LAMPS_HOUSE,cams:[],entries:ENTRIES_HOUSE,
  start:startHouse,update:updateHouse,interact:houseInteract,render:(c,cx,cy)=>{houseShade(c,cx,cy);houseRender(c,cx,cy);},stress:houseStress,obj:houseObj,debrief:houseDebrief,wallCol:houseWallCol,
  win:'2-Adam-14, przyjęłam. Detektywi i technicy są w drodze. Zabezpieczcie miejsce.',
  nb:{no:'#26-118-0457',pri:'P1',code:'10-71',small:'ADRES ZDARZENIA',addr:'214 OAKRIDGE<br>LANE',facts:[['JEDNOSTKA','2-Adam-14 · Ofc. Miller, Ofc. Ortiz'],['GODZINA','06:40'],['ZADANIE','Sprawdzić zgłoszenie']],
