@@ -62,7 +62,7 @@ function endMission(win,reason){if(G.ended)return;logEv('KONIEC: '+reason);G.end
 // ================= INPUT =================
 const K=G.keys;
 addEventListener('keydown',e=>{if(['Tab','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','Slash','Quote','Period','Comma','Enter'].includes(e.code)&&G.running)e.preventDefault();
- if(e.repeat)return;K[e.code]=true;G.press[e.code]=true;audioInit();
+ if(e.repeat)return;K[e.code]=true;(G.press||(G.press={}))[e.code]=true;audioInit();
  if(!G.running)return;
  if(e.code==='Escape'){if(G.ctxOpen){closeCtx();return;}if(!G.ended)togglePause();return;}
  if(G.paused||G.ended)return;
@@ -367,10 +367,12 @@ function renderMenu(dt){menuT+=dt;const c=ctx;c.setTransform(1,0,0,1,0,0);c.glob
  if(!planSmall.drawn){drawPlan(planSmall,false,0);planSmall.drawn=1;}
  P(c,0,0,VW,VH,'#07090b');P(c,0,0,VW,150,'#0e1115');for(let x=0;x<VW;x+=48)P(c,x,0,1,150,'#15191e');P(c,0,146,VW,4,'#1a1e23');
  MONS.forEach(([x,y,w,h,v],i)=>{P(c,x-3,y-3,w+6,h+6,'#1c2026');P(c,x-2,y-2,w+4,h+4,'#030404');
-  if(v==='plan'){P(c,x,y,w,h,'#05080e');}
+  if(v==='plan'){P(c,x,y,w,h,'#05080e');const wf=worldFull(),sx=G.lvl==='house'?29*16:24*16,sy=G.lvl==='house'?33.5*16:40*16;c.save();c.beginPath();c.rect(x,y,w,h);c.clip();c.drawImage(wf,sx+Math.sin(menuT*.05)*6,sy,w*2,h*2,x,y,w,h);
+   if(G.lvl==='house'){const on=((menuT*5)|0)%2,lx=x+(34*16+21-sx)/2,ly=y+(41*16+11-sy)/2,gg=c.createRadialGradient(lx,ly,0,lx,ly,16);gg.addColorStop(0,on?'rgba(255,40,30,.5)':'rgba(40,90,255,.5)');gg.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=gg;c.fillRect(lx-16,ly-16,32,32);}
+   c.fillStyle='rgba(0,10,8,.25)';c.fillRect(x,y,w,h);c.restore();c.fillStyle='#bfe8c8';c.font='6px monospace';c.fillText('CAM 06  '+(G.lvl==='house'?'06:4'+(1+((menuT/60)|0)):'02:4'+(7+((menuT/60)|0)))+':'+String((menuT|0)%60).padStart(2,'0'),x+3,y+8);}
   else{const sx=clamp(v[0]*TS+Math.sin(menuT*.07+i)*60-w,0,world.width-w*2),sy=clamp(v[1]*TS+Math.cos(menuT*.05+i)*30-h,0,world.height-h*2);c.drawImage(worldFull(),sx,sy,w*2,h*2,x,y,w,h);
    c.globalCompositeOperation='multiply';P(c,x,y,w,h,i%2?'#9fd8b8':'#a8c4e0');c.globalCompositeOperation='lighter';P(c,x,y,w,h,'rgba(40,90,70,.22)');c.globalCompositeOperation='source-over';
-   c.fillStyle='#bfe8c8';c.font='6px monospace';c.fillText('CAM 0'+(i+1)+'  02:'+(47+((menuT/60)|0))+':'+String((menuT|0)%60).padStart(2,'0'),x+3,y+8);if(((menuT*2)|0)%2)P(c,x+w-7,y+3,3,3,'#e0302a');}
+   c.fillStyle='#bfe8c8';c.font='6px monospace';c.fillText('CAM 0'+(i+1)+'  '+(G.lvl==='house'?'06:'+(41+((menuT/60)|0)):'02:'+(47+((menuT/60)|0)))+':'+String((menuT|0)%60).padStart(2,'0'),x+3,y+8);if(((menuT*2)|0)%2)P(c,x+w-7,y+3,3,3,'#e0302a');}
   for(let k=0;k<h;k+=2)P(c,x,y+k,w,1,'rgba(0,0,0,.18)');P(c,x,y,w,1,'rgba(255,255,255,.08)');});
  // desk & equipment
  P(c,0,150,VW,66,'#12151a');P(c,0,150,VW,3,'#2a3038');P(c,0,153,VW,2,'#07090b');
@@ -444,6 +446,11 @@ document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=
  if(g==='squad'){buildSquadCards();}if(g==='menu'&&G.running){G.running=false;$('hud').classList.add('hidden');radioClear();}
  if(G.paused&&g==='menu'){G.paused=false;}showScreen(g==='ctrl'&&G.paused?'ctrl':g);}));
 $('mode1').onclick=()=>{G.players=1;$('mode1').classList.add('sel');$('mode2').classList.remove('sel');$('modehint').textContent='Pozostali członkowie oddziału są sterowani przez AI i wykonują twoje rozkazy.';SND.click();};
+$('mm-coop').onclick=()=>{SND.click();$('mode2').onclick();showScreen('scen');};
+{const items=()=>[...document.querySelectorAll('#scr-menu .mm-i')];items().forEach(b=>b.addEventListener('mouseenter',()=>{items().forEach(x=>x.classList.toggle('on',x===b));}));
+ addEventListener('keydown',e=>{if($('scr-menu').classList.contains('hidden')||G.running)return;const it=items(),k=it.findIndex(x=>x.classList.contains('on'));
+  if(e.code==='ArrowRight'||e.code==='KeyD'||e.code==='ArrowLeft'||e.code==='KeyA'){const n=(k+(e.code==='ArrowRight'||e.code==='KeyD'?1:-1)+it.length)%it.length;it.forEach((x,j)=>x.classList.toggle('on',j===n));SND.click&&A.ctx&&SND.click();e.preventDefault();}
+  else if(e.code==='Enter'||e.code==='Space'){it[Math.max(0,k)].click();e.preventDefault();}});}
 [['sc1','house'],['sc2','hosp']].forEach(([id,l])=>{$(id).onclick=()=>{if($(id).classList.contains('lock')){SND.click();toast('Scenariusz chwilowo niedostępny');return;}if(G.lvl!==l)setLevel(l);$('sc1').classList.toggle('sel1',l==='house');$('sc2').classList.toggle('sel1',l==='hosp');SND.click();};});
 $('mode2').onclick=()=>{G.players=2;$('mode2').classList.add('sel');$('mode1').classList.remove('sel');$('modehint').textContent='Gracz 1 prowadzi zespół, gracz 2 steruje partnerem (pad lub strzałki). Reszta to AI. Kamera wspólna.';SND.click();};
 let pickStage=1;
@@ -494,7 +501,7 @@ addEventListener('resize',resize);resize();
 buildMap();bakeWorld();
 let last=performance.now();
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
- try{const blur=G.running?'none':'blur(2.5px)';if(cv.style.filter!==blur)cv.style.filter=blur;const tf=!G.running?menuSway():tiltOn()?'perspective('+(TILT.p*wrap.clientHeight)+'px) rotateX('+(TILT.th*180/Math.PI)+'deg) scale('+TILT.k+')':'none';if(cv.style.transform!==tf){cv.style.transform=tf;$('monov').style.transform=G.running?'none':tf;}if(G.running){if(!G.paused)update(dt);render();}else{renderMenu(dt);if(!$('scr-brief').classList.contains('hidden')){if(G.lvl==='house'){callUpdate(dt);drawWave();}else drawPlan($('brief-map'),false,G.entry);}else if(CALLS.on)stopCall();}}catch(err){console.error(err);}
+ try{const blur=G.running?'none':'blur(1.6px) saturate(.65) brightness(.75)';if(cv.style.filter!==blur)cv.style.filter=blur;const tf=!G.running?menuSway():tiltOn()?'perspective('+(TILT.p*wrap.clientHeight)+'px) rotateX('+(TILT.th*180/Math.PI)+'deg) scale('+TILT.k+')':'none';if(cv.style.transform!==tf){cv.style.transform=tf;$('monov').style.transform=G.running?'none':tf;}if(G.running){if(!G.paused)update(dt);render();}else{renderMenu(dt);if(!$('scr-brief').classList.contains('hidden')){if(G.lvl==='house'){callUpdate(dt);drawWave();}else drawPlan($('brief-map'),false,G.entry);}else if(CALLS.on)stopCall();}}catch(err){console.error(err);}
  requestAnimationFrame(frame);}
 requestAnimationFrame(frame);
 document.addEventListener('click',()=>audioInit(),{once:false});

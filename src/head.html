@@ -62,6 +62,18 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
 #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 /* screens */
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(var(--u)*6);text-transform:uppercase;letter-spacing:.08em;background:radial-gradient(ellipse at center,rgba(10,12,12,.55) 0,rgba(0,0,0,.92) 75%);z-index:10}
+#scr-menu:not(.hidden){display:block;background:none;text-transform:none;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+#monov{display:none!important}
+.mm-gr{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at -5% -10%,rgba(40,80,255,.14),transparent 45%),radial-gradient(circle at 108% 0,rgba(230,40,40,.09),transparent 45%),radial-gradient(ellipse at 50% 38%,transparent 30%,rgba(0,0,0,.7) 90%),linear-gradient(180deg,rgba(10,16,28,.25) 0,rgba(0,0,0,.12) 45%,rgba(0,0,0,.82) 78%,rgba(0,0,0,.94) 100%);animation:mmSiren 3.2s ease-in-out infinite alternate}
+@keyframes mmSiren{0%{opacity:.85}100%{opacity:1}}
+.mm-lb{position:absolute;left:0;right:0;height:calc(var(--u)*21);background:#000}.mm-lt{top:0}.mm-lbb{bottom:0}
+.mm-rec{position:absolute;top:calc(var(--u)*31);left:calc(var(--u)*36);font-size:calc(var(--u)*3.6);letter-spacing:.32em;color:#8a929c}.mm-rec i{display:inline-block;width:calc(var(--u)*2.3);height:calc(var(--u)*2.3);border-radius:50%;background:#e0302a;box-shadow:0 0 8px #e0302a;margin-right:calc(var(--u)*3.3);animation:recb 1.4s steps(1) infinite}
+.mm-title{position:absolute;left:calc(var(--u)*36);bottom:calc(var(--u)*56);font-weight:200;font-size:calc(var(--u)*32);letter-spacing:.24em;line-height:.95;white-space:nowrap;color:#e2e4e8;animation:bmIn 3s ease-out both}
+.mm-title .mb{color:#8fb0f2;text-shadow:0 0 calc(var(--u)*8) rgba(70,120,255,.55);animation:bmPulse 5.5s ease-in-out infinite}.mm-title .mm{text-shadow:0 0 calc(var(--u)*6) rgba(0,0,0,.8);animation:bmFlick 9s infinite}
+.mm-nav{position:absolute;left:calc(var(--u)*36);right:calc(var(--u)*36);bottom:calc(var(--u)*34);display:flex;gap:calc(var(--u)*18);align-items:center;border-top:1px solid rgba(255,255,255,.12);padding-top:calc(var(--u)*7)}
+.mm-i{background:none;border:0;padding:0;font-family:inherit;font-size:calc(var(--u)*4.3);letter-spacing:.34em;color:#7f8790;cursor:pointer;position:relative;transition:color .2s}
+.mm-i.on{color:#fff}.mm-i.on:before{content:"";position:absolute;left:0;right:.34em;top:calc(var(--u)*-7.6);height:2px;background:linear-gradient(90deg,#3d6bff,#e0302a)}
+.mm-r{margin-left:auto;font-size:calc(var(--u)*3.3);letter-spacing:.26em;color:#59616b}
 #monov{position:absolute;inset:0;pointer-events:none;z-index:11;transform-origin:50% 50%}
 #monscr{position:absolute;left:34.9%;top:31.5%;width:30.7%;height:32.4%;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse at center,#0a1220 0,#05080e 60%,#020305 100%);box-shadow:inset 0 0 calc(var(--u)*8) rgba(0,0,0,.9),0 0 calc(var(--u)*10) rgba(60,100,220,.08)}
 #monscr::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0,rgba(0,0,0,.28) 1px,transparent 1px,transparent 3px),radial-gradient(ellipse at 30% 20%,rgba(255,255,255,.05),transparent 55%);animation:monRoll 7s linear infinite;pointer-events:none}
@@ -163,9 +175,10 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
  <div id="ctx" class="hidden"></div>
 
  <div id="scr-menu" class="screen">
-  <button class="btn" data-go="scen">Nowa operacja</button>
-  <button class="btn" data-go="ctrl">Sterowanie</button>
-  <button class="btn" data-go="opts">Opcje</button>
+  <div class="mm-gr"></div><div class="mm-lb mm-lt"></div><div class="mm-lb mm-lbb"></div>
+  <div class="mm-rec"><i></i>MOBILE COMMAND</div>
+  <div class="mm-title"><span class="mb">BLUE</span> <span class="mm">MONDAY</span></div>
+  <div class="mm-nav"><button class="mm-i on" data-go="scen">NOWA OPERACJA</button><button class="mm-i" id="mm-coop">CO-OP</button><button class="mm-i" data-go="ctrl">STEROWANIE</button><button class="mm-i" data-go="opts">OPCJE</button><span class="mm-r">← → · ENTER</span></div>
  </div>
 
  <div id="scr-scen" class="screen hidden">
