@@ -17,7 +17,8 @@ Skleja pliki z `src/` w `dist/index.html`.
 - **03 · Pine Court, Apt 3B** — Chicago PD, śnieżny wieczór.
 - **04 · Starlight Motel, Room 12** — Nye County Sheriff (Nevada), gorąca noc z pyłem.
 - **05 · Terminal B** — Phoenix PD Airport Bureau, upalne popołudnie.
-- **06 · St. Dymphna** — Ridgefield PD S.W.A.T., burza (zablokowane).
+- **06 · Millbrook High** — Fairview PD (Ohio), aktywny strzelec w szkole, słoneczne popołudnie.
+- **07 · St. Dymphna** — Ridgefield PD S.W.A.T., burza (zablokowane).
 
 ## Struktura `src/`
 | Plik | Zawartość |
@@ -32,7 +33,7 @@ Skleja pliki z `src/` w `dist/index.html`.
 | `g_ext.js` | scenariusze szpitala, wyposażenie |
 | `h_house.js` | poziom 01 (214 Oakridge Lane): mapa, fabuła, klimat |
 | `i_frame.js` | rejestr poziomów `LVL`, pogoda, wspólne narzędzia misji patrolowych |
-| `l_road.js`, `l_apt.js`, `l_motel.js`, `l_air.js` | misje 02–05 |
+| `l_road.js`, `l_apt.js`, `l_motel.js`, `l_air.js`, `l_school.js` | misje 02–06 |
 | `e_game.js` | start misji, sterowanie, pętla gry, render, HUD, menu |
 
 ## Sterowanie (skrót)

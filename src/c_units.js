@@ -106,13 +106,13 @@ function kill(u,by,a){if(!u.alive)return;
  if(u.team==='enemy'&&by&&by.team==='squad'&&(u.state==='surr'||u.state==='cuffed'||u.pose==='sleep'||(u.stun>0&&!u.target))){G.stats.roe++;logEv('NIEUPRAWNIONE UŻYCIE SIŁY: '+by.name+' ('+roomName(u.x,u.y)+')');setTimeout(()=>radio('TOC','Nieuprawnione użycie siły! Podejrzany nie stanowił zagrożenia.',{prio:1}),600);}u.alive=false;u.deathT=0;u.fallA=a||0;u.pose='dead';u.target=null;u.action=null;u.task=null;
  u.vx=Math.cos(a||0)*45;u.vy=Math.sin(a||0)*45;SND.body(u.x,u.y);u.mseed=Math.random()*1000|0;
  for(let i=0;i<5;i++)G.fx.push({k:'dust',x:u.x,y:u.y-6,vx:rand(-25,25),vy:rand(-30,10),t:0,life:.35,c:'#5d5a52'});
- const byS=by&&by.team==='squad';
+ const byS=by&&by.team==='squad';u.killedBy=by;
  if(u.team==='enemy'){onEnemyDown(u);logEv((by&&by.name||'?')+' zneutralizował napastnika ('+roomName(u.x,u.y)+')');}
  if(u.team==='squad')logEv(u.name+' KIA ('+roomName(u.x,u.y)+')');else if(u.team==='civ'&&u.kind!=='director')logEv('Zginął cywil ('+roomName(u.x,u.y)+')');
  if(u.team==='enemy'){G.stats.eKilled++;if(byS)radio(by.name,pick(['Wróg zneutralizowany.','Cel trafiony.','Napastnik leży.','Jeden mniej.']));}
  else if(u.team==='squad'){G.stats.squadLost++;const al=G.squad.find(s=>s.alive);radio(al?al.name:'TOC',pick([u.name+' padł!',u.name+' nie żyje!','Mamy stratę! '+u.name+'!']),{prio:1});onSquadDeath(u);}
  else if(u.kind==='director'){onHostageDeath(by);}
- else{G.stats.civKilled++;if(byS)radio('TOC','Trafiliście cywila! Wstrzymać ogień!',{prio:1});}}
+ else{if(byS||!by){G.stats.civKilled++;}if(byS)radio('TOC','Trafiliście cywila! Wstrzymać ogień!',{prio:1});}}
 function lineSafe(u,t){const ax=u.x,ay=u.y,bx=t.x,by=t.y,L=Math.hypot(bx-ax,by-ay);
  for(const f of G.units){if(f===u||f===t||!f.alive)continue;if(f.team==='enemy'&&f.active())continue;
   const px=f.x-ax,py=f.y-ay,pr=(px*(bx-ax)+py*(by-ay))/L;if(pr<0||pr>L+8)continue;const pd=Math.abs(px*(by-ay)-py*(bx-ax))/L;if(pd<9)return false;}return true;}

@@ -10,7 +10,7 @@ ROOMS_MOTEL.push(R_('Recepcja',2,30,9,36,'lino'));DOORS_MOTEL.push([10,33]);
   if(mine){F_('clothes',x+2,19);F_('cans',x+1,20);F_('bottle',x+3,18);F_('papers',x+1,19);F_('towels',x+3,14);F_('cash',x+3,19);}
   else if(r()<.4)F_('shoes',x+1,20);}
  for(let i=0;i<14;i++)if(i%2===0)F_('ice',MOT_X0(i)+3,22);
- F_('reception',3,31);F_('chair',4,30);F_('vending',9,30);F_('plant',2,36);F_('bench',6,36);F_('rack',2,30);
+ F_('reception',3,31);F_('chair',4,30);F_('vending',9,30);F_('plant',2,36);F_('bench',6,36);F_('keyrack',2,30);
  F_('police',40,33);F_('car',14,26);F_('car',48,26);F_('car',58,26);F_('car',68,26);F_('neon',22,25);F_('bins',76,22);
  for(const[x,y]of[[25,30],[52,33],[36,28],[62,32],[18,34]])F_('puddle',x,y);
  for(let x=11;x<78;x+=4)F_('lineP',x,25);}
@@ -23,7 +23,7 @@ function motelTerrain(M,set,fillR,H,V){fillR(0,0,79,57,T.ASPH,'asph');fillR(5,22
 function motelWindows(M,set){for(let i=0;i<14;i++)set(MOT_X0(i)+3,21,T.WIN);set(10,31,T.WIN);set(10,35,T.WIN);set(4,37,T.WIN);}
 F('ice',1,1,1,0,(g,x,y)=>{P(g,x+2,y+13,12,3,SH);P(g,x+2,y,12,13,'#c8ccd0');P(g,x+2,y,12,2,'#e0e4e8');P(g,x+4,y+4,8,3,'#3a7ac8');P(g,x+5,y+5,6,1,'#e8f0f8');});
 F('lineP',1,1,0,0,(g,x,y)=>{P(g,x+7,y+2,1,14,'rgba(210,210,200,.4)');});
-F('rack',1,1,1,0,(g,x,y)=>{P(g,x+2,y+13,12,2,SH);P(g,x+2,y,12,13,'#5a4a3a');for(let i=0;i<3;i++)for(let j=0;j<3;j++)P(g,x+4+i*3,y+2+j*4,2,3,['#c8c0a0','#3a7ac8','#c84a3a'][(i+j)%3]);});
+F('keyrack',1,1,1,0,(g,x,y)=>{P(g,x+2,y+13,12,2,SH);P(g,x+2,y,12,13,'#5a4a3a');for(let i=0;i<3;i++)for(let j=0;j<3;j++)P(g,x+4+i*3,y+2+j*4,2,3,['#c8c0a0','#3a7ac8','#c84a3a'][(i+j)%3]);});
 F('neon',1,1,1,0,(g,x,y)=>{P(g,x+7,y-2,2,17,'#3a3e44');P(g,x+8,y+14,4,2,SH);P(g,x-14,y-26,44,22,'#1a1418');P(g,x-13,y-25,42,20,'#2a1e26');P(g,x-11,y-22,38,3,'#ff5aa8');P(g,x-11,y-16,26,2,'#5ad8ff');P(g,x-11,y-11,30,2,'#ff5aa8');P(g,x+20,y-16,5,2,'#5ad8ff');});
 function motelScenTxt(){}
 function startMotel(){G.hostage=null;G.deadline=1e9;

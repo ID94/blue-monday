@@ -151,7 +151,7 @@ function enemyPerceive(e){if(e.state==='flee'&&e.fleeT>10)return;let best=null,b
   if(!e.target||e.target!==best&&(!e.target.alive||bd<dist(e.x,e.y,e.target.x,e.target.y)-TS*2)){const none=!e.target;e.target=best;
    if(none){e.react=(G.alarm?rand(.32,.5):rand(.55,.85))+(best.quiet&&!G.alarm?.15:0);e.ico='!';e.icoT=2;e.state='combat';e.burst=0;e.burstCd=0;e.alarmT=rand(.9,1.4);}}}
  else e.seeT=false;}
-function updateEnemy(e,dt){if(!e.alive)return;
+function updateEnemy(e,dt){if(!e.alive)return;if(e.upd&&!(e.stun>0)&&e.upd(e,dt))return;
  if(e.stun>0){e.stun-=dt;e.target=null;moveUnit(e,dt,0,0,0);e.ang+=Math.sin(G.time*5+e.id)*dt*1.5;if(e.stun<=0&&e.state!=='surr')e.state='search',e.goal={x:e.x,y:e.y},e.searchT=3,e.arrived=true;return;}
  if(e.state==='surr'&&e.fake){moveUnit(e,dt,0,0,0);updateFake(e,dt);if(e.state==='surr')return;}
  if(e.pose==='sleep'||e.state==='surr'||e.state==='cuffed'){moveUnit(e,dt,0,0,0);return;}
@@ -242,7 +242,7 @@ function roomPosts(r,ref,skipDoor,maxD){maxD=(maxD||99)*TS;const tiles=LV.roomTi
  for(const[c0,c1]of cs)add(c0,c1,b=>Math.atan2(cy-(b[1]*TS+8),cx-(b[0]*TS+8)),'corner');
  return posts;}
 function clearPosts(){if(G.postAnchor){G.postAnchor=null;for(const u of G.squad)u.post=null;}}
-function updateTactical(dt){const L=leader();if(!L||G.order!=='follow'||G.ops.length||(L.patrol&&isPat())){clearPosts();G.stillT=0;return;}
+function updateTactical(dt){const L=leader();if(!L||G.order!=='follow'||G.ops.length||(L.patrol&&isPat()&&!L.tac)){clearPosts();G.stillT=0;return;}
  const r=LV.room[I(L.x/TS|0,L.y/TS|0)];
  if(G.postAnchor){if(dist(L.x,L.y,G.postAnchor.x,G.postAnchor.y)>TS*1.6||r!==G.postAnchor.r)clearPosts();return;}
  G.stillT=Math.hypot(L.vx,L.vy)<6?(G.stillT||0)+dt:0;
@@ -251,7 +251,7 @@ function updateTactical(dt){const L=leader();if(!L||G.order!=='follow'||G.ops.le
   const m=aiMembers().find(u=>u.post);if(m&&G.time-(G.postTalkT||-99)>25&&Math.random()<.5&&(G.postTalkT=G.time))radio(m.name,pick(['Zabezpieczamy.','Biorę drzwi.','Kąty czyste.','Pokrywam wejście.']));}}
 const COLF=[.45,-.45,.3,-.3],COLS=[-1.3,1.3,-2,Math.PI];
 function doFollow(u,dt,idx,engaged,cnt){const L=leader();if(!L||L===u){moveUnit(u,dt,0,0,0);return;}
- if(u.patrol&&isPat()){patrolFollow(u,dt,L,engaged);return;}
+ if(u.patrol&&isPat()&&!u.tac){patrolFollow(u,dt,L,engaged);return;}
  const lsp=L.quiet?26:48;u.pose='stand';
  if(u.post){const p=u.post,px=p.tx*TS+8,py=p.ty*TS+8,d=dist(u.x,u.y,px,py);
   if(d<3){moveUnit(u,dt,0,0,0);u.path=null;if(!engaged){turnTo(u,p.face+Math.sin(G.time*.5+u.id)*.3,dt,3);if(p.kind==='door')u.pose='kneel';}return;}
