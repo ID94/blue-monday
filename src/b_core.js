@@ -187,7 +187,7 @@ function bakeWorld(){const r=rng(1337);wc.clearRect(0,0,world.width,world.height
  for(const f of solids)furn3D(f);
  if(LD().autumn)autumnDecor();else if(isPat())buildOUTM();if(LD().decor)LD().decor();
  // parking text-like marks & entrance sign
- P(wc,29*TS,41*TS+4,48,2,'rgba(200,200,180,.25)');
+ if(G.lvl==='hosp')P(wc,29*TS,41*TS+4,48,2,'rgba(200,200,180,.25)');
 }
 
 // ---- extra furniture / decals ----
