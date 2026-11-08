@@ -2204,7 +2204,7 @@ function houseDecor(){const r=rng(5151);
   P(g,43*TS+5,19,9,5,'#2a2420');for(const[dx,w]of[[6,1],[8,2],[11,1]])P(g,43*TS+dx,20,w,3,'#e8d8a8');
   for(const sx of[32*TS+2,50*TS+12,58*TS+12])P(g,sx,16,2,12,'#7a7c7e');}
  for(const[ty,xs]of[[33,[6*TS+2,24*TS+12]],[33,[65*TS+2,77*TS+12]]]){const g2=face(ty);if(g2)for(const sx of xs)P(g2,sx,16,2,12,'#7a7c7e');}}
-const ROOFS=[{x0:50,y0:24,x1:58,y1:34,c:'#4c4640',s:3},{x0:32,y0:19,x1:50,y1:34,c:'#48423e',s:1,chim:[46,22],dish:[36,24],vent:[[40,30],[44,23]]},
+const ROOFS=[{x0:50,y0:24,x1:58,y1:34,c:'#4c4640',s:3,grp:1},{x0:32,y0:19,x1:50,y1:34,c:'#48423e',s:1,grp:1,chim:[46,22],dish:[36,24],vent:[[40,30],[44,23]]},
  {x0:6,y0:18,x1:24,y1:33,c:'#3e4248',s:5,chim:[9,21],vent:[[18,28]]},{x0:65,y0:19,x1:77,y1:33,c:'#4e3e36',s:7,chim:[74,22],sky:[69,27]},
  {x0:8,y0:49,x1:26,y1:57,c:'#444a44',s:9,chim:[22,51]},{x0:50,y0:49,x1:72,y1:57,c:'#4a4440',s:11,vent:[[60,52]]}];
 function bakeRoofs(){for(const R of ROOFS){const W=(R.x1-R.x0+1)*TS+4,Hh=(R.y1-R.y0+1)*TS-6,cv=document.createElement('canvas');cv.width=W;cv.height=Hh+6;const g=cv.getContext('2d'),r=rng(R.s*97+3),id=g.createImageData(W,Hh),D=id.data;
@@ -2229,7 +2229,7 @@ function bakeRoofs(){for(const R of ROOFS){const W=(R.x1-R.x0+1)*TS+4,Hh=(R.y1-R
   if(R.sky){const x=R.sky[0]*TS-ox,y=R.sky[1]*TS-oy;P(g,x,y,12,9,'#2a2e34');P(g,x+1,y+1,10,7,'#1a2a3a');P(g,x+2,y+2,4,2,'#4a6a8a');}
   R.cv=cv;R.a=1;}}
 function houseRoofs(c,cx,cy,dt){if(!ROOFS[0].cv)bakeRoofs();const ins=(R,u)=>u&&u.alive&&u.x>=(R.x0+.5)*TS&&u.x<=(R.x1+.5)*TS&&u.y>=(R.y0+.5)*TS&&u.y<=(R.y1+.8)*TS;
- const wa=weatherAlpha();for(const R of ROOFS){const tg=(ins(R,G.p1)||ins(R,G.p2))?0:1;R.a+=(tg-R.a)*Math.min(1,dt*6);if(R.a<.02)continue;
+ const wa=weatherAlpha(),inR=R=>ins(R,G.p1)||ins(R,G.p2);for(const R of ROOFS){const tg=(R.grp?ROOFS.some(Q=>Q.grp===R.grp&&inR(Q)):inR(R))?0:1;R.a+=(tg-R.a)*Math.min(1,dt*6);if(R.a<.02)continue;
   const x=R.x0*TS-2-cx,y=R.y0*TS-WH-cy;if(x>VW||y>VH||x+R.cv.width<0||y+R.cv.height<0)continue;
   c.globalAlpha=R.a;c.drawImage(R.cv,Math.round(x),Math.round(y));c.globalAlpha=R.a*(1-wa)*.9;c.fillStyle='#000';c.fillRect(Math.round(x),Math.round(y),R.cv.width,R.cv.height-6);c.globalAlpha=1;}
  // linie energetyczne nad ulicą
