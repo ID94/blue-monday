@@ -362,6 +362,7 @@ function menuChatter(dt){if(G.running||!A.ctx)return;G.hitT=(G.hitT==null?4:G.hi
  u.onend=()=>{if(A.ctx)nz(ui(.3),A.ctx.currentTime,.2,{f:1800,q:1.4,g:.75});};setTimeout(()=>{if(!G.running)speechSynthesis.speak(u);},380);
  const d=est;setTimeout(()=>{if(A.ctx)nz(ui(.045),A.ctx.currentTime,.18,{f:1800,q:1.5,g:.7});},d*1000+120);}
 const planSmall=document.createElement('canvas');planSmall.width=800;planSmall.height=580;
+const MONV_H=[[[13,41,'c',2],[20,52,'c',2.4]],[[44,12,'ir',2.2],[36,11,'ir',1.8]],[[55,37,'bw',1.8],[55,36,'bw',1.4]],[[70,37,'warm',2],[75,40,'warm',2.4]],[[18,50,'c',2],[8,40,'c',2.6]],[0],[[68,43,'blue',2],[62,44,'blue',2.6]]];
 const MONS=[[10,10,84,50,[36,30]],[100,10,84,50,[8,12]],[190,10,84,50,[72,29]],[280,10,94,50,[60,40]],[10,68,118,70,[55,7]],[134,68,118,70,'plan'],[258,68,116,70,[20,34]]];
 function renderMenu(dt){menuT+=dt;const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-over';c.globalAlpha=1;
  if(!planSmall.drawn){drawPlan(planSmall,false,0);planSmall.drawn=1;}
@@ -370,8 +371,15 @@ function renderMenu(dt){menuT+=dt;const c=ctx;c.setTransform(1,0,0,1,0,0);c.glob
   if(v==='plan'){P(c,x,y,w,h,'#05080e');const wf=worldFull(),sx=G.lvl==='house'?29*16:24*16,sy=G.lvl==='house'?33.5*16:40*16;c.save();c.beginPath();c.rect(x,y,w,h);c.clip();c.drawImage(wf,sx+Math.sin(menuT*.05)*6,sy,w*2,h*2,x,y,w,h);
    if(G.lvl==='house'){const on=((menuT*5)|0)%2,lx=x+(34*16+21-sx)/2,ly=y+(41*16+11-sy)/2,gg=c.createRadialGradient(lx,ly,0,lx,ly,16);gg.addColorStop(0,on?'rgba(255,40,30,.5)':'rgba(40,90,255,.5)');gg.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=gg;c.fillRect(lx-16,ly-16,32,32);}
    c.fillStyle='rgba(0,10,8,.25)';c.fillRect(x,y,w,h);c.restore();c.fillStyle='#bfe8c8';c.font='6px monospace';c.fillText('CAM 06  '+(G.lvl==='house'?'06:4'+(1+((menuT/60)|0)):'02:4'+(7+((menuT/60)|0)))+':'+String((menuT|0)%60).padStart(2,'0'),x+3,y+8);}
-  else{const sx=clamp(v[0]*TS+Math.sin(menuT*.07+i)*60-w,0,world.width-w*2),sy=clamp(v[1]*TS+Math.cos(menuT*.05+i)*30-h,0,world.height-h*2);c.drawImage(worldFull(),sx,sy,w*2,h*2,x,y,w,h);
-   c.globalCompositeOperation='multiply';P(c,x,y,w,h,i%2?'#9fd8b8':'#a8c4e0');c.globalCompositeOperation='lighter';P(c,x,y,w,h,'rgba(40,90,70,.22)');c.globalCompositeOperation='source-over';
+  else{let mode=i%2?'g':'b',zm=2;if(G.lvl==='house'){const set=MONV_H[i],k=((menuT/14+i*.37)|0)%set.length,cv=set[k];v=cv;mode=cv[2];zm=cv[3]||2;const ph=(menuT/14+i*.37)%1;if(ph<.02)mode='n';}
+   const sx=clamp(v[0]*TS+Math.sin(menuT*.07+i)*40-w*zm/2,0,world.width-w*zm),sy=clamp(v[1]*TS+Math.cos(menuT*.05+i)*20-h*zm/2,0,world.height-h*zm);c.save();c.beginPath();c.rect(x,y,w,h);c.clip();c.drawImage(worldFull(),sx,sy,w*zm,h*zm,x,y,w,h);
+   if(mode==='ir'||mode==='bw'){c.globalCompositeOperation='saturation';P(c,x,y,w,h,'#808080');c.globalCompositeOperation='multiply';P(c,x,y,w,h,mode==='ir'?'#86ffa0':'#e8eaee');c.globalCompositeOperation='lighter';P(c,x,y,w,h,mode==='ir'?'rgba(10,50,15,.35)':'rgba(40,40,44,.3)');}
+   else if(mode==='warm'){c.globalCompositeOperation='multiply';P(c,x,y,w,h,'#ffd2a0');c.globalCompositeOperation='lighter';P(c,x,y,w,h,'rgba(40,24,8,.2)');}
+   else if(mode==='blue'){c.globalCompositeOperation='multiply';P(c,x,y,w,h,'#9fb8ff');c.globalCompositeOperation='lighter';P(c,x,y,w,h,'rgba(10,20,50,.25)');}
+   else if(mode==='c'){c.globalCompositeOperation='lighter';P(c,x,y,w,h,'rgba(30,34,30,.25)');}
+   else if(mode==='n'){c.globalCompositeOperation='source-over';for(let k=0;k<160;k++)P(c,x+Math.random()*w|0,y+Math.random()*h|0,2,1,Math.random()<.5?'#cfd':'#334');}
+   else{c.globalCompositeOperation='multiply';P(c,x,y,w,h,mode==='g'?'#9fd8b8':'#a8c4e0');c.globalCompositeOperation='lighter';P(c,x,y,w,h,'rgba(40,90,70,.22)');}
+   c.globalCompositeOperation='source-over';c.restore();
    c.fillStyle='#bfe8c8';c.font='6px monospace';c.fillText('CAM 0'+(i+1)+'  '+(G.lvl==='house'?'06:'+(41+((menuT/60)|0)):'02:'+(47+((menuT/60)|0)))+':'+String((menuT|0)%60).padStart(2,'0'),x+3,y+8);if(((menuT*2)|0)%2)P(c,x+w-7,y+3,3,3,'#e0302a');}
   for(let k=0;k<h;k+=2)P(c,x,y+k,w,1,'rgba(0,0,0,.18)');P(c,x,y,w,1,'rgba(255,255,255,.08)');});
  // desk & equipment
