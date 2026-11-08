@@ -78,7 +78,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
 #calltx p.cur{color:#f2f3f4;font-size:calc(var(--u)*5.6);opacity:1}#calltx p.cur b{color:#e0b060}#calltx p.d.cur b{color:#6fd0c0}#calltx .x{font-style:italic;opacity:.5}
 #nb .mm-nav{z-index:3}
 #scr-scen:not(.hidden){display:block;background:none;text-transform:none;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:0}
-.sc-dim{background:radial-gradient(circle at -5% -10%,rgba(40,80,255,.12),transparent 45%),radial-gradient(circle at 108% 0,rgba(230,40,40,.08),transparent 45%),linear-gradient(180deg,rgba(0,0,0,.8),rgba(0,0,0,.86) 60%,rgba(0,0,0,.95))}
+.mm-gr.sc-dim{background:radial-gradient(circle at -5% -10%,rgba(40,80,255,.12),transparent 45%),radial-gradient(circle at 108% 0,rgba(230,40,40,.08),transparent 45%),linear-gradient(180deg,rgba(0,0,0,.8),rgba(0,0,0,.86) 60%,rgba(0,0,0,.95))}
 .sc-top{z-index:3}.sc-modes{display:flex;align-items:center;gap:calc(var(--u)*3)}
 .sc-m{background:none;border:0;border-bottom:1px solid transparent;padding:0 0 calc(var(--u)*1);font-family:inherit;font-size:calc(var(--u)*3.6);letter-spacing:.32em;color:#6c7684;cursor:pointer}.sc-m.sel{color:#fff;border-bottom-color:#3d6bff}
 .sc-row{position:absolute;left:calc(var(--u)*36);right:calc(var(--u)*36);top:calc(var(--u)*52);display:flex;gap:calc(var(--u)*8)}
@@ -93,6 +93,17 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
 .sc-card .st{position:absolute;left:calc(var(--u)*7);bottom:calc(var(--u)*5);font-size:calc(var(--u)*3.2);letter-spacing:.3em;color:#5d6773}.sc-card .st.ok{color:#3fd08a}
 .sc-card.lock{opacity:.45;pointer-events:auto;cursor:not-allowed}.sc-card.lock .n{color:#5d6773;text-shadow:none}
 .sc-hint{position:absolute;left:calc(var(--u)*36);bottom:calc(var(--u)*56);font-size:calc(var(--u)*3.8);color:#6c7684;font-style:italic}
+#scr-ctrl:not(.hidden){display:block;background:none;text-transform:none;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:0}
+.mm-gr.ct-dim{background:radial-gradient(circle at -5% -10%,rgba(40,80,255,.1),transparent 45%),linear-gradient(180deg,rgba(2,3,5,.9),rgba(2,3,5,.93) 60%,rgba(0,0,0,.97))}
+.ct-sub{position:absolute;left:calc(var(--u)*36);top:calc(var(--u)*42);font-size:calc(var(--u)*3.3);letter-spacing:.32em;color:#c9a860}
+.ct-grid{position:absolute;left:calc(var(--u)*36);right:calc(var(--u)*36);top:calc(var(--u)*54);display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*9)}
+#ctp2{grid-template-columns:1fr 1fr 1fr}
+.cg h5{margin:0 0 calc(var(--u)*4);padding-bottom:calc(var(--u)*2.4);font-weight:400;font-size:calc(var(--u)*3.2);letter-spacing:.32em;color:#6c7684;border-bottom:1px solid rgba(255,255,255,.1)}
+.cr{display:flex;align-items:center;gap:calc(var(--u)*1.3);margin-bottom:calc(var(--u)*3);font-size:calc(var(--u)*4);color:#c4c9cf;flex-wrap:wrap}
+.cr span{margin-left:calc(var(--u)*1.5);color:#aab1b9}.cr em{font-style:normal;font-size:.75em;color:#6c7684;letter-spacing:.1em}
+.cg k{display:inline-block;min-width:calc(var(--u)*6.5);padding:calc(var(--u)*.8) calc(var(--u)*1.6);text-align:center;font-size:calc(var(--u)*3.3);letter-spacing:.06em;color:#eef0f2;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-bottom-width:2px;border-radius:calc(var(--u)*.8);font-family:inherit}
+.cg p{margin:0 0 calc(var(--u)*3);font-size:calc(var(--u)*4);line-height:1.55;color:#9aa2ac}
+.ct-note{position:absolute;left:calc(var(--u)*36);bottom:calc(var(--u)*56);font-size:calc(var(--u)*3.8);color:#6c7684;font-style:italic}.ct-note b{color:#c4c9cf;font-style:normal}
 #monov{display:none!important}
 .mm-gr{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at -5% -10%,rgba(40,80,255,.14),transparent 45%),radial-gradient(circle at 108% 0,rgba(230,40,40,.09),transparent 45%),radial-gradient(ellipse at 50% 38%,transparent 30%,rgba(0,0,0,.7) 90%),linear-gradient(180deg,rgba(10,16,28,.25) 0,rgba(0,0,0,.12) 45%,rgba(0,0,0,.82) 78%,rgba(0,0,0,.94) 100%);animation:mmSiren 3.2s ease-in-out infinite alternate}
 @keyframes mmSiren{0%{opacity:.85}100%{opacity:1}}
@@ -247,21 +258,13 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
   <div class="row" style="margin-top:calc(var(--u)*5)"><button class="btn" id="gear-back">‹ Odprawa</button><button class="btn" id="go-mission">Rozpocznij operację</button></div>
  </div>
  <div id="scr-ctrl" class="screen hidden">
-  <div class="h2">Sterowanie</div>
-  <div class="ctrl">
-   <h4>Gracz 1 · klawiatura + mysz</h4>
-   <div><k>W A S D</k> ruch</div><div><k>SHIFT</k> cichy chód</div>
-   <div><k>MYSZ</k> celowanie / kierunek wzroku</div><div><k>LPM</k> strzał</div>
-   <div><k>E</k> interakcja (przytrzymaj: wytrych / wyważenie)</div><div><k>Q</k> umiejętność specjalizacji</div>
-   <div><k>R</k> przeładowanie · medyk: <k>Q</k> opatruje rannych</div><div><k>1–5</k> / <k>TAB</k> / klik w listę — przejmij operatora</div>
-   <div><k>PPM</k> menu rozkazów — wybór zespołu: Cały / Czerwony / Niebieski</div><div><k>F</k> za mną · <k>H</k> trzymać pozycję</div>
-   <div><k>T</k> zgłoś do dowództwa (skuty, ciało, zabity)</div><div><k>M</k> (przytrzymaj) plan budynku</div><div><k>C</k> sprawdź róg peryskopem (Ofc. Mason)</div><div><k>N</k> noktowizja / latarki · <k>G</k> gaz pieprzowy</div><div><k>SPACJA</k> sygnał wejścia dla zespołów „na sygnał”</div><div><k>ESC</k> pauza</div>
-   <h4>Gracz 2 · pad lub klawiatura</h4>
-   <div><k>PAD</k> lewa gałka ruch, prawa celowanie</div><div><k>RT</k> strzał · <k>A</k> interakcja · <k>X</k> umiejętność · <k>Y</k> przeład. · <k>LT</k> cicho</div>
-   <div><k>STRZAŁKI</k> ruch (patrzy w kierunku ruchu)</div><div><k>P. SHIFT</k> blokada kierunku · <k>ENTER</k> strzał</div>
-   <div><k>;</k> / <k>B</k> zgłoszenie · <k>/</k> interakcja · <k>.</k> umiejętność · <k>,</k> przeład. · <k>'</k> / <k>RB</k> zmiana operatora</div><div>Gracz 2 ma lekkie wspomaganie celowania</div>
-  </div>
-  <button class="btn" data-go="menu" style="margin-top:calc(var(--u)*6)">Wróć</button>
+  <div class="mm-gr sc-dim ct-dim"></div><div class="mm-lb mm-lt"></div><div class="mm-lb mm-lbb"></div>
+  <div class="nb-top sc-top"><span><i></i>STEROWANIE</span><span class="sc-modes"><button class="sc-m sel" id="ct1">GRACZ 1</button><button class="sc-m" id="ct2">GRACZ 2</button></span></div>
+  <div class="ct-sub" id="ct-sub">KLAWIATURA + MYSZ</div>
+  <div class="ct-grid" id="ctp1"><div class="cg"><h5>RUCH I WALKA</h5><div class="cr"><k>W</k><k>A</k><k>S</k><k>D</k><span>ruch</span></div><div class="cr"><k>MYSZ</k><span>celowanie i kierunek wzroku</span></div><div class="cr"><k>LPM</k><span>strzał</span></div><div class="cr"><k>R</k><span>przeładowanie</span></div><div class="cr"><k>SHIFT</k><span>cichy chód</span></div></div><div class="cg"><h5>INTERAKCJA</h5><div class="cr"><k>E</k><span>interakcja — drzwi, rozmowa, skuwanie, oględziny</span></div><div class="cr"><k>E</k><em>przytrzymaj</em><span>wytrych / wyważenie drzwi</span></div><div class="cr"><k>Q</k><span>umiejętność postaci</span></div><div class="cr"><k>G</k><span>gaz pieprzowy</span></div><div class="cr"><k>T</k><span>zgłoszenie do dowództwa</span></div></div><div class="cg"><h5>ZESPÓŁ</h5><div class="cr"><k>PPM</k><span>menu rozkazów</span></div><div class="cr"><k>F</k><span>za mną</span></div><div class="cr"><k>H</k><span>trzymać pozycję</span></div><div class="cr"><k>SPACJA</k><span>sygnał wejścia</span></div><div class="cr"><k>1–5</k><k>TAB</k><span>przejmij operatora</span></div></div><div class="cg"><h5>POZOSTAŁE</h5><div class="cr"><k>C</k><span>sprawdź róg peryskopem</span></div><div class="cr"><k>N</k><span>noktowizja / latarki</span></div><div class="cr"><k>M</k><em>przytrzymaj</em><span>plan budynku</span></div><div class="cr"><k>ESC</k><span>pauza</span></div></div></div>
+  <div class="ct-grid hidden" id="ctp2"><div class="cg"><h5>PAD</h5><div class="cr"><k>L</k><em>gałka</em><span>ruch</span></div><div class="cr"><k>R</k><em>gałka</em><span>celowanie</span></div><div class="cr"><k>RT</k><span>strzał</span></div><div class="cr"><k>A</k><span>interakcja</span></div><div class="cr"><k>X</k><span>umiejętność</span></div><div class="cr"><k>Y</k><span>przeładowanie</span></div><div class="cr"><k>B</k><span>zgłoszenie</span></div><div class="cr"><k>LT</k><span>cichy chód</span></div><div class="cr"><k>RB</k><span>zmiana operatora</span></div></div><div class="cg"><h5>KLAWIATURA</h5><div class="cr"><k>↑</k><k>←</k><k>↓</k><k>→</k><span>ruch — patrzy w kierunku ruchu</span></div><div class="cr"><k>P. SHIFT</k><span>blokada kierunku patrzenia</span></div><div class="cr"><k>ENTER</k><span>strzał</span></div><div class="cr"><k>/</k><span>interakcja</span></div><div class="cr"><k>.</k><span>umiejętność</span></div><div class="cr"><k>,</k><span>przeładowanie</span></div><div class="cr"><k>;</k><span>zgłoszenie</span></div><div class="cr"><k>P. CTRL</k><span>cichy chód</span></div><div class="cr"><k>'</k><span>zmiana operatora</span></div></div><div class="cg"><h5>WSPÓŁPRACA</h5><p>Gracz 1 prowadzi zespół i wydaje rozkazy. Gracz 2 steruje partnerem.</p><p>Kamera jest wspólna — trzymajcie się blisko.</p><p>Gracz 2 ma lekkie wspomaganie celowania.</p></div></div>
+  <div class="ct-note">W misji patrolowej: <b>Q</b> to okrzyk „Police!”, broń wyciąga się w trakcie, nie ma noktowizji ani peryskopu.</div>
+  <div class="mm-nav"><button class="mm-i on" data-go="menu">WRÓĆ</button><span class="mm-r">← → GRACZ · ESC</span></div>
  </div>
 
  <div id="scr-opts" class="screen hidden">
