@@ -63,6 +63,20 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
 /* screens */
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(var(--u)*6);text-transform:uppercase;letter-spacing:.08em;background:radial-gradient(ellipse at center,rgba(10,12,12,.55) 0,rgba(0,0,0,.92) 75%);z-index:10}
 #scr-menu:not(.hidden){display:block;background:none;text-transform:none;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+#nb{position:absolute;inset:0;z-index:2;background:#000;text-transform:none;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:0}
+#nbbg{position:absolute;inset:-2%;width:104%;height:104%;object-fit:cover;image-rendering:pixelated;filter:blur(3px) saturate(.45) brightness(.5)}
+.nb-gr{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.88) 0,rgba(0,0,0,.55) 45%,rgba(0,0,0,.35) 65%,rgba(0,0,0,.75) 100%),radial-gradient(circle at 0 100%,rgba(40,80,255,.12),transparent 45%),repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 1px,transparent 1px 3px)}
+.nb-top{position:absolute;top:calc(var(--u)*31);left:calc(var(--u)*36);right:calc(var(--u)*36);display:flex;justify-content:space-between;font-size:calc(var(--u)*3.6);letter-spacing:.32em;color:#7d8590}.nb-top i{display:inline-block;width:calc(var(--u)*2.3);height:calc(var(--u)*2.3);border-radius:50%;background:#e0302a;box-shadow:0 0 8px #e0302a;margin-right:calc(var(--u)*3.3);animation:recb 1.4s steps(1) infinite}.nb-top b{color:#e0b060;font-weight:400}
+.nb-addr{position:absolute;left:calc(var(--u)*36);top:calc(var(--u)*50)}.nb-addr small{display:block;font-size:calc(var(--u)*3.6);letter-spacing:.36em;color:#6c7684;margin-bottom:calc(var(--u)*4.6)}.nb-addr h2{font-weight:200;font-size:calc(var(--u)*19);letter-spacing:.16em;line-height:1.05;color:#eceef0;margin:0}
+.nb-addr .ln{margin-top:calc(var(--u)*7);width:calc(var(--u)*86);height:1px;background:linear-gradient(90deg,#3d6bff,#e0302a 60%,transparent)}
+.nb-facts{position:absolute;left:calc(var(--u)*36);top:calc(var(--u)*122);display:grid;grid-template-columns:calc(var(--u)*60) 1fr;row-gap:calc(var(--u)*5.3);font-size:calc(var(--u)*5);color:#cfd3d8}.nb-facts span{font-size:calc(var(--u)*3.3);letter-spacing:.3em;color:#5d6773;padding-top:calc(var(--u)*1.3)}
+.nb-call{position:absolute;right:calc(var(--u)*36);top:calc(var(--u)*50);width:calc(var(--u)*186);bottom:calc(var(--u)*62);display:flex;flex-direction:column}
+.nb-call .h{display:flex;justify-content:space-between;font-size:calc(var(--u)*3.3);letter-spacing:.32em;color:#6c7684;padding-bottom:calc(var(--u)*4);border-bottom:1px solid rgba(255,255,255,.1)}.nb-call .h em{font-style:normal}.nb-call .h b{font-weight:400;color:#e0b060}.nb-call .h b.d{color:#6fd0c0}
+#wave{width:100%;height:calc(var(--u)*23);margin:calc(var(--u)*5) 0 calc(var(--u)*3)}
+#calltx{flex:1;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+#calltx p{font-size:calc(var(--u)*4.6);line-height:1.55;color:#6f7884;margin:0 0 calc(var(--u)*4);opacity:.6}#calltx p b{display:block;font-weight:400;font-size:calc(var(--u)*3);letter-spacing:.3em;margin-bottom:calc(var(--u)*.6)}#calltx .d b{color:#4fa898}#calltx .c b{color:#b08848}
+#calltx p.cur{color:#f2f3f4;font-size:calc(var(--u)*5.6);opacity:1}#calltx p.cur b{color:#e0b060}#calltx p.d.cur b{color:#6fd0c0}#calltx .x{font-style:italic;opacity:.5}
+#nb .mm-nav{z-index:3}
 #monov{display:none!important}
 .mm-gr{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at -5% -10%,rgba(40,80,255,.14),transparent 45%),radial-gradient(circle at 108% 0,rgba(230,40,40,.09),transparent 45%),radial-gradient(ellipse at 50% 38%,transparent 30%,rgba(0,0,0,.7) 90%),linear-gradient(180deg,rgba(10,16,28,.25) 0,rgba(0,0,0,.12) 45%,rgba(0,0,0,.82) 78%,rgba(0,0,0,.94) 100%);animation:mmSiren 3.2s ease-in-out infinite alternate}
 @keyframes mmSiren{0%{opacity:.85}100%{opacity:1}}
@@ -110,13 +124,6 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
 .hint{color:#8b8f86;font-size:.7em;margin-top:calc(var(--u)*4);text-transform:none;letter-spacing:.03em}
 #scr-menu{background:radial-gradient(ellipse at center,rgba(5,8,12,.2) 0,rgba(0,0,0,.1) 45%,rgba(0,0,0,.5) 100%);justify-content:flex-end;padding-bottom:calc(var(--u)*12);box-sizing:border-box}
 #scr-brief{flex-direction:row;gap:calc(var(--u)*6);padding:calc(var(--u)*8);box-sizing:border-box;align-items:stretch}
-#call911{height:100%;width:58%;box-sizing:border-box;display:flex;flex-direction:column;gap:calc(var(--u)*2);border:1px solid #2f3a48;background:linear-gradient(#0a0e14,#06080b);padding:calc(var(--u)*3);text-transform:none;letter-spacing:.02em}
-#call911.hidden{display:none}#call911 .ch{font-size:.6em;letter-spacing:.2em;color:#8a96a6;display:flex;align-items:center;gap:calc(var(--u)*2)}
-#call911 .rec{width:calc(var(--u)*2);height:calc(var(--u)*2);border-radius:50%;background:#d03a30;box-shadow:0 0 6px #d03a30;animation:recb 1.2s steps(1) infinite}@keyframes recb{50%{opacity:.2}}
-#call911 .cm{display:flex;justify-content:space-between;font-size:.62em;color:#c9b458;letter-spacing:.15em}
-#wave{width:100%;height:calc(var(--u)*34);background:#05070a;border:1px solid #1c2430}
-#calltx{flex:1;overflow:auto;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.74em;line-height:1.5;color:#7d8794;padding-right:calc(var(--u)*2)}
-#calltx p{margin:0 0 calc(var(--u)*1.6)}#calltx p.cur{color:#eef0f2}#calltx b{display:block;font-size:.72em;letter-spacing:.18em;margin-bottom:calc(var(--u)*.4)}#calltx .d b{color:#6fd0c0}#calltx .c b{color:#e0b060}#calltx .x{color:#5a6470;font-style:italic}
 #brief-map{height:100%;max-width:58%;object-fit:contain;border:1px solid #2f5a50;background:#0b1512}
 #brief-r{flex:1;display:flex;flex-direction:column;min-width:0}
 #brief-txt{flex:1;overflow:auto;font-size:.66em;text-transform:none;letter-spacing:.02em;line-height:1.5;color:#c4c8bc;white-space:pre-wrap;background:rgba(10,14,12,.6);padding:calc(var(--u)*3);border:1px solid #23302a}
@@ -205,15 +212,19 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
  </div>
 
  <div id="scr-brief" class="screen hidden">
+  <div id="nb" class="hidden"><canvas id="nbbg" width="576" height="324"></canvas><div class="nb-gr"></div><div class="mm-lb mm-lt"></div><div class="mm-lb mm-lbb"></div>
+   <div class="nb-top"><span><i></i>ZGŁOSZENIE #26-118-0457</span><span>PRIORYTET <b>P1</b> &nbsp;·&nbsp; KOD 10-71</span></div>
+   <div class="nb-addr"><small>ADRES ZDARZENIA</small><h2>214 OAKRIDGE<br>LANE</h2><div class="ln"></div></div>
+   <div class="nb-facts"><span>JEDNOSTKA</span><div>2-Adam-14 · Ofc. Miller, Ofc. Ortiz</div><span>GODZINA</span><div>06:40</div><span>ZADANIE</span><div>Sprawdzić zgłoszenie</div></div>
+   <div class="nb-call"><div class="h"><span>911 · ZAPIS ROZMOWY · <em id="calltime">05:52:14</em></span><b id="callwho">ŁĄCZENIE…</b></div><canvas id="wave" width="1120" height="140"></canvas><div id="calltx"></div></div>
+   <div class="mm-nav"><button class="mm-i on" id="to-gear">ROZPOCZNIJ</button><button class="mm-i" id="callre">ODTWÓRZ PONOWNIE</button><button class="mm-i" data-go="scen">WRÓĆ</button><span class="mm-r">← → · ENTER</span></div></div>
   <canvas id="brief-map" width="800" height="580"></canvas>
-  <div id="call911" class="hidden"><div class="ch"><span class="rec"></span>911 · RIDGEFIELD COUNTY DISPATCH · ZAPIS ROZMOWY</div><div class="cm"><span id="callwho">ŁĄCZENIE…</span><span id="calltime">05:52:14</span></div>
-   <canvas id="wave" width="800" height="220"></canvas><div id="calltx"></div><button class="btn" id="callre" style="min-width:0;align-self:flex-start">↺ Odtwórz ponownie</button></div>
   <div id="brief-r">
    <div class="h2" id="brief-h" style="margin-bottom:calc(var(--u)*3);font-size:1em">Odprawa · Operacja „Cicha sala”</div>
    <div id="brief-txt"></div>
    <div id="ent-l" style="font-size:.6em;color:#8b8f86;margin:calc(var(--u)*3) 0 calc(var(--u)*1)">Punkt wejścia</div>
    <div id="entries"></div>
-   <div class="row" style="justify-content:flex-start;margin-top:calc(var(--u)*2)"><button class="btn" data-go="scen" style="min-width:0">Wróć</button><button class="btn" id="to-gear" style="flex:1">Rozpocznij operację ›</button></div>
+   <div class="row" style="justify-content:flex-start;margin-top:calc(var(--u)*2)"><button class="btn" data-go="scen" style="min-width:0">Wróć</button><button class="btn" id="to-gear-old" style="flex:1">Rozpocznij operację ›</button></div>
   </div>
  </div>
 

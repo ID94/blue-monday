@@ -447,8 +447,9 @@ document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=
  if(G.paused&&g==='menu'){G.paused=false;}showScreen(g==='ctrl'&&G.paused?'ctrl':g);}));
 $('mode1').onclick=()=>{G.players=1;$('mode1').classList.add('sel');$('mode2').classList.remove('sel');$('modehint').textContent='Pozostali członkowie oddziału są sterowani przez AI i wykonują twoje rozkazy.';SND.click();};
 $('mm-coop').onclick=()=>{SND.click();$('mode2').onclick();showScreen('scen');};
-{const items=()=>[...document.querySelectorAll('#scr-menu .mm-i')];items().forEach(b=>b.addEventListener('mouseenter',()=>{items().forEach(x=>x.classList.toggle('on',x===b));}));
- addEventListener('keydown',e=>{if($('scr-menu').classList.contains('hidden')||G.running)return;const it=items(),k=it.findIndex(x=>x.classList.contains('on'));
+{const navRoot=()=>!$('scr-menu').classList.contains('hidden')?$('scr-menu'):(!$('scr-brief').classList.contains('hidden')&&!$('nb').classList.contains('hidden'))?$('nb'):null;
+ const items=()=>{const r=navRoot();return r?[...r.querySelectorAll('.mm-i')]:[];};document.querySelectorAll('.mm-i').forEach(b=>b.addEventListener('mouseenter',()=>{items().forEach(x=>x.classList.toggle('on',x===b));}));
+ addEventListener('keydown',e=>{if(!navRoot()||G.running)return;const it=items(),k=it.findIndex(x=>x.classList.contains('on'));
   if(e.code==='ArrowRight'||e.code==='KeyD'||e.code==='ArrowLeft'||e.code==='KeyA'){const n=(k+(e.code==='ArrowRight'||e.code==='KeyD'?1:-1)+it.length)%it.length;it.forEach((x,j)=>x.classList.toggle('on',j===n));SND.click&&A.ctx&&SND.click();e.preventDefault();}
   else if(e.code==='Enter'||e.code==='Space'){it[Math.max(0,k)].click();e.preventDefault();}});}
 [['sc1','house'],['sc2','hosp']].forEach(([id,l])=>{$(id).onclick=()=>{if($(id).classList.contains('lock')){SND.click();toast('Scenariusz chwilowo niedostępny');return;}if(G.lvl!==l)setLevel(l);$('sc1').classList.toggle('sel1',l==='house');$('sc2').classList.toggle('sel1',l==='hosp');SND.click();};});
@@ -469,14 +470,14 @@ const BRIEF=()=>G.lvl==='house'?houseBrief():`<div class="sec"><span class="lbl"
 <div class="sec"><span class="lbl">UWAGA</span><span class="red">Nie strzelaj do cywili ani do poddanych.</span> Monitoring szpitala działa — dyżurka ochrony (wsch. od holu) · ultimatum 12 min · alarm = zagrożenie dla zakładnika.</div>`;
 function openBriefing(){G.scen=G.lvl==='house'?houseScen():genScen();if(G.entry>=ENTRIES.length)G.entry=0;showScreen('brief');const el=$('brief-txt');el.innerHTML=BRIEF();const ent=$('entries');ent.innerHTML='';
  ENTRIES.forEach((e,i)=>{const b=document.createElement('button');b.className='btn ent'+(i===G.entry?' sel':'');b.innerHTML='<b>'+(i+1)+'. '+e.n+'</b> — '+e.s;b.onclick=()=>{G.entry=i;SND.click();[...ent.children].forEach((c,j)=>c.classList.toggle('sel',j===i));};ent.appendChild(b);});
- radioClear();const hs=G.lvl==='house';$('brief-map').style.display=hs?'none':'';$('call911').classList.toggle('hidden',!hs);$('ent-l').style.display=hs?'none':'';$('entries').style.display=hs?'none':'';
+ radioClear();const hs=G.lvl==='house';$('nb').classList.toggle('hidden',!hs);if(hs){nbBackground();document.querySelectorAll('#nb .mm-i').forEach((x,j)=>x.classList.toggle('on',j===0));}
  $('brief-h').textContent=hs?'Zgłoszenie · 214 Oakridge Lane':'Odprawa · Operacja „St. Dymphna”';
  if(hs){G._callClock=0;setTimeout(startCall,500);}else setTimeout(()=>radio('TOC','Alfa, uzbrojona grupa w szpitalu psychiatrycznym. Jeden zakładnik. Pozycje napastników niepotwierdzone. Nie strzelać do cywili.'),400);}
 $('callre').onclick=()=>{SND.click();G._callClock=0;startCall();};
 $('sq-next').onclick=()=>{SND.click();openBriefing();};
 $('go-mission').onclick=()=>{SND.click();audioInit();startMission();};
 $('scen-next').onclick=()=>{SND.click();G.p1Spec=0;G.p2Spec=1;openBriefing();};
-$('to-gear').onclick=()=>{SND.click();audioInit();G.p1Spec=0;G.p2Spec=1;G.load=defaultLoad();startMission();};$('gear-back').onclick=()=>{SND.click();showScreen('brief');};
+$('to-gear').onclick=$('to-gear-old').onclick=()=>{SND.click();audioInit();G.p1Spec=0;G.p2Spec=1;G.load=defaultLoad();startMission();};$('gear-back').onclick=()=>{SND.click();showScreen('brief');};
 $('p-res').onclick=()=>togglePause();$('p-rst').onclick=()=>{G.paused=false;startMission();};$('p-ctrl').onclick=()=>showScreen('ctrl');
 $('p-menu').onclick=()=>{G.paused=false;G.running=false;$('hud').classList.add('hidden');radioClear();showScreen('menu');};
 $('d-rst').onclick=()=>{startMission();};$('d-menu').onclick=()=>{G.running=false;$('hud').classList.add('hidden');radioClear();showScreen('menu');};
