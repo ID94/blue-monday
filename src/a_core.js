@@ -212,7 +212,7 @@ function pump(){if(R.busy||!R.q.length)return;const m=R.q.shift();R.busy=true;
  if(m.o.say||m.o.raw){const el=$('say');el.innerHTML='<span class="sn">'+m.who+'</span>'+(m.o.raw?'<span class="sh">'+m.text+'</span>':m.text);el.classList.add('on');
   if(m.o.raw&&A.ctx)SND.shoutFx(clamp(m.text.length*.05,.8,2.4));
   setTimeout(()=>{el.classList.remove('on');setTimeout(()=>{R.busy=false;pump();},260);},1300+m.text.length*58);return;}
- const el=$('radio');el.innerHTML='<b>'+m.who+'</b>'+m.text;el.classList.add('on');
+ const el=$('radio');el.innerHTML='<b>'+m.who+'</b><span class="wv">'+[0,.15,.3,.08,.22,.4,.12].map(d=>'<i style="animation-delay:-'+d+'s"></i>').join('')+'</span><span class="tx">'+m.text+'</span>';el.classList.add('on');
  if(!m.o.raw&&A.voice!=='static')SND.squelch();
  let done=false;const fin=()=>{if(done)return;done=true;if(!m.o.raw&&A.voice!=='static')SND.squelchEnd();setTimeout(()=>{el.classList.remove('on');R.busy=false;pump();},380);};
  if(A.voice==='static'&&A.ctx){const d=clamp(m.text.length*.055,1,3.6);if(m.o.raw){SND.shoutFx(d);}else radioFx(d,1,m.who==='TOC');setTimeout(fin,(d+.6)*1000);}

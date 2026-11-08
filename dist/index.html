@@ -51,6 +51,54 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
 #toast.on{opacity:1}
 #cmdhint{position:absolute;left:50%;bottom:calc(var(--u)*5);transform:translateX(-50%);color:#6e7268;font-size:.72em;white-space:nowrap}
 #order{position:absolute;left:calc(var(--u)*5);top:calc(var(--u)*76);color:#c9b458;font-size:.8em;background:rgba(8,10,12,.5);padding:calc(var(--u)*1) calc(var(--u)*3)}
+/* ===== BODYCAM HUD ===== */
+#hud{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:calc(var(--u)*4.2);text-transform:none;letter-spacing:0;color:#e8e8e4}
+#hud .bcm{font-family:"DejaVu Sans Mono","Menlo","Consolas","Courier New",monospace}
+#bc-rec{position:absolute;left:calc(var(--u)*11);top:calc(var(--u)*8.5);display:flex;align-items:center;gap:calc(var(--u)*3.2);font-size:calc(var(--u)*4.3);letter-spacing:.2em;text-shadow:0 1px 0 #000,0 0 3px #000}
+#bc-rec i{width:calc(var(--u)*3.3);height:calc(var(--u)*3.3);border-radius:50%;background:#e8302a;box-shadow:0 0 calc(var(--u)*2.6) #e8302a;animation:bcblink 1.6s steps(2) infinite}
+#bc-rec b{font-weight:700}#bc-rec span{opacity:.72}
+@keyframes bcblink{50%{opacity:.25}}
+#bc-ts{position:absolute;right:calc(var(--u)*11);top:calc(var(--u)*8.5);text-align:right;font-size:calc(var(--u)*5);letter-spacing:.06em;color:#f2f2ee;text-shadow:0 0 2px #000,0 1px 0 #000}
+#bc-ts .s{font-size:calc(var(--u)*4);opacity:.75;margin-top:calc(var(--u)*1.3)}
+#roster{pointer-events:auto;position:absolute;left:calc(var(--u)*11);top:auto;bottom:calc(var(--u)*10);display:flex;flex-direction:column;gap:calc(var(--u)*2.6)}
+.m{cursor:pointer;display:flex;gap:calc(var(--u)*4);align-items:center;padding:0;background:none;border:0;min-width:0;font-size:calc(var(--u)*4);letter-spacing:.18em;text-transform:uppercase;text-shadow:0 1px 2px #000}
+.m .nm{color:#fff;font-weight:600;width:calc(var(--u)*54);white-space:nowrap}
+.m.p1 .nm:before{content:"▸ ";color:#3d6bff}.m.p2 .nm:before{content:"▸ ";color:#5fc7d6}
+.m .hb{width:calc(var(--u)*23);height:1px;background:rgba(255,255,255,.18);position:relative}.m .hb i{position:absolute;left:0;top:-1px;height:3px;background:#e8e8e4}
+.m .hb i.w{background:#ff5a4a}
+.m .st{color:#e8e8e4;opacity:.55;font-size:.88em;margin-left:0;white-space:nowrap}.m .st .r{color:#ff5a4a;opacity:1}
+.m.kia{opacity:.4}.m.kia .nm{text-decoration:line-through}
+.m .tag,.m .rl{display:none}
+#order{position:absolute;left:calc(var(--u)*11);top:calc(var(--u)*17);bottom:auto;transform:none;background:none;padding:0;color:#c9a860;font-size:calc(var(--u)*3.3);letter-spacing:.24em;text-transform:uppercase;line-height:1.7;text-shadow:0 1px 2px #000}
+#obj{position:absolute;right:calc(var(--u)*11);top:calc(var(--u)*28);background:none;padding:0;min-width:0;text-align:right;font-size:calc(var(--u)*4.3);line-height:1.75;text-shadow:0 1px 2px #000,0 0 3px #000;transition:opacity .3s}
+#obj .h{font-size:calc(var(--u)*3.3);letter-spacing:.3em;color:#e8e8e4;opacity:.55;margin-bottom:calc(var(--u)*.6);text-transform:uppercase}
+#obj .no{color:#ececE6}#obj .ok{color:#e8e8e4;opacity:.38;text-decoration:line-through}#obj .opt{color:#e8e8e4;opacity:.5;font-size:.88em}
+#obj .bx{display:none}
+#obj.fold>*:not(.h){display:none}
+#radio{left:50%;top:calc(var(--u)*8.5);bottom:auto;transform:translateX(-50%);max-width:58%;background:none;border:0;padding:0;color:#d4dcd2;display:flex;align-items:center;gap:calc(var(--u)*4.6);font-size:calc(var(--u)*4.3);text-shadow:0 1px 2px #000,0 0 4px #000;white-space:nowrap}
+#radio b{color:#5fd08a;font-weight:600;letter-spacing:.2em;font-size:.82em;margin:0}
+#radio b:before{content:none}
+#radio .wv{display:inline-flex;gap:1px;align-items:center;height:calc(var(--u)*5.3)}#radio .wv i{width:calc(var(--u)*.7);background:#5fd08a;height:30%;animation:wv .5s ease-in-out infinite alternate}
+#radio .tx{white-space:normal}
+@keyframes wv{to{height:100%}}
+#say{bottom:calc(var(--u)*35);max-width:62%;font-size:calc(var(--u)*7.3);line-height:1.35;text-shadow:0 2px 8px #000,0 0 2px #000,0 0 12px rgba(0,0,0,.8)}
+#say .sn{font-size:calc(var(--u)*4);letter-spacing:.3em;color:#e8c46a;margin-bottom:calc(var(--u)*2.6);font-weight:600}
+#prompt{left:50%;top:57%;bottom:auto;transform:translateX(-8%);background:none;padding:0;display:flex;align-items:center;gap:calc(var(--u)*3.3);font-size:calc(var(--u)*4.3);letter-spacing:.15em;text-transform:uppercase;color:#fff;text-shadow:0 1px 2px #000,0 0 4px #000}
+#prompt k{min-width:calc(var(--u)*8.6);height:calc(var(--u)*8.6);padding:0 calc(var(--u)*1.6);border:1.5px solid #fff;border-radius:calc(var(--u)*4.3);display:inline-grid;place-items:center;font-weight:600;font-size:calc(var(--u)*4);letter-spacing:0;box-shadow:0 0 4px rgba(0,0,0,.6)}
+#prompt k.hold{border-style:dashed}
+#prompt .sep{opacity:.35;margin:0 calc(var(--u)*1)}
+#bar{left:50%;top:calc(57% + var(--u)*11);bottom:auto;transform:translateX(-8%);width:calc(var(--u)*50);height:2px;background:rgba(255,255,255,.18);border:0}#bar i{background:#fff}
+.wbox{bottom:calc(var(--u)*10);background:none;padding:0;min-width:0;text-shadow:0 1px 2px #000,0 0 4px #000}
+#weapon{right:calc(var(--u)*11)}
+#p2weapon{left:auto;right:calc(var(--u)*11);bottom:calc(var(--u)*50);border:0;text-align:right}
+.wbox .wn{color:#e8e8e4;opacity:.65;font-size:calc(var(--u)*3.6);letter-spacing:.3em;text-transform:uppercase}
+.wbox .am{font-size:calc(var(--u)*14.7);font-weight:300;line-height:1;margin-top:calc(var(--u)*2);color:#fff}.wbox .am small{font-size:calc(var(--u)*5.3);color:#e8e8e4;opacity:.5;font-weight:400}
+.wbox .am small.rl{font-size:calc(var(--u)*4.3);letter-spacing:.25em;opacity:.8}
+.wbox .pp{display:flex;gap:1px;justify-content:flex-end;margin-top:calc(var(--u)*2.6)}.wbox .pp i{width:calc(var(--u)*1.3);height:calc(var(--u)*3.3);background:#e8e8e4}.wbox .pp i.e{background:rgba(255,255,255,.16)}
+.wbox .ab{font-size:calc(var(--u)*3.1);color:#c9a860;letter-spacing:.2em;text-transform:uppercase;margin-top:calc(var(--u)*2.2);opacity:.85}
+#cmdhint{bottom:calc(var(--u)*3);font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:calc(var(--u)*3);letter-spacing:.18em;color:#e8e8e4;opacity:.38;text-transform:uppercase;transition:opacity 1.2s}
+#cmdhint.fade{opacity:0}
+#threat{top:calc(var(--u)*20)}
 #ctx{position:absolute;background:rgba(10,12,14,.94);border:1px solid #5a5e56;font-size:calc(var(--u)*5);text-transform:uppercase;min-width:calc(var(--u)*110);z-index:5}
 #ctx .t{padding:calc(var(--u)*1.5) calc(var(--u)*3);color:#8b8f86;font-size:.8em;border-bottom:1px solid #333}
 #ctx .i{padding:calc(var(--u)*1.5) calc(var(--u)*3);cursor:pointer;color:#e6e3d6}
@@ -190,6 +238,8 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
  <div id="crt"></div>
  <div id="flash"></div>
  <div id="hud" class="hidden">
+  <div id="bc-rec"><i></i><b>REC</b><span id="bc-who"></span></div>
+  <div id="bc-ts" class="bcm"><div id="bc-t"></div><div class="s" id="bc-s"></div></div>
   <div id="roster"></div>
   <div id="order"></div>
   <div id="obj"></div>
@@ -203,7 +253,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
   <div id="idcard"><div class="idh"><span>RIDGEFIELD COUNTY</span><span>DRIVER LICENSE</span></div><div class="idb"><canvas id="idph" width="18" height="22"></canvas><div class="idf">
    <div><i>DL</i> H460-2271-0314</div><div class="idn">HARTLEY</div><div class="idn2">ETHAN JAMES</div><div><i>DOB</i> 03/14/2006</div><div>214 OAKRIDGE LN<br>RIDGEFIELD</div><div><i>HGT</i> 5'11" &nbsp;<i>EYES</i> BRN &nbsp;<i>SEX</i> M</div><div><i>EXP</i> 03/14/2030</div></div></div><div class="idsig">Ethan Hartley</div></div>
   <div id="toast"></div>
-  <div id="cmdhint">PPM: rozkazy · F: za mną · H: stój · 1–5 / TAB: zmiana operatora · M: plan · ESC: pauza</div>
+  <div id="cmdhint">PPM rozkazy · F za mną · H stój · 1–5 / TAB operator · M plan · J notatnik · ESC pauza</div>
  </div>
  <div id="planov" class="hidden"><canvas id="plancv" width="800" height="580"></canvas></div>
  <div id="ctx" class="hidden"></div>
@@ -512,7 +562,7 @@ function pump(){if(R.busy||!R.q.length)return;const m=R.q.shift();R.busy=true;
  if(m.o.say||m.o.raw){const el=$('say');el.innerHTML='<span class="sn">'+m.who+'</span>'+(m.o.raw?'<span class="sh">'+m.text+'</span>':m.text);el.classList.add('on');
   if(m.o.raw&&A.ctx)SND.shoutFx(clamp(m.text.length*.05,.8,2.4));
   setTimeout(()=>{el.classList.remove('on');setTimeout(()=>{R.busy=false;pump();},260);},1300+m.text.length*58);return;}
- const el=$('radio');el.innerHTML='<b>'+m.who+'</b>'+m.text;el.classList.add('on');
+ const el=$('radio');el.innerHTML='<b>'+m.who+'</b><span class="wv">'+[0,.15,.3,.08,.22,.4,.12].map(d=>'<i style="animation-delay:-'+d+'s"></i>').join('')+'</span><span class="tx">'+m.text+'</span>';el.classList.add('on');
  if(!m.o.raw&&A.voice!=='static')SND.squelch();
  let done=false;const fin=()=>{if(done)return;done=true;if(!m.o.raw&&A.voice!=='static')SND.squelchEnd();setTimeout(()=>{el.classList.remove('on');R.busy=false;pump();},380);};
  if(A.voice==='static'&&A.ctx){const d=clamp(m.text.length*.055,1,3.6);if(m.o.raw){SND.shoutFx(d);}else radioFx(d,1,m.who==='TOC');setTimeout(fin,(d+.6)*1000);}
@@ -1811,8 +1861,8 @@ function houseRender(c,cx,cy){const H=G.h;if(!H)return;
   const seed=(G.time*11)|0,cols=['#5a6870','#7a8a90','#5c1f1f','#3a1414','#c8ccce','#4a4a44','#8a7a6a'];for(let j=0;j<10;j+=2)for(let i=0;i<26;i+=2){const hh=Math.sin(i*12.9898+j*78.233+seed*.37)*43758.5453;P(c,x+3+i,y+1+j,2,2,cols[Math.floor((hh-Math.floor(hh))*cols.length)]);}
   if(((G.time*2)|0)%2)P(c,x+27,y+3,2,2,'rgba(160,220,255,.4)');}}
 function houseObj(){const H=G.h;if(!H)return'';const s=H.s,ar=s.state==='cuffed'||!s.alive,ins=H.talked&&H.inside;
- const row=(ok,t)=>'<div class="'+(ok?'ok':'no')+'">'+(ok?'■':'□')+' '+t+'</div>';
- return'<div class="h">2-ADAM-14 · 214 OAKRIDGE LN · '+fmtT(G.stats.time)+'</div>'+row(ins,'Sprawdź zgłoszenie')+(H.freezer?row(ar,'Zatrzymaj podejrzanego'):'')+(H.nf?'<div class="opt">Notatki: '+H.nf+'</div>':'');}
+ const row=(ok,t)=>'<div class="'+(ok?'ok':'no')+'">'+t+'</div>';
+ return'<div class="h">Notatnik · J</div>'+row(ins,'Sprawdź zgłoszenie')+(H.freezer?row(ar,'Zatrzymaj podejrzanego'):'')+(H.nf?'<div class="opt">Notatki: '+H.nf+'</div>':'');}
 function houseBrief(){return`<div class="sec"><span class="lbl">JEDNOSTKA</span>Ridgefield PD · patrol <b>2-Adam-14</b><br>Ofc. Miller, Ofc. Ortiz</div>
 <div class="sec"><span class="lbl">ADRES</span>214 Oakridge Lane, Ridgefield<br>06:40 · jesienny poranek</div>
 <div class="sec"><span class="lbl">ZADANIE</span>Sprawdzić zgłoszenie.</div>`;}
@@ -2068,7 +2118,7 @@ function patrolDebrief(rows,score){const s=G.stats;score+=G.win?100:0;score-=s.r
  $('deb-h').textContent=G.win?'MISJA ZAKOŃCZONA SUKCESEM':'MISJA NIEUDANA';$('deb-h').style.color=G.win?'#7fae6a':'#e0574a';$('deb-r').textContent='OCENA: '+rank;
  $('deb-st').innerHTML=[['Wynik',G.reason],['Czas',fmtT(s.time)],...rows,['Cywile zabici',s.civKilled],['Straty',s.squadLost+' / '+G.squad.filter(Boolean).length],['Ranni / opatrzeni',s.wounded+' / '+s.healed],['Nieuprawnione użycie siły',s.roe],['Oddane strzały',s.shots],['Punkty',score]].map(r=>'<div>'+r[0]+'<span>'+r[1]+'</span></div>').join('');
  $('deb-log').innerHTML='<div class="h">OŚ CZASU</div>'+G.log.map(l=>'<div><span>'+fmtT(l[0])+'</span>'+l[1]+'</div>').join('');showScreen('deb');}
-function objRows(head,rows,extra){const row=(ok,t)=>'<div class="'+(ok?'ok':'no')+'">'+(ok?'■':'□')+' '+t+'</div>';return'<div class="h">'+head+' · '+fmtT(G.stats.time)+'</div>'+rows.filter(Boolean).map(r=>row(r[0],r[1])).join('')+(extra||'');}
+function objRows(head,rows,extra){const row=(ok,t)=>'<div class="'+(ok?'ok':'no')+'">'+t+'</div>';return'<div class="h">Notatnik · J</div>'+rows.filter(Boolean).map(r=>row(r[0],r[1])).join('')+(extra||'');}
 // ---- cinematic briefing filled from level data ----
 function fillBriefing(){const n=LD().nb;if(!n)return;
  $('nb').querySelector('.nb-top').innerHTML='<span><i></i>ZGŁOSZENIE '+n.no+'</span><span>PRIORYTET <b>'+n.pri+'</b> &nbsp;·&nbsp; KOD '+n.code+'</span>';
@@ -2086,7 +2136,7 @@ function extWall(g,x,y,tx,ty,r){const k=LD().ext;
 const WXP=[];for(let i=0;i<150;i++)WXP.push({x:Math.random()*VW,y:Math.random()*VH,s:Math.random(),ph:Math.random()*6.28});
 const FOGB=[];for(let i=0;i<14;i++)FOGB.push({x:Math.random()*1.4-.2,y:Math.random()*1.4-.2,r:50+Math.random()*70,v:.004+Math.random()*.006});
 var SNOWC=null;
-function snowCover(){if(SNOWC||!OUTM)return SNOWC;SNOWC=document.createElement('canvas');SNOWC.width=OUTM.width;SNOWC.height=OUTM.height;const g=SNOWC.getContext('2d');g.drawImage(OUTM,0,0);g.globalCompositeOperation='source-in';g.fillStyle='rgba(225,232,242,.42)';g.fillRect(0,0,SNOWC.width,SNOWC.height);
+function snowCover(){if(SNOWC||!OUTM)return SNOWC;SNOWC=document.createElement('canvas');SNOWC.width=OUTM.width;SNOWC.height=OUTM.height;const g=SNOWC.getContext('2d');g.drawImage(OUTM,0,0);g.globalCompositeOperation='source-in';g.fillStyle='rgba(225,232,242,.3)';g.fillRect(0,0,SNOWC.width,SNOWC.height);
  g.globalCompositeOperation='source-atop';const r=rng(7);for(let i=0;i<2600;i++){g.fillStyle=r()<.5?'rgba(255,255,255,.35)':'rgba(170,185,205,.3)';g.fillRect(r()*SNOWC.width|0,r()*SNOWC.height|0,2,1);}return SNOWC;}
 function drawWeather(c,cx,cy){const w=W8(),dt=1/60;
  if(w==='snow'){const sc=snowCover();if(sc)c.drawImage(sc,cx,cy,VW,VH,0,0,VW,VH);const wind=6+Math.sin(G.time*.2)*8;
@@ -2646,7 +2696,7 @@ addEventListener('keydown',e=>{if(['Tab','ArrowUp','ArrowDown','ArrowLeft','Arro
  if(e.code==='KeyN')toggleNVG();
  if(e.code==='KeyC'&&G.p1&&G.p1.alive){if(G.p1.spec==='tech'){if(!G.camv){const a=G.p1.ang;G.p1.action={t:0,dur:.5,label:'Peryskop',pose:'kneel',done:()=>startMirror(G.p1,a)};}}else orderCorner();}
  if(e.code==='Space'){const w=G.ops.filter(o=>o.wait&&!o.go);if(w.length){w.forEach(o=>o.go=true);radio(G.p1?G.p1.name:'ALFA','Wszystkie zespoły: wejście, wejście, wejście!',{prio:1});logEv('Sygnał do wejścia ('+w.map(o=>teamName(o.team)).join(' + ')+')');}}
- if(e.code==='KeyM')G.map=true;});
+ if(e.code==='KeyM')G.map=true;if(e.code==='KeyJ'&&G.running&&!G.paused)$('obj').classList.toggle('fold');});
 addEventListener('keyup',e=>{K[e.code]=false;if(e.code==='KeyM')G.map=false;});
 addEventListener('blur',()=>{for(const k in K)K[k]=false;G.mouse.down=false;});
 const wrap=$('wrap');
@@ -2993,20 +3043,21 @@ function drawPlan(cnv,live,entry){const g=cnv.getContext('2d'),S=10;g.setTransfo
 let hudCache={};function setH(id,html){if(hudCache[id]!==html){hudCache[id]=html;$(id).innerHTML=html;}}
 const ORD={follow:'ROZKAZ: ZA MNĄ · SZYK KOLUMNOWY',hold:'ROZKAZ: TRZYMAĆ POZYCJĘ',move:'ROZKAZ: RUCH NA POZYCJĘ',op:'ROZKAZ: AKCJA PRZY DRZWIACH'};
 function abText(u){if(u.patrol)return'Q: okrzyk „'+((LD().crew&&LD().crew.shout)||'Police! Don\'t move!')+'”';switch(u.spec){case'lead':return'Q: okrzyk „Policja!”'+(u.shoutCd>0?' ('+Math.ceil(u.shoutCd)+')':'');case'breach':return u.ram?'Q: taran':'Q: ładunek ×'+u.charges;case'tech':return'Q: kamera (drzwi) / peryskop (róg) · E: wytrych';case'medic':return'Q: sedatyw ×'+u.sed;case'scout':return'Q: granat hukowy ×'+u.flash;}return'';}
-function wHTML(u){if(!u||!u.alive)return'<div class="wn">—</div>';return'<div class="wn">'+u.name+' · '+u.W.n+'</div><div class="am">'+(u.rel>0?'<small>PRZEŁADOWANIE</small>':u.mag+'<small> / '+u.res+'</small>')+'</div><div class="ab">'+abText(u)+(u.spray?' · G: gaz ×'+u.spray:'')+(u.shield?' · TARCZA':'')+(u.quiet?' · CICHO':'')+'</div>';}
+function wHTML(u,pre){if(!u||!u.alive)return'<div class="wn">—</div>';const lt=u.holster?'LATARKA':G.nvg?'NOKTOWIZJA':(isPat()&&!LD().nvg)?'LATARKA':'';let pp='';if(u.W.mag<=40){for(let i=0;i<u.W.mag;i++)pp+='<i'+(i<u.mag&&!(u.rel>0)?'':' class="e"')+'></i>';}
+ return'<div class="wn">'+(pre||'')+(u.holster?'BROŃ W KABURZE':u.W.n)+(lt?' · '+lt:'')+'</div><div class="am">'+(u.rel>0?'<small class="rl">PRZEŁADOWANIE</small>':u.mag+' <small>/ '+u.res+'</small>')+'</div>'+(pp?'<div class="pp">'+pp+'</div>':'')+'<div class="ab">'+abText(u).replace(/^Q: /,'Q · ')+(u.spray?' · G gaz ×'+u.spray:'')+(u.shield?' · TARCZA':'')+(u.quiet?' · CICHO':'')+'</div>';}
 function updateHUD(){let r='',ri=0;for(const s of SPECS.map((_,i)=>G.squad[i])){const idx=ri++;if(!s)continue;let st;
   if(!s.alive)st='KIA';else if(s.wounded&&!s.treated)st='<span style="color:#ff5a4a">RANNY · '+Math.ceil(s.bleed)+' s</span>';else if(s.stun>0)st='OGŁUSZONY';else if(s.human)st=(s.wounded?'opatrzony · ':'')+s.mag+'/'+s.W.mag;else{const t=s.task;st=s.action?'akcja':t?(t.type==='hold'?'pozycja':t.done?'gotowy':'ruch'):s.post?(s.post.kind==='door'?'pilnuje drzwi':'zabezp. kąt'):'w szyku';st+=' · '+s.mag;}
-  r+='<div data-i="'+idx+'" class="m'+(s.human===1?' p1':s.human===2?' p2':'')+(s.alive?'':' kia')+'">'+(s.human?'<span class="tag">P'+s.human+'</span>':'')+'<span class="nm">'+(idx+1)+' '+s.name+'</span><span class="rl">'+s.role+'</span><span class="st">'+st+'</span></div>';}
+  const hw=!s.alive?0:s.wounded&&!s.treated?35:s.wounded?65:100;r+='<div data-i="'+idx+'" class="m'+(s.human===1?' p1':s.human===2?' p2':'')+(s.alive?'':' kia')+'"><span class="nm">'+s.name+'</span><span class="hb"><i'+(hw<100?' class="w"':'')+' style="width:'+hw+'%"></i></span><span class="st">'+st+'</span></div>';}
  setH('roster',r);setH('order',(ORD[G.order]||'')+(G.ops.some(o=>o.wait)?'<br>'+G.ops.filter(o=>o.wait).map(o=>teamName(o.team).toUpperCase()+': '+(o.go?'WCHODZI':o.ready?'GOTOWY':'W DRODZE')).join(' · ')+(G.ops.some(o=>o.wait&&!o.go&&o.ready)?' · [SPACJA] WEJŚCIE':''):'')+'<br>'+(isPat()&&!LD().nvg?'LATARKI':G.nvg?'NOKTOWIZJA [N]':'LATARKI [N]'));
  const ne=G.enemies.length,nn=G.enemies.filter(e=>!e.alive||e.state==='cuffed'||e.state==='surr'||e.pose==='sleep').length;
  const nc=G.civs.filter(c=>c.kind!=='director'&&c.state!=='bed').length;
- if(isPat())setH('obj',LD().obj());else setH('obj','<div class="h">CELE OPERACJI · '+fmtT(G.stats.time)+' · <span style="color:'+(G.deadline<180?'#ff5a4a':'#c9b458')+'">ULTIMATUM '+fmtT(Math.max(0,G.deadline))+'</span></div>'+
-  '<div class="'+(G.obj.found?'ok':'no')+'">'+(G.obj.found?'■':'□')+' Odnajdź zakładnika</div>'+
-  '<div class="'+(G.obj.freed?'ok':'no')+'">'+(G.obj.freed?'■':'□')+' Uwolnij zakładnika [E]</div>'+
-  '<div class="'+(G.win?'ok':'no')+'">'+(G.win?'■':'□')+' Wyprowadź go z budynku</div>'+
+ if(isPat())setH('obj',LD().obj());else setH('obj','<div class="h">Notatnik · J · <span style="color:'+(G.deadline<180?'#ff5a4a':'#c9b458')+'">ULTIMATUM '+fmtT(Math.max(0,G.deadline))+'</span></div>'+
+  '<div class="'+(G.obj.found?'ok':'no')+'">'+'Odnajdź zakładnika</div>'+
+  '<div class="'+(G.obj.freed?'ok':'no')+'">'+'Uwolnij zakładnika [E]</div>'+
+  '<div class="'+(G.win?'ok':'no')+'">'+'Wyprowadź go z budynku</div>'+
   '<div class="opt">Napastnicy zneutralizowani: '+nn+'/'+ne+'</div><div class="opt">Cywile skuci / uśpieni: '+G.stats.civSecured+'/'+nc+'</div>'+(G.alarm?'<div style="color:#e0574a">ALARM PODNIESIONY</div>':'<div class="opt">Element zaskoczenia: zachowany</div>'));
  const th=$('threat');if(G.hostage&&G.alarm&&G.hostage.alive&&G.hostage.state==='tied'&&G.enemies.find(e=>e.boss&&e.active())){th.classList.remove('hidden');setH('threat','ZAKŁADNIK ZAGROŻONY · '+Math.max(0,Math.ceil(G.execT))+' s');}else th.classList.add('hidden');
- setH('weapon',wHTML(G.p1));if(G.players===2)setH('p2weapon','<div class="wn">GRACZ 2</div>'+wHTML(G.p2));
+ setH('weapon',wHTML(G.p1));if(G.players===2)setH('p2weapon',wHTML(G.p2,'P2 · '));bodycamHUD();
  const u=G.p1;let pr='';const bar=$('bar');
  if(u&&u.alive&&!G.ended){if(u.action){bar.classList.remove('hidden');bar.firstChild.style.width=(u.action.t/u.action.dur*100)+'%';pr=u.action.label+'…';}
   else{bar.classList.add('hidden');const it=interactInfo(u);if(it)pr=(it.dur>0?'[przytrzymaj E] ':'[E] ')+it.label;else{const d=frontDoor(u);if(d&&d.locked&&!d.knownLocked&&!d.broken)pr='[E] Otwórz drzwi';}
@@ -3015,7 +3066,16 @@ function updateHUD(){let r='',ri=0;for(const s of SPECS.map((_,i)=>G.squad[i])){
    if(u.spec==='medic'){const ht=healTarget(u)||(u.wounded&&!u.treated?u:null);if(ht)pr+=(pr?' · ':'')+'[Q] Opatrz: '+(ht===u?'siebie':ht.name);}
    if(u.spec==='breach'||u.spec==='tech'){const d=frontDoor(u);if(d&&!d.broken&&d.open<.5&&!d.charge)pr+=(pr?' · ':'')+'[Q] '+(u.spec==='breach'?'Załóż ładunek':'Kamera pod drzwiami');}}}
  else bar.classList.add('hidden');
- setH('prompt',pr);}
+ setH('prompt',promptHTML(pr));}
+function promptHTML(pr){if(!pr)return'';return pr.split(' · ').map(x=>{const m=x.match(/^\[(przytrzymaj )?([^\]]+)\] ?(.*)$/i);return m?'<k'+(m[1]?' class="hold"':'')+'>'+m[2]+'</k>'+m[3]:x;}).join('<span class="sep">·</span>');}
+const BC_AG={house:['RIDGEFIELD PD','-0500'],road:['WYOMING HWY PATROL','-0700'],apt:['CHICAGO PD','-0600'],motel:['NYE COUNTY SO','-0800'],air:['PHOENIX PD','-0700'],hosp:['RIDGEFIELD PD S.W.A.T.','-0500']};
+function bcHash(s){let h=7;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;return h;}
+function bodycamHUD(){const u=G.p1;if(!u)return;const ag=BC_AG[G.lvl]||BC_AG.house,swat=!u.patrol,h=bcHash(u.name);
+ const nm=u.name.replace(/^(OFC|TPR|DEP|SGT|CPL)\. /,'');setH('bc-who','· '+u.name+' #'+(1000+h%9000));
+ const ck=(LD().nb&&LD().nb.clock)||[2,14,0],t=Math.floor(ck[0]*3600+ck[1]*60+ck[2]+180+G.stats.time),p=n=>String(n).padStart(2,'0'),d=new Date();
+ setH('bc-t',d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(Math.floor(t/3600)%24)+':'+p(Math.floor(t/60)%60)+':'+p(t%60)+' '+ag[1]);
+ setH('bc-s',(swat&&G.lvl==='motel'?'NYE COUNTY S.W.A.T.':ag[0])+' · '+(swat?'HELMET CAM':'BODY CAM')+' X'+(60+h%30)+'A-'+(1000+(h>>>8)%9000));
+ $('cmdhint').classList.toggle('fade',G.stats.time>15);}
 function fmtT(t){t=Math.floor(t);return Math.floor(t/60)+':'+String(t%60).padStart(2,'0');}
 
 // ================= SCREENS =================

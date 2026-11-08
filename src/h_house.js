@@ -196,8 +196,8 @@ function houseRender(c,cx,cy){const H=G.h;if(!H)return;
   const seed=(G.time*11)|0,cols=['#5a6870','#7a8a90','#5c1f1f','#3a1414','#c8ccce','#4a4a44','#8a7a6a'];for(let j=0;j<10;j+=2)for(let i=0;i<26;i+=2){const hh=Math.sin(i*12.9898+j*78.233+seed*.37)*43758.5453;P(c,x+3+i,y+1+j,2,2,cols[Math.floor((hh-Math.floor(hh))*cols.length)]);}
   if(((G.time*2)|0)%2)P(c,x+27,y+3,2,2,'rgba(160,220,255,.4)');}}
 function houseObj(){const H=G.h;if(!H)return'';const s=H.s,ar=s.state==='cuffed'||!s.alive,ins=H.talked&&H.inside;
- const row=(ok,t)=>'<div class="'+(ok?'ok':'no')+'">'+(ok?'■':'□')+' '+t+'</div>';
- return'<div class="h">2-ADAM-14 · 214 OAKRIDGE LN · '+fmtT(G.stats.time)+'</div>'+row(ins,'Sprawdź zgłoszenie')+(H.freezer?row(ar,'Zatrzymaj podejrzanego'):'')+(H.nf?'<div class="opt">Notatki: '+H.nf+'</div>':'');}
+ const row=(ok,t)=>'<div class="'+(ok?'ok':'no')+'">'+t+'</div>';
+ return'<div class="h">Notatnik · J</div>'+row(ins,'Sprawdź zgłoszenie')+(H.freezer?row(ar,'Zatrzymaj podejrzanego'):'')+(H.nf?'<div class="opt">Notatki: '+H.nf+'</div>':'');}
 function houseBrief(){return`<div class="sec"><span class="lbl">JEDNOSTKA</span>Ridgefield PD · patrol <b>2-Adam-14</b><br>Ofc. Miller, Ofc. Ortiz</div>
 <div class="sec"><span class="lbl">ADRES</span>214 Oakridge Lane, Ridgefield<br>06:40 · jesienny poranek</div>
 <div class="sec"><span class="lbl">ZADANIE</span>Sprawdzić zgłoszenie.</div>`;}

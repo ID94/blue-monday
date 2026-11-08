@@ -52,7 +52,7 @@ function patrolDebrief(rows,score){const s=G.stats;score+=G.win?100:0;score-=s.r
  $('deb-h').textContent=G.win?'MISJA ZAKOŃCZONA SUKCESEM':'MISJA NIEUDANA';$('deb-h').style.color=G.win?'#7fae6a':'#e0574a';$('deb-r').textContent='OCENA: '+rank;
  $('deb-st').innerHTML=[['Wynik',G.reason],['Czas',fmtT(s.time)],...rows,['Cywile zabici',s.civKilled],['Straty',s.squadLost+' / '+G.squad.filter(Boolean).length],['Ranni / opatrzeni',s.wounded+' / '+s.healed],['Nieuprawnione użycie siły',s.roe],['Oddane strzały',s.shots],['Punkty',score]].map(r=>'<div>'+r[0]+'<span>'+r[1]+'</span></div>').join('');
  $('deb-log').innerHTML='<div class="h">OŚ CZASU</div>'+G.log.map(l=>'<div><span>'+fmtT(l[0])+'</span>'+l[1]+'</div>').join('');showScreen('deb');}
-function objRows(head,rows,extra){const row=(ok,t)=>'<div class="'+(ok?'ok':'no')+'">'+(ok?'■':'□')+' '+t+'</div>';return'<div class="h">'+head+' · '+fmtT(G.stats.time)+'</div>'+rows.filter(Boolean).map(r=>row(r[0],r[1])).join('')+(extra||'');}
+function objRows(head,rows,extra){const row=(ok,t)=>'<div class="'+(ok?'ok':'no')+'">'+t+'</div>';return'<div class="h">Notatnik · J</div>'+rows.filter(Boolean).map(r=>row(r[0],r[1])).join('')+(extra||'');}
 // ---- cinematic briefing filled from level data ----
 function fillBriefing(){const n=LD().nb;if(!n)return;
  $('nb').querySelector('.nb-top').innerHTML='<span><i></i>ZGŁOSZENIE '+n.no+'</span><span>PRIORYTET <b>'+n.pri+'</b> &nbsp;·&nbsp; KOD '+n.code+'</span>';
@@ -70,7 +70,7 @@ function extWall(g,x,y,tx,ty,r){const k=LD().ext;
 const WXP=[];for(let i=0;i<150;i++)WXP.push({x:Math.random()*VW,y:Math.random()*VH,s:Math.random(),ph:Math.random()*6.28});
 const FOGB=[];for(let i=0;i<14;i++)FOGB.push({x:Math.random()*1.4-.2,y:Math.random()*1.4-.2,r:50+Math.random()*70,v:.004+Math.random()*.006});
 var SNOWC=null;
-function snowCover(){if(SNOWC||!OUTM)return SNOWC;SNOWC=document.createElement('canvas');SNOWC.width=OUTM.width;SNOWC.height=OUTM.height;const g=SNOWC.getContext('2d');g.drawImage(OUTM,0,0);g.globalCompositeOperation='source-in';g.fillStyle='rgba(225,232,242,.42)';g.fillRect(0,0,SNOWC.width,SNOWC.height);
+function snowCover(){if(SNOWC||!OUTM)return SNOWC;SNOWC=document.createElement('canvas');SNOWC.width=OUTM.width;SNOWC.height=OUTM.height;const g=SNOWC.getContext('2d');g.drawImage(OUTM,0,0);g.globalCompositeOperation='source-in';g.fillStyle='rgba(225,232,242,.3)';g.fillRect(0,0,SNOWC.width,SNOWC.height);
  g.globalCompositeOperation='source-atop';const r=rng(7);for(let i=0;i<2600;i++){g.fillStyle=r()<.5?'rgba(255,255,255,.35)':'rgba(170,185,205,.3)';g.fillRect(r()*SNOWC.width|0,r()*SNOWC.height|0,2,1);}return SNOWC;}
 function drawWeather(c,cx,cy){const w=W8(),dt=1/60;
  if(w==='snow'){const sc=snowCover();if(sc)c.drawImage(sc,cx,cy,VW,VH,0,0,VW,VH);const wind=6+Math.sin(G.time*.2)*8;

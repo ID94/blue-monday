@@ -75,7 +75,7 @@ addEventListener('keydown',e=>{if(['Tab','ArrowUp','ArrowDown','ArrowLeft','Arro
  if(e.code==='KeyN')toggleNVG();
  if(e.code==='KeyC'&&G.p1&&G.p1.alive){if(G.p1.spec==='tech'){if(!G.camv){const a=G.p1.ang;G.p1.action={t:0,dur:.5,label:'Peryskop',pose:'kneel',done:()=>startMirror(G.p1,a)};}}else orderCorner();}
  if(e.code==='Space'){const w=G.ops.filter(o=>o.wait&&!o.go);if(w.length){w.forEach(o=>o.go=true);radio(G.p1?G.p1.name:'ALFA','Wszystkie zespoły: wejście, wejście, wejście!',{prio:1});logEv('Sygnał do wejścia ('+w.map(o=>teamName(o.team)).join(' + ')+')');}}
- if(e.code==='KeyM')G.map=true;});
+ if(e.code==='KeyM')G.map=true;if(e.code==='KeyJ'&&G.running&&!G.paused)$('obj').classList.toggle('fold');});
 addEventListener('keyup',e=>{K[e.code]=false;if(e.code==='KeyM')G.map=false;});
 addEventListener('blur',()=>{for(const k in K)K[k]=false;G.mouse.down=false;});
 const wrap=$('wrap');
@@ -422,20 +422,21 @@ function drawPlan(cnv,live,entry){const g=cnv.getContext('2d'),S=10;g.setTransfo
 let hudCache={};function setH(id,html){if(hudCache[id]!==html){hudCache[id]=html;$(id).innerHTML=html;}}
 const ORD={follow:'ROZKAZ: ZA MNĄ · SZYK KOLUMNOWY',hold:'ROZKAZ: TRZYMAĆ POZYCJĘ',move:'ROZKAZ: RUCH NA POZYCJĘ',op:'ROZKAZ: AKCJA PRZY DRZWIACH'};
 function abText(u){if(u.patrol)return'Q: okrzyk „'+((LD().crew&&LD().crew.shout)||'Police! Don\'t move!')+'”';switch(u.spec){case'lead':return'Q: okrzyk „Policja!”'+(u.shoutCd>0?' ('+Math.ceil(u.shoutCd)+')':'');case'breach':return u.ram?'Q: taran':'Q: ładunek ×'+u.charges;case'tech':return'Q: kamera (drzwi) / peryskop (róg) · E: wytrych';case'medic':return'Q: sedatyw ×'+u.sed;case'scout':return'Q: granat hukowy ×'+u.flash;}return'';}
-function wHTML(u){if(!u||!u.alive)return'<div class="wn">—</div>';return'<div class="wn">'+u.name+' · '+u.W.n+'</div><div class="am">'+(u.rel>0?'<small>PRZEŁADOWANIE</small>':u.mag+'<small> / '+u.res+'</small>')+'</div><div class="ab">'+abText(u)+(u.spray?' · G: gaz ×'+u.spray:'')+(u.shield?' · TARCZA':'')+(u.quiet?' · CICHO':'')+'</div>';}
+function wHTML(u,pre){if(!u||!u.alive)return'<div class="wn">—</div>';const lt=u.holster?'LATARKA':G.nvg?'NOKTOWIZJA':(isPat()&&!LD().nvg)?'LATARKA':'';let pp='';if(u.W.mag<=40){for(let i=0;i<u.W.mag;i++)pp+='<i'+(i<u.mag&&!(u.rel>0)?'':' class="e"')+'></i>';}
+ return'<div class="wn">'+(pre||'')+(u.holster?'BROŃ W KABURZE':u.W.n)+(lt?' · '+lt:'')+'</div><div class="am">'+(u.rel>0?'<small class="rl">PRZEŁADOWANIE</small>':u.mag+' <small>/ '+u.res+'</small>')+'</div>'+(pp?'<div class="pp">'+pp+'</div>':'')+'<div class="ab">'+abText(u).replace(/^Q: /,'Q · ')+(u.spray?' · G gaz ×'+u.spray:'')+(u.shield?' · TARCZA':'')+(u.quiet?' · CICHO':'')+'</div>';}
 function updateHUD(){let r='',ri=0;for(const s of SPECS.map((_,i)=>G.squad[i])){const idx=ri++;if(!s)continue;let st;
   if(!s.alive)st='KIA';else if(s.wounded&&!s.treated)st='<span style="color:#ff5a4a">RANNY · '+Math.ceil(s.bleed)+' s</span>';else if(s.stun>0)st='OGŁUSZONY';else if(s.human)st=(s.wounded?'opatrzony · ':'')+s.mag+'/'+s.W.mag;else{const t=s.task;st=s.action?'akcja':t?(t.type==='hold'?'pozycja':t.done?'gotowy':'ruch'):s.post?(s.post.kind==='door'?'pilnuje drzwi':'zabezp. kąt'):'w szyku';st+=' · '+s.mag;}
-  r+='<div data-i="'+idx+'" class="m'+(s.human===1?' p1':s.human===2?' p2':'')+(s.alive?'':' kia')+'">'+(s.human?'<span class="tag">P'+s.human+'</span>':'')+'<span class="nm">'+(idx+1)+' '+s.name+'</span><span class="rl">'+s.role+'</span><span class="st">'+st+'</span></div>';}
+  const hw=!s.alive?0:s.wounded&&!s.treated?35:s.wounded?65:100;r+='<div data-i="'+idx+'" class="m'+(s.human===1?' p1':s.human===2?' p2':'')+(s.alive?'':' kia')+'"><span class="nm">'+s.name+'</span><span class="hb"><i'+(hw<100?' class="w"':'')+' style="width:'+hw+'%"></i></span><span class="st">'+st+'</span></div>';}
  setH('roster',r);setH('order',(ORD[G.order]||'')+(G.ops.some(o=>o.wait)?'<br>'+G.ops.filter(o=>o.wait).map(o=>teamName(o.team).toUpperCase()+': '+(o.go?'WCHODZI':o.ready?'GOTOWY':'W DRODZE')).join(' · ')+(G.ops.some(o=>o.wait&&!o.go&&o.ready)?' · [SPACJA] WEJŚCIE':''):'')+'<br>'+(isPat()&&!LD().nvg?'LATARKI':G.nvg?'NOKTOWIZJA [N]':'LATARKI [N]'));
  const ne=G.enemies.length,nn=G.enemies.filter(e=>!e.alive||e.state==='cuffed'||e.state==='surr'||e.pose==='sleep').length;
  const nc=G.civs.filter(c=>c.kind!=='director'&&c.state!=='bed').length;
- if(isPat())setH('obj',LD().obj());else setH('obj','<div class="h">CELE OPERACJI · '+fmtT(G.stats.time)+' · <span style="color:'+(G.deadline<180?'#ff5a4a':'#c9b458')+'">ULTIMATUM '+fmtT(Math.max(0,G.deadline))+'</span></div>'+
-  '<div class="'+(G.obj.found?'ok':'no')+'">'+(G.obj.found?'■':'□')+' Odnajdź zakładnika</div>'+
-  '<div class="'+(G.obj.freed?'ok':'no')+'">'+(G.obj.freed?'■':'□')+' Uwolnij zakładnika [E]</div>'+
-  '<div class="'+(G.win?'ok':'no')+'">'+(G.win?'■':'□')+' Wyprowadź go z budynku</div>'+
+ if(isPat())setH('obj',LD().obj());else setH('obj','<div class="h">Notatnik · J · <span style="color:'+(G.deadline<180?'#ff5a4a':'#c9b458')+'">ULTIMATUM '+fmtT(Math.max(0,G.deadline))+'</span></div>'+
+  '<div class="'+(G.obj.found?'ok':'no')+'">'+'Odnajdź zakładnika</div>'+
+  '<div class="'+(G.obj.freed?'ok':'no')+'">'+'Uwolnij zakładnika [E]</div>'+
+  '<div class="'+(G.win?'ok':'no')+'">'+'Wyprowadź go z budynku</div>'+
   '<div class="opt">Napastnicy zneutralizowani: '+nn+'/'+ne+'</div><div class="opt">Cywile skuci / uśpieni: '+G.stats.civSecured+'/'+nc+'</div>'+(G.alarm?'<div style="color:#e0574a">ALARM PODNIESIONY</div>':'<div class="opt">Element zaskoczenia: zachowany</div>'));
  const th=$('threat');if(G.hostage&&G.alarm&&G.hostage.alive&&G.hostage.state==='tied'&&G.enemies.find(e=>e.boss&&e.active())){th.classList.remove('hidden');setH('threat','ZAKŁADNIK ZAGROŻONY · '+Math.max(0,Math.ceil(G.execT))+' s');}else th.classList.add('hidden');
- setH('weapon',wHTML(G.p1));if(G.players===2)setH('p2weapon','<div class="wn">GRACZ 2</div>'+wHTML(G.p2));
+ setH('weapon',wHTML(G.p1));if(G.players===2)setH('p2weapon',wHTML(G.p2,'P2 · '));bodycamHUD();
  const u=G.p1;let pr='';const bar=$('bar');
  if(u&&u.alive&&!G.ended){if(u.action){bar.classList.remove('hidden');bar.firstChild.style.width=(u.action.t/u.action.dur*100)+'%';pr=u.action.label+'…';}
   else{bar.classList.add('hidden');const it=interactInfo(u);if(it)pr=(it.dur>0?'[przytrzymaj E] ':'[E] ')+it.label;else{const d=frontDoor(u);if(d&&d.locked&&!d.knownLocked&&!d.broken)pr='[E] Otwórz drzwi';}
@@ -444,7 +445,16 @@ function updateHUD(){let r='',ri=0;for(const s of SPECS.map((_,i)=>G.squad[i])){
    if(u.spec==='medic'){const ht=healTarget(u)||(u.wounded&&!u.treated?u:null);if(ht)pr+=(pr?' · ':'')+'[Q] Opatrz: '+(ht===u?'siebie':ht.name);}
    if(u.spec==='breach'||u.spec==='tech'){const d=frontDoor(u);if(d&&!d.broken&&d.open<.5&&!d.charge)pr+=(pr?' · ':'')+'[Q] '+(u.spec==='breach'?'Załóż ładunek':'Kamera pod drzwiami');}}}
  else bar.classList.add('hidden');
- setH('prompt',pr);}
+ setH('prompt',promptHTML(pr));}
+function promptHTML(pr){if(!pr)return'';return pr.split(' · ').map(x=>{const m=x.match(/^\[(przytrzymaj )?([^\]]+)\] ?(.*)$/i);return m?'<k'+(m[1]?' class="hold"':'')+'>'+m[2]+'</k>'+m[3]:x;}).join('<span class="sep">·</span>');}
+const BC_AG={house:['RIDGEFIELD PD','-0500'],road:['WYOMING HWY PATROL','-0700'],apt:['CHICAGO PD','-0600'],motel:['NYE COUNTY SO','-0800'],air:['PHOENIX PD','-0700'],hosp:['RIDGEFIELD PD S.W.A.T.','-0500']};
+function bcHash(s){let h=7;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;return h;}
+function bodycamHUD(){const u=G.p1;if(!u)return;const ag=BC_AG[G.lvl]||BC_AG.house,swat=!u.patrol,h=bcHash(u.name);
+ const nm=u.name.replace(/^(OFC|TPR|DEP|SGT|CPL)\. /,'');setH('bc-who','· '+u.name+' #'+(1000+h%9000));
+ const ck=(LD().nb&&LD().nb.clock)||[2,14,0],t=Math.floor(ck[0]*3600+ck[1]*60+ck[2]+180+G.stats.time),p=n=>String(n).padStart(2,'0'),d=new Date();
+ setH('bc-t',d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(Math.floor(t/3600)%24)+':'+p(Math.floor(t/60)%60)+':'+p(t%60)+' '+ag[1]);
+ setH('bc-s',(swat&&G.lvl==='motel'?'NYE COUNTY S.W.A.T.':ag[0])+' · '+(swat?'HELMET CAM':'BODY CAM')+' X'+(60+h%30)+'A-'+(1000+(h>>>8)%9000));
+ $('cmdhint').classList.toggle('fade',G.stats.time>15);}
 function fmtT(t){t=Math.floor(t);return Math.floor(t/60)+':'+String(t%60).padStart(2,'0');}
 
 // ================= SCREENS =================
