@@ -242,15 +242,16 @@ function roomPosts(r,ref,skipDoor,maxD){maxD=(maxD||99)*TS;const tiles=LV.roomTi
  for(const[c0,c1]of cs)add(c0,c1,b=>Math.atan2(cy-(b[1]*TS+8),cx-(b[0]*TS+8)),'corner');
  return posts;}
 function clearPosts(){if(G.postAnchor){G.postAnchor=null;for(const u of G.squad)u.post=null;}}
-function updateTactical(dt){const L=leader();if(!L||G.order!=='follow'||G.ops.length){clearPosts();G.stillT=0;return;}
+function updateTactical(dt){const L=leader();if(!L||G.order!=='follow'||G.ops.length||(L.patrol&&isPat())){clearPosts();G.stillT=0;return;}
  const r=LV.room[I(L.x/TS|0,L.y/TS|0)];
  if(G.postAnchor){if(dist(L.x,L.y,G.postAnchor.x,G.postAnchor.y)>TS*1.6||r!==G.postAnchor.r)clearPosts();return;}
  G.stillT=Math.hypot(L.vx,L.vy)<6?(G.stillT||0)+dt:0;
  if(G.stillT>1.4&&r>=0&&!ROOMS[r].n.startsWith('Korytarz')){const posts=roomPosts(r,L,null,6),mem=aiMembers().filter(u=>!u.task);if(!posts.length||!mem.length)return;
   G.postAnchor={x:L.x,y:L.y,r};for(const p of posts){if(!mem.length)break;let b=null,bd=1e9;for(const u of mem){const d=dist(u.x,u.y,p.tx*TS+8,p.ty*TS+8);if(d<bd){bd=d;b=u;}}mem.splice(mem.indexOf(b),1);b.post=p;b.path=null;}
-  const m=aiMembers().find(u=>u.post);if(m&&Math.random()<.5)radio(m.name,pick(['Zabezpieczamy.','Biorę drzwi.','Kąty czyste.','Pokrywam wejście.']));}}
+  const m=aiMembers().find(u=>u.post);if(m&&G.time-(G.postTalkT||-99)>25&&Math.random()<.5&&(G.postTalkT=G.time))radio(m.name,pick(['Zabezpieczamy.','Biorę drzwi.','Kąty czyste.','Pokrywam wejście.']));}}
 const COLF=[.45,-.45,.3,-.3],COLS=[-1.3,1.3,-2,Math.PI];
 function doFollow(u,dt,idx,engaged,cnt){const L=leader();if(!L||L===u){moveUnit(u,dt,0,0,0);return;}
+ if(u.patrol&&isPat()){patrolFollow(u,dt,L,engaged);return;}
  const lsp=L.quiet?26:48;u.pose='stand';
  if(u.post){const p=u.post,px=p.tx*TS+8,py=p.ty*TS+8,d=dist(u.x,u.y,px,py);
   if(d<3){moveUnit(u,dt,0,0,0);u.path=null;if(!engaged){turnTo(u,p.face+Math.sin(G.time*.5+u.id)*.3,dt,3);if(p.kind==='door')u.pose='kneel';}return;}
@@ -364,3 +365,30 @@ function updateOne(op,dt){op.t+=dt;const d=op.d;op.mem=op.mem.filter(u=>u.alive&
    const left=G.enemies.filter(e=>e.active()&&ts.has(I(e.x/TS|0,e.y/TS|0))).length;
    op.mem.forEach(u=>setHold(u,u.task&&u.task.holdFace!=null?u.task.holdFace:Math.atan2(R.cy-u.y,R.cx-u.x)+rand(-.6,.6)));
    radio(op.mem[0].name,left?'Kontakt w pomieszczeniu!':pick(['Czysto!','Pomieszczenie czyste.','Czysto, zabezpieczone.']));op.done=true;if(!G.ops.some(o=>o!==op&&!o.done))G.order='hold';}break;}}
+
+// ---- patrol partner: contact & cover instead of SWAT room posts ----
+function patrolFocus(L){let best=null,bd=TS*6;for(const c of G.units){if(c.team==='squad'||!c.alive||!c.visNow)continue;if(c.team!=='civ'&&c.team!=='enemy')continue;if(c.kind==='gawk'||c.kind==='neighbor')continue;const d=dist(c.x,c.y,L.x,L.y);if(d<bd&&losClear(L.x,L.y,c.x,c.y)){bd=d;best=c;}}return best;}
+function patrolFollow(u,dt,L,engaged){u.pose='stand';const P_=u.pf||(u.pf={tx:null,ty:null,t:0,scan:0,scanA:0,rooms:{}});P_.t-=dt;
+ const f=patrolFocus(L),dl=dist(u.x,u.y,L.x,L.y);
+ if(P_.t<=0||P_.tx==null){P_.t=.9;let wx,wy;
+  if(f){// osłona: trójkąt z partnerem i obserwowaną osobą
+   const a0=Math.atan2(L.y-f.y,L.x-f.x),r=TS*2.3;let best=null,bs=1e9;
+   for(const sg of[1,-1])for(const da of[.95,1.2,.7]){const a=a0+sg*da,x=f.x+Math.cos(a)*r,y=f.y+Math.sin(a)*r;if(collides(x,y,u.r+1)||!losClear(x,y,f.x,f.y))continue;const sc=dist(x,y,u.x,u.y)+(dist(x,y,L.x,L.y)<TS*1.2?200:0);if(sc<bs){bs=sc;best=[x,y];}}
+   if(best){wx=best[0];wy=best[1];}}
+  if(wx==null){const h=L.moving?Math.atan2(L.vy,L.vx):L.heading||L.ang,side=((u.id||1)%2)?1:-1;
+   for(const[b,sdv]of[[1.5,.9],[1.2,.5],[1.8,0],[1,1.2]]){const x=L.x-Math.cos(h)*TS*b-Math.sin(h)*TS*sdv*side,y=L.y-Math.sin(h)*TS*b+Math.cos(h)*TS*sdv*side;if(!collides(x,y,u.r+1)){wx=x;wy=y;break;}}
+   if(wx==null){wx=L.x;wy=L.y;}}
+  if(P_.tx==null||dist(wx,wy,P_.tx,P_.ty)>TS*1.1||(L.moving&&dist(wx,wy,P_.tx,P_.ty)>TS*.6)){P_.tx=wx;P_.ty=wy;u.path=null;}}
+ const d=dist(u.x,u.y,P_.tx,P_.ty),sp=dl>TS*6?50:dl>TS*3.5?40:L.moving?(L.quiet?24:34):24;
+ if(d<5){moveUnit(u,dt,0,0,0);u.path=null;}
+ else if(d<TS*3&&walkLine(u.x,u.y,P_.tx,P_.ty,u.r)){u.path=null;moveUnit(u,dt,(P_.tx-u.x)/d,(P_.ty-u.y)/d,Math.min(sp,d*2.5+10));}
+ else{u.repath-=dt;if(!u.path||u.repath<=0){u.path=findPath(u.x/TS|0,u.y/TS|0,P_.tx/TS|0,P_.ty/TS|0);u.repath=.8;}if(u.path)followPath(u,dt,sp);else moveUnit(u,dt,0,0,0);}
+ // krótka, rzeczowa komunikacja przy pierwszym wejściu do pomieszczenia
+ const r=LV.room[I(u.x/TS|0,u.y/TS|0)];if(r>=0&&!P_.rooms[r]){P_.rooms[r]=1;if(!f&&G.time-(G.pTalk||-99)>30&&Math.random()<.35&&!ROOMS[r].n.startsWith('Korytarz')){G.pTalk=G.time;say(u.name,pick(['Czysto.','Nikogo.','Tu pusto.']));}}
+ if(engaged)return;
+ if(f){turnTo(u,Math.atan2(f.y-u.y,f.x-u.x),dt,4);return;}
+ if(u.moving&&d>TS*.8){turnTo(u,Math.atan2(u.vy,u.vx),dt,5);return;}
+ // spokojna obserwacja: drzwi w pobliżu, tył zespołu, kierunek lidera
+ P_.scan-=dt;if(P_.scan<=0){P_.scan=rand(3,5.5);let od=null,bd=TS*4;for(const dd of LV.doors){const q=dist(u.x,u.y,dd.x*TS+8,dd.y*TS+8);if(q<bd&&q>TS*.8&&losClear(u.x,u.y,dd.x*TS+8,dd.y*TS+8)){bd=q;od=dd;}}
+  const h=L.heading||L.ang,opts=[h+Math.PI*.8*(((u.id||1)%2)?1:-1),h];if(od)opts.push(Math.atan2(od.y*TS+8-u.y,od.x*TS+8-u.x));P_.scanA=opts[(Math.random()*opts.length)|0];}
+ turnTo(u,P_.scanA+Math.sin(G.time*.4+u.id)*.12,dt,2.2);}
