@@ -153,8 +153,8 @@ function schoolDecor(){const face=ty=>WR[ty]&&WR[ty].getContext('2d'),r=rng(77);
  const L=(x,y,w,h,c)=>P(wc,x,y,w,h,c),X0=0,X1=MW*TS;
  L(X0,45*TS-1,X1,1,'#c8c4b8');L(X0,45*TS,X1,2,'rgba(0,0,0,.35)');L(X0,51*TS-1,X1,1,'#c8c4b8');L(X0,51*TS,X1,1,'rgba(255,255,255,.12)');
  for(let x=X0;x<X1;x+=1){if(x>=37*TS&&x<41*TS)continue;L(x,45*TS+3,1,1,'rgba(230,230,220,.7)');L(x,51*TS-4,1,1,'rgba(230,230,220,.7)');L(x,48*TS-2,1,1,'#d8b030');L(x,48*TS+1,1,1,'#d8b030');}
- for(let x=37*TS+1;x<41*TS;x+=6)L(x,45*TS+5,3,6*TS-10,'rgba(235,235,225,.82)');
- L(37*TS,45*TS+1,64,1,'rgba(235,235,225,.82)');
+ for(let y=45*TS+6;y<51*TS-8;y+=8)L(37*TS+2,y,4*TS-4,4,'rgba(235,235,225,.85)');
+ L(36*TS+8,45*TS+2,2,6*TS-4,'rgba(235,235,225,.5)');L(41*TS+6,45*TS+2,2,6*TS-4,'rgba(235,235,225,.5)');
  for(let y=24;y<=42;y+=2){L(1*TS,y*TS,3*TS,1,'rgba(230,230,220,.75)');L(9*TS,y*TS,3*TS,1,'rgba(230,230,220,.75)');}
  for(let y=23;y<=35;y+=4)L(65*TS,y*TS,14*TS,1,'rgba(230,200,60,.7)');L(65*TS,36*TS-2,3*TS,2,'rgba(240,240,230,.8)');L(4*TS,44*TS-1,4*TS,2,'rgba(240,240,230,.7)');
  for(const[x,y]of SC.trees){const cx=x*TS+8,cy=y*TS+12;for(let j=-5;j<=5;j++){const w=Math.round(Math.sqrt(36-j*j)*1.6);L(cx-w,cy+j,w*2,1,j%2?'#4a3020':'#553825');}}
