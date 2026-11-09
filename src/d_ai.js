@@ -95,7 +95,7 @@ function interactInfo(u){if(isPat()&&LD().interact){const h=LD().interact(u);if(
  for(const o of G.units){if(o===u||!o.alive||o.team==='squad'||o.pose==='sleep'||o.state==='bed')continue;const d=Math.min(dist(fx,fy,o.x,o.y),dist(u.x,u.y,o.x,o.y)+4);if(d>=bd)continue;let k=null;
   if(o.kind==='director'){if(o.state==='tied')k=['free','Uwolnij zakładnika',1.4];}
   else if(o.team==='enemy'){if(o.state==='surr')k=['cuff','Skuj napastnika',.8];else if(o.stun>0)k=['surr','Na ziemię! (wymuś poddanie)',0];}
-  else if(o.state!=='cuffed')k=['cuffc',o.kind==='patient'?'Skuj pacjenta':'Skuj cywila',.9];
+  else if(o.state!=='cuffed'&&o.kind!=='ems'&&!(o.kind==='patient'&&G.lvl==='school')&&!o.noCuff)k=['cuffc',o.kind==='patient'?'Skuj pacjenta':'Skuj cywila',.9];
   if(k){bd=d;best={k:k[0],label:k[1],dur:k[2],o};}}
  if(best)return best;
  {const tr=trapNear(u);if(tr){if(u.spec==='tech')return{k:'disarm',label:'Rozbrój pułapkę',dur:2.5,o:tr};return null;}}
