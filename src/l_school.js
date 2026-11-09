@@ -18,7 +18,7 @@ const DOORS_SCHOOL=[
  [38,36,0,1],[39,36,0,1],[14,29],[63,29],
  [18,28],[26,28],[34,28],[42,28],[50,28],[59,28,1],
  [17,31],[21,31],[27,31],[46,31],[50,31],[55,31],[60,31],
- [17,7],[23,7],[32,7],[41,7,1],[50,7,1],[59,7],
+ [17,7],[23,7],[32,7,1],[41,7,1],[50,7,1],[59,7],
  [18,10],[25,10],[32,10],[39,10],[47,10],[53,10],[60,10]];
 const FURN_SCHOOL=[];
 {const F_=(...a)=>FURN_SCHOOL.push(a),r=rng(606);
@@ -178,6 +178,7 @@ function startSchool(){G.hostage=null;G.deadline=1e9;G.order='hold';
  H.vicStart=12;H.vic=12;
  H.hide=[{door:[59,28],room:'Sala 105',n:23,who:'NAUCZYCIELKA'},{door:[41,7],room:'Sala 203',n:19,who:'NAUCZYCIEL'},{door:[50,7],room:'Sala 204',n:26,who:'NAUCZYCIELKA'}];
  for(const hd of H.hide){const up=hd.door[1]===7||hd.door[1]===28;const rm=LV.room[I(hd.door[0],hd.door[1]-1)];const R=ROOMS[rm];if(!R)continue;for(let k=0;k<5;k++){const tx=R.x+((k*2)%(R.x2-R.x+1)),ty=R.y;const c=mkNPC({tx,ty,kind:'student',pal:STU_PAL(),state:'calm',pose:'kneel',a:Math.PI/2,name:'UCZEŃ',upd:(c,dt)=>{moveUnit(c,dt,0,0,0);c.pose='kneel';}});c.hide=true;}}
+ H.emma=mkNPC({tx:36,ty:2,kind:'student',pal:Object.assign(STU_PAL(),{body:'#c8a040',hair:'#8a5a30'}),state:'calm',pose:'kneel',a:Math.PI/2,name:'EMMA',upd:(c,dt)=>{moveUnit(c,dt,0,0,0);c.pose='kneel';}});H.emma.hide=true;H.emma.noCuff=1;
  H.run=[];for(let k=0;k<6;k++){const c=mkNPC({tx:randi(24,58),ty:randi(38,42),kind:'student',pal:STU_PAL(),state:'run',a:Math.PI/2,name:'UCZEŃ',upd:fleeUpd});c.ex=[randi(4,62),57];H.run.push(c);}
  H.crowd=[];for(let k=0;k<34;k++){const x=randi(2,77),y=randi(53,54);if((x>=6&&x<=11)||(x>=38&&x<=43)||(x>=63&&x<=68)||(x>=22&&x<=25))continue;const c=mkNPC({tx:x,ty:y,kind:'gawk',pal:STU_PAL(),state:'calm',a:-Math.PI/2+rand(-.4,.4),name:pick(['GAPIĄ','RODZIC','RODZIC']),upd:crowdUpd});c.phone=Math.random()<.4;if(Math.random()<.15)c.cry=1;H.crowd.push(c);}
  H.rep=mkNPC({tx:8,ty:53,kind:'gawk',pal:{body:'#c8303a',legs:'#2a2a3a',hair:'#e0c070',skin:'#e0c0a8',head:'#e0c0a8',face:'#e0c0a8',visor:'#2a1a12',eyes:1},state:'calm',a:Math.PI/2,name:'REPORTERKA',upd:repUpd});
@@ -197,10 +198,18 @@ function repUpd(c,dt){moveUnit(c,dt,0,0,0);c.wT=(c.wT||0)+dt;turnTo(c,(((c.wT/6)
 function emsUpd(c,dt){moveUnit(c,dt,0,0,0);c.ph+=dt;if(c.cpr){c.pose=((c.ph*3.2)|0)%2?'kneel':'stand';}else{c.pose=c.stand?'stand':'kneel';turnTo(c,c.ang+Math.sin(c.ph*.7)*.02,dt,1);}}
 function inUF(u){return u.y<17*TS;}
 function inGF(u){return u.x>SC.gf.x0*TS&&u.x<SC.gf.x1*TS&&u.y>22*TS&&u.y<36*TS;}
+function shWalk(e,dt,gx,gy,key){if(!e.path||e.goalT!==key){e.path=findPath(e.x/TS|0,e.y/TS|0,gx,gy,4000);e.goalT=key;}if(e.path)for(const nn of e.path.slice(0,3)){const dd=LV.doorAt[I(nn[0],nn[1])];if(dd&&dd.target===0&&!dd.locked&&dist(dd.x*TS+8,dd.y*TS+8,e.x,e.y)<TS*1.6)toggleDoor(dd,e);}if(!e.path||followPath(e,dt,40))e.path=null;else if(e.moving)turnTo(e,Math.atan2(e.vy,e.vx),dt,6);}
+function rattleAt(x,y){if(!A.ctx)return;const o=out(x,y,.6,{rev:.3}),t0=A.ctx.currentTime;if(o)for(let k=0;k<4;k++){nz(o,t0+k*.09,.06,{type:'bandpass',f:1500+Math.random()*600,g:.9});tone(o,t0+k*.09,.04,{f:240,f2:180,g:.35,type:'square'});}}
+const WING=x=>x<29?'zachodniej':x>36?'wschodniej':null,FLIP={zachodniej:'wschodniej',wschodniej:'zachodniej'};
 function shooterUpd(e,dt){const H=G.h;if(H.up||e.state==='surr'||e.stun>0)return false;
+ if(H.det&&!H.detDone){const gx=32*TS+8,gy=8*TS+8;if(dist(e.x,e.y,gx,gy)>5){shWalk(e,dt,32,8,'det');return true;}
+  moveUnit(e,dt,0,0,0);turnTo(e,-Math.PI/2,dt,6);e.pose='stand';if(H.detT==null){H.detT=5;H.rattleT=0;radio('DISPATCH','Uwaga! Emma mówi, że on stoi pod jej drzwiami. Szarpie za klamkę... sala 202, piętro!',{prio:1});logEv('Strzelec pod drzwiami sali 202');}
+  H.detT-=dt;H.rattleT-=dt;if(H.rattleT<=0){H.rattleT=rand(.5,.9);rattleAt(32*TS+8,7*TS+8);makeNoise(32*TS+8,8*TS,8,'kick',e);}
+  if(H.detT<=0){H.detDone=true;e.path=null;e.goalT=null;let n=H.st;while(n===H.st)n=randi(0,SC.stations.length-1);H.st=n;H.stT=rand(16,22);const w=WING(SC.stations[n][0]);setTimeout(()=>{if(!G.ended&&!H.up)radio('DISPATCH','Odszedł. Emma słyszy, że idzie '+(w?'w stronę '+w.replace('niej','niego')+' skrzydła':'korytarzem tuż obok')+'. Mówi, że nie może przestać się trząść.');},2200);}
+  return true;}
  const st=SC.stations[H.st],tx=st[0]*TS+8,ty=st[1]*TS+8;H.stT-=dt;
  if(H.stT<=0){H.stT=rand(14,22);let n=H.st;while(n===H.st)n=randi(0,SC.stations.length-1);H.st=n;e.path=null;const nm=['zachodnie skrzydło','biblioteka','środek budynku','pracownia chemiczna'][n];setTimeout(()=>{if(!G.ended&&!H.up)radio('DISPATCH','Świadkowie: strzały z okien na piętrze, '+nm+'.');},4000);}
- if(dist(e.x,e.y,tx,ty)>6){if(!e.path||e.goalT!==H.st){e.path=findPath(e.x/TS|0,e.y/TS|0,st[0],st[1],4000);e.goalT=H.st;}if(e.path)for(const nn of e.path.slice(0,3)){const dd=LV.doorAt[I(nn[0],nn[1])];if(dd&&dd.target===0&&!dd.locked&&dist(dd.x*TS+8,dd.y*TS+8,e.x,e.y)<TS*1.6)toggleDoor(dd,e);}if(!e.path||followPath(e,dt,40))e.path=null;else if(e.moving)turnTo(e,Math.atan2(e.vy,e.vx),dt,6);return true;}
+ if(dist(e.x,e.y,tx,ty)>6){shWalk(e,dt,st[0],st[1],H.st);return true;}
  moveUnit(e,dt,0,0,0);turnTo(e,Math.PI/2,dt,5);e.pose='stand';
  H.fireT-=dt;if(H.fireT<=0){H.fireT=rand(2.4,4.5);windowShot(e,st[0]);}
  return true;}
@@ -220,13 +229,14 @@ function schoolInteract(u){const H=G.h;if(!H)return null;
  if(!H.geared&&nearPt(u,SC.trunk.x*TS,SC.trunk.y*TS,26))return{k:'house',label:'Weź wyposażenie z bagażnika',dur:1.8,f:gearUp};
  for(const s of SC.stairs){if(!inUF(u)&&nearPt(u,s.gx*TS,s.gy*TS,24))return{k:'house',label:'Wejdź na piętro ('+s.n+' klatka)',dur:.6,f:()=>stairsGo(s,true)};
   if(inUF(u)&&nearPt(u,s.ux*TS,s.uy*TS,24))return{k:'house',label:'Zejdź na parter ('+s.n+' klatka)',dur:.6,f:()=>stairsGo(s,false)};}
+ if(!H.emmaSafe&&inUF(u)&&nearPt(u,32*TS+8,7*TS+8,22))return{k:'house',label:'Zapukaj: „Emma, policja!”',dur:0,f:()=>{H.emmaSafe=true;H.saidNear=1;knockAt(32*TS+8,7*TS+8);say(u.name,'Emma? Policja. Jesteśmy pod drzwiami.');setTimeout(()=>{if(G.ended)return;if(H.call)radio('DISPATCH','Ona was słyszy! Płacze... mówi, że widzi wasze buty w szparze pod drzwiami.');else say('EMMA','(szeptem) Naprawdę...? Proszę, nie zostawiajcie mnie...');say(u.name,'Zostań w środku, Emma. Drzwi zamknięte. Wrócimy po ciebie.');logEv('Emma (911) odnaleziona w sali 202');},1500);}};
  for(const hd of H.hide){if(H.safe[hd.room])continue;const x=hd.door[0]*TS+8,y=hd.door[1]*TS+8;if(nearPt(u,x,y,22))return{k:'house',label:'Zapukaj: „Policja!”',dur:0,f:()=>{H.safe[hd.room]=1;knockAt(x,y);say(u.name,'Policja! Ktoś tam jest?');setTimeout(()=>{if(G.ended)return;say(hd.who,'Jesteśmy tutaj! '+hd.n+' osób, nikt nie jest ranny... On był na górze!');say(u.name,'Zostańcie w środku, drzwi zamknięte. Ktoś po was przyjdzie.');logEv(hd.room+': '+hd.n+' osób ukrytych, bez obrażeń');},1400);}};}
  return null;}
 function stairsGo(s,up){const H=G.h,L=G.p1;const tx=(up?s.ux:s.gx)*TS,ty=(up?s.uy:s.gy)*TS;let i=0;
  for(const q of G.squad){if(!q||!q.alive)continue;const o=[[0,0],[1,0],[-1,0],[0,1],[1,1]][i++%5];q.x=tx+o[0]*12;q.y=ty+o[1]*12;q.path=null;q.task=null;q.post=null;q.vx=q.vy=0;unstick(q);}
  G.trailOwner=null;clearPosts();G.ops=[];G.cam.x=L.x;G.cam.y=L.y;SND.step(L.x,L.y,'conc',.8);
  radio(L.name,up?'Piętro. Idziemy za strzałami.':'Parter.',{radio:1});logEv(up?'Zespół wchodzi na piętro':'Zespół schodzi na parter');
- if(up&&!H.up){H.up=true;const e=H.sh;if(e.alive&&e.state!=='surr'&&e.state!=='cuffed')shooterAmbush(e);setTimeout(()=>{if(!G.ended)radio('DISPATCH','Strzały z okien ustały. Uwaga, może wiedzieć, że idziecie.');},2500);}}
+ if(up&&!H.up){H.up=true;const e=H.sh;if(e.alive&&e.state!=='surr'&&e.state!=='cuffed')shooterAmbush(e);setTimeout(()=>{if(!G.ended&&H.call&&!H.emmaSafe&&H.sh.alive){const w=WING(H.sh.x/TS);radio('DISPATCH','Emma słyszy kroki na schodach... pyta, czy to wy. Ostatnio słyszała go '+(w?'po stronie '+w:'blisko siebie')+'.');H.relN=Math.max(H.relN,9);}},6500);setTimeout(()=>{if(!G.ended)radio('DISPATCH','Strzały z okien ustały. Uwaga, może wiedzieć, że idziecie.');},2500);}}
 const PA_LINES=['Uwaga, uwaga. Lockdown. Uczniowie i nauczyciele pozostają w salach. Zamknąć drzwi, zgasić światło.','To nie są ćwiczenia. Lockdown. Nie wychodzić na korytarze.','Uwaga. Lockdown. Czekać na policję.'];
 function schoolAtmo(dt){const H=G.h,L=G.p1;if(!L||!A.ctx)return;const ins=inGF(L)||inUF(L);
  H.paT=(H.paT==null?6:H.paT)-dt;if(ins&&H.paT<=0&&(H.paN||0)<PA_LINES.length&&!G.ended){H.paT=42;const pi=H.paN||0;H.paN=pi+1;const o=out(L.x,L.y-60,.5,{rev:.6}),t0=A.ctx.currentTime;if(o)[784,659,523].forEach((f,i)=>tone(o,t0+i*.32,.5,{f,g:.35}));setTimeout(()=>{if(!G.ended)say('INTERKOM',PA_LINES[pi]);},1100);}
@@ -234,11 +244,22 @@ function schoolAtmo(dt){const H=G.h,L=G.p1;if(!L||!A.ctx)return;const ins=inGF(L
  if(ins&&H.phT<=0&&!G.ended){H.phT=rand(8,14);const up=inUF(L),c=SC.phones.filter(([x,y])=>(y<17)===up&&dist(x*TS,y*TS,L.x,L.y)<TS*12);if(c.length){const[x,y]=pick(c);H.ring={x:x*TS+10,y:y*TS+6,t:0};const o=out(H.ring.x,H.ring.y,.45),t0=A.ctx.currentTime;if(o)for(let k=0;k<2;k++)[1319,1568,1760,1568,1319,1175].forEach((f,i)=>tone(o,t0+k*1.4+i*.12,.1,{f,g:.22,type:'triangle'}));
   if(!H.saidPh){H.saidPh=1;setTimeout(()=>{const o2=G.squad.find(q=>q&&q.alive&&!q.human);if(o2&&!G.ended)say(o2.name,'Telefony... to rodzice dzwonią.');},2600);}}}
  for(const[fx,fy]of SC.flick)if(Math.random()<dt*.6&&dist(fx*TS,fy*TS,L.x,L.y)<TS*10)for(let i=0;i<4;i++)G.fx.push({k:'dust',x:fx*TS+8+rand(-3,3),y:fy*TS-6,vx:rand(-30,30),vy:rand(0,40),t:0,life:rand(.2,.45),c:'#ffe08a'});}
-function updateSchool(dt){const H=G.h;if(!H||G.ended)return;H.t+=dt;if(H.flash>0)H.flash-=dt;schoolAtmo(dt);
+function emmaCall(dt){const H=G.h,e=H.sh,L=G.p1;if(G.ended||!e)return;const alive=e.alive&&e.state!=='cuffed';
+ if(!H.call){if(H.t>22||H.inside){H.call=1;H.callT0=H.t;H.relT=16;H.relN=0;radio('DISPATCH','Wszystkie jednostki w szkole: mam na linii 911 uczennicę ze środka. Emma, szesnaście lat. Ukryta pod biurkiem w sali 202, piętro. Mówi szeptem, będę przekazywać.',{prio:1});logEv('911: Emma, sala 202, połączenie aktywne');}return;}
+ if(!alive)return;
+ if(!H.emmaSafe&&!H.saidNear&&L&&inUF(L)&&dist(L.x,L.y,32*TS+8,8*TS)<TS*2.6){H.saidNear=1;radio('DISPATCH','Emma słyszy kogoś pod drzwiami. Jest przerażona, myśli, że on wrócił. Jeśli to wy — zapukajcie i się przedstawcie.',{prio:1});}
+ H.relT-=dt;if(H.relT>0)return;H.relT=rand(20,26);const w=WING(e.x/TS);
+ if(H.up){if(H.relN<9){H.relN=9;radio('DISPATCH','Emma mówi, że od dłuższej chwili cisza. Ostatnie kroki słyszała '+(w?'po stronie '+w:'tuż za ścianą')+'. Potem trzask drzwi.');}return;}
+ if(H.relN===0){radio('DISPATCH','Emma przekazuje: strzały bardzo głośne, '+(w?'od strony '+w:'tuż za ścianą, w sali obok')+'. Słyszy, jak łuski spadają na podłogę.');}
+ else if(H.relN===1){radio('DISPATCH','Teraz mówi, że chyba '+(w?'od strony '+FLIP[w]:'z dołu')+'... nie jest pewna. Korytarz niesie echo, alarm wszystko zagłusza.');}
+ else if(H.relN===2){H.det=true;radio('DISPATCH','Emma mówi, że strzały ucichły. Słyszy kroki na korytarzu. Coraz bliżej.');}
+ else if(H.detDone&&H.relN<6){radio('DISPATCH','Emma: znowu strzały, '+(w?'od strony '+w:'blisko')+'. Prosi, żebyście się pospieszyli.');}
+ H.relN++;}
+function updateSchool(dt){const H=G.h;if(!H||G.ended)return;H.t+=dt;if(H.flash>0)H.flash-=dt;schoolAtmo(dt);emmaCall(dt);
  if(!H.geared)for(const q of G.squad)if(q&&q.alive&&!q.human&&(!q.task||q.task.type!=='hold'))setHold(q,-Math.PI/2);
  if(!H.inside&&G.squad.some(q=>q&&q.alive&&(inGF(q)||inUF(q)))){H.inside=true;radio(G.p1.name,'Jesteśmy w środku. Parter.',{radio:1});logEv('Zespół wchodzi do budynku');}
  let v=H.vicStart;for(const u of G.units)if(u.team==='civ'&&!u.alive&&u.kind!=='corpse'&&!(u.killedBy&&u.killedBy.team==='squad'))v++;if(v>H.vic){if(!G.ended)radio('DISPATCH',pick(['Kolejna osoba trafiona przed szkołą!','Mamy następnego rannego przy wejściu!','Strzał z okna, ktoś leży na trawniku!']));H.vic=v;}
- const e=H.sh;if(H.endT==null&&(!e.alive||e.state==='cuffed')){H.endT=3;H.arrT=H.t;radio(G.p1.name,e.alive?'Strzelec zatrzymany! Powtarzam, strzelec zatrzymany!':'Strzelec zneutralizowany! Potrzebne karetki do środka, wiele ofiar!',{radio:1});setTimeout(()=>{if(!G.ended)radio('DISPATCH','Przyjęłam. Wszystkie zespoły medyczne do budynku.');},2200);}
+ const e=H.sh;if(H.endT==null&&(!e.alive||e.state==='cuffed')){H.endT=3;H.arrT=H.t;radio(G.p1.name,e.alive?'Strzelec zatrzymany! Powtarzam, strzelec zatrzymany!':'Strzelec zneutralizowany! Potrzebne karetki do środka, wiele ofiar!',{radio:1});setTimeout(()=>{if(!G.ended)radio('DISPATCH','Przyjęłam. Wszystkie zespoły medyczne do budynku.'+(H.call?' Emma pyta, czy to już koniec. Mówię jej, że tak.':''));},1200);}
  if(H.endT!=null){H.endT-=dt;if(H.endT<=0)endMission(true,e.alive?'Strzelec zatrzymany. Szkoła zabezpieczona.':'Strzelec zneutralizowany. Szkoła zabezpieczona.');}}
 function schoolStress(dt,L){const c=A.ctx;if(!c||!L)return;const t=c.currentTime,ins=inGF(L)||inUF(L);
  if(!A.alarmG){A.alarmG=c.createGain();A.alarmG.gain.value=0;A.alarmG.connect(A.master);
@@ -276,9 +297,9 @@ function schoolRender(c,cx,cy){const H=G.h;if(!H)return;
  if(H.rep){const x=H.rep.x+3-cx,y=H.rep.y-11-cy;P(c,x|0,y|0,2,3,'#1a1a1a');P(c,x|0,(y-1)|0,2,1,'#c8201a');}
  if(!H.geared){const x=SC.trunk.x*TS-cx,y=SC.trunk.y*TS-cy,k=.5+.5*Math.sin(G.time*4);c.strokeStyle='rgba(232,196,106,'+(.35+.4*k)+')';c.lineWidth=1;c.beginPath();c.ellipse(x,y,7+k*2,4+k,0,0,6.283);c.stroke();}}
 function schoolObj(){const H=G.h;if(!H)return'';const e=H.sh,dn=!e.alive||e.state==='cuffed';const sv=Object.keys(H.safe).length;
- return objRows('',[[H.geared,'Weź wyposażenie z radiowozu'],[H.inside,'Wejdź do budynku'],[dn,'Zneutralizuj strzelca']],'<div class="opt">Ofiary: '+H.vic+(sv?' · sale: '+sv+'/3':'')+'</div>');}
-function schoolDebrief(){const H=G.h||{},s=G.stats,e=H.sh;let sc=(G.win?60:0)+Object.keys(H.safe||{}).length*6-Math.max(0,(H.vic||0)-(H.vicStart||0))*6-s.civKilled*30-s.squadLost*12+Math.max(0,30-Math.floor(s.time/20));
- patrolDebrief([['Czas do neutralizacji',H.arrT?fmtT(H.arrT):'—'],['Ofiary po przyjeździe',Math.max(0,(H.vic||0)-(H.vicStart||0)),(H.vic||0)>(H.vicStart||0)?'bad':'good'],['Ofiary łącznie',H.vic||0],['Strzelec',!e?'—':!e.alive?'nie żyje':e.state==='cuffed'?'zatrzymany':'na wolności'],['Sale z ukrytymi',Object.keys(H.safe||{}).length+' / 3']],sc);}
+ return objRows('',[[H.geared,'Weź wyposażenie z radiowozu'],[H.inside,'Wejdź do budynku'],[dn,'Zneutralizuj strzelca']],'<div class="opt">Ofiary: '+H.vic+(sv?' · sale: '+sv+'/3':'')+'</div>'+(H.call?'<div class="opt call911">☎ 911 · Emma · sala 202 · '+fmtT(H.t-H.callT0)+(H.emmaSafe?' · odnaleziona':'')+'</div>':''));}
+function schoolDebrief(){const H=G.h||{},s=G.stats,e=H.sh;let sc=(G.win?60:0)+(H.emmaSafe?8:0)+Object.keys(H.safe||{}).length*6-Math.max(0,(H.vic||0)-(H.vicStart||0))*6-s.civKilled*30-s.squadLost*12+Math.max(0,30-Math.floor(s.time/20));
+ patrolDebrief([['Czas do neutralizacji',H.arrT?fmtT(H.arrT):'—'],['Ofiary po przyjeździe',Math.max(0,(H.vic||0)-(H.vicStart||0)),(H.vic||0)>(H.vicStart||0)?'bad':'good'],['Ofiary łącznie',H.vic||0],['Strzelec',!e?'—':!e.alive?'nie żyje':e.state==='cuffed'?'zatrzymany':'na wolności'],['Sale z ukrytymi',Object.keys(H.safe||{}).length+' / 3'],['Emma (zgłoszenie 911)',H.emmaSafe?'odnaleziona':H.call?'czekała do końca':'—',H.emmaSafe?'good':'']],sc);}
 LVL.school={id:'school',patrol:true,nvg:false,lit:.88,weather:'day',ext:'brick',terrain:schoolTerrain,windows:schoolWindows,decor:schoolDecor,rooms:ROOMS_SCHOOL,doors:DOORS_SCHOOL,furn:FURN_SCHOOL,lamps:LAMPS_SCHOOL,cams:[],entries:ENTRIES_SCHOOL,
  spawn:spawnSchoolTeam,start:startSchool,update:updateSchool,interact:schoolInteract,render:schoolRender,over:schoolOver,stress:schoolStress,obj:schoolObj,debrief:schoolDebrief,
  crew:{role:'Patrol Officer',shout:'Police! Drop it!'},car:{b:'#dde0e3',hi:'#eef0f2',lo:'#a8acb0',e:'#dde0e3',r:'#d4d7da',rh:'#e6e8ea',rl:'#b0b4b8',s:'#1e3c8a'},
