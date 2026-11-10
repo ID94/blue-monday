@@ -338,10 +338,10 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
    <div class="sc-card lock" id="sc3"><div class="n">03</div><div class="tt">Pine Court, Apt 3B</div><div class="fa">Chicago PD · Illinois</div><div class="ds">Śnieżny wieczór. Ktoś z rodziny prosi, żeby zajrzeć do lokatorki.</div><div class="st">ZABLOKOWANE</div></div>
    <div class="sc-card lock" id="sc4"><div class="n">04</div><div class="tt">Starlight Motel, Room 12</div><div class="fa">Nye County Sheriff · Nevada</div><div class="ds">Gorąca, wietrzna noc przy autostradzie. Zgłoszenie z recepcji motelu.</div><div class="st">ZABLOKOWANE</div></div>
    <div class="sc-card lock" id="sc5"><div class="n">05</div><div class="tt">Terminal B</div><div class="fa">Phoenix PD · Airport Bureau</div><div class="ds">Upalne popołudnie. Ochrona terminalu prosi o patrol.</div><div class="st">ZABLOKOWANE</div></div>
-   <div class="sc-card" id="sc6"><div class="n">06</div><div class="tt">Millbrook High</div><div class="fa">Fairview PD · Ohio</div><div class="ds">Słoneczne popołudnie. Zgłoszenie ze szkoły średniej.</div><div class="st ok">● DOSTĘPNE</div></div>
+   <div class="sc-card lock" id="sc6"><div class="n">06</div><div class="tt">Millbrook High</div><div class="fa">Fairview PD · Ohio</div><div class="ds">Słoneczne popołudnie. Zgłoszenie ze szkoły średniej.</div><div class="st">ZABLOKOWANE</div></div>
    <div class="sc-card lock" id="sc7"><div class="n">07</div><div class="tt">St. Dymphna</div><div class="fa">Ridgefield PD · S.W.A.T.</div><div class="ds">Noc, burza. Szpital psychiatryczny na skraju miasta.</div><div class="st">ZABLOKOWANE</div></div>
-   <div class="sc-card" id="sc8"><div class="n">08</div><div class="tt">Riverside Park</div><div class="fa">Portland Police Bureau · Oregon</div><div class="ds">Zimna jesienna noc. Sąsiadka skarży się na hałas w parku.</div><div class="st ok">● DOSTĘPNE</div></div>
-   <div class="sc-card" id="sc9"><div class="n">09</div><div class="tt">Fallmart #2217</div><div class="fa">Pasadena PD · S.W.A.T. · Texas</div><div class="ds">Pochmurne popołudnie. Telefon na linię obsługi klienta.</div><div class="st ok">● DOSTĘPNE</div></div>
+   <div class="sc-card lock" id="sc8"><div class="n">08</div><div class="tt">Riverside Park</div><div class="fa">Portland Police Bureau · Oregon</div><div class="ds">Zimna jesienna noc. Sąsiadka skarży się na hałas w parku.</div><div class="st">ZABLOKOWANE</div></div>
+   <div class="sc-card lock" id="sc9"><div class="n">09</div><div class="tt">Fallmart #2217</div><div class="fa">Pasadena PD · S.W.A.T. · Texas</div><div class="ds">Pochmurne popołudnie. Telefon na linię obsługi klienta.</div><div class="st">ZABLOKOWANE</div></div>
   </div>
   <div class="sc-det" id="sc-det"></div>
   <div class="sc-hint" id="modehint">Pozostali członkowie oddziału są sterowani przez AI i wykonują twoje rozkazy.</div>
@@ -4123,6 +4123,7 @@ function scDetail(id){const c=$(id),m=SCMETA[id]||['','','',1,''],lock=c.classLi
  const b=$('sc-go');if(b)b.onclick=()=>$('scen-next').click();}
 function scQuote(id){const L=LVL[SCLV[id]];const nb=L&&L.nb;if(!nb||!nb.call)return'';const ln=nb.call.find(r=>r[0]==='C');if(!ln)return'';return'<div class="d-q"><small>'+(nb.title||'Zgłoszenie')+' · '+((nb.who&&nb.who.C)||'')+'</small>„'+ln[1]+'”</div>';}
 function scSelect(id,quiet){SCIDS.forEach(x=>$(x).classList.toggle('sel1',x===id));G.pendLvl=$(id).classList.contains('lock')?null:SCLV[id];scDetail(id);if(!quiet)SND.click();$(id).scrollIntoView({block:'nearest'});}
+if(/[?&#]test\b/.test(location.search+location.hash))SCIDS.forEach(id=>{const c=$(id);if(c.classList.contains('lock')){c.classList.remove('lock');const st=c.querySelector('.st');st.className='st ok';st.textContent='● TEST';}});
 SCIDS.forEach(id=>{$(id).onclick=()=>scSelect(id);$(id).ondblclick=()=>{if(!$(id).classList.contains('lock'))$('scen-next').click();};});
 setTimeout(()=>scSelect(SCIDS.find(x=>$(x).classList.contains('sel1'))||'sc1',1),0);
 addEventListener('keydown',e=>{if($('scr-scen').classList.contains('hidden')||G.running)return;const ids=SCIDS,k=Math.max(0,ids.findIndex(x=>$(x).classList.contains('sel1')));

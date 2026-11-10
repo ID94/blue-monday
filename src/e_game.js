@@ -493,6 +493,7 @@ function scDetail(id){const c=$(id),m=SCMETA[id]||['','','',1,''],lock=c.classLi
  const b=$('sc-go');if(b)b.onclick=()=>$('scen-next').click();}
 function scQuote(id){const L=LVL[SCLV[id]];const nb=L&&L.nb;if(!nb||!nb.call)return'';const ln=nb.call.find(r=>r[0]==='C');if(!ln)return'';return'<div class="d-q"><small>'+(nb.title||'Zgłoszenie')+' · '+((nb.who&&nb.who.C)||'')+'</small>„'+ln[1]+'”</div>';}
 function scSelect(id,quiet){SCIDS.forEach(x=>$(x).classList.toggle('sel1',x===id));G.pendLvl=$(id).classList.contains('lock')?null:SCLV[id];scDetail(id);if(!quiet)SND.click();$(id).scrollIntoView({block:'nearest'});}
+if(/[?&#]test\b/.test(location.search+location.hash))SCIDS.forEach(id=>{const c=$(id);if(c.classList.contains('lock')){c.classList.remove('lock');const st=c.querySelector('.st');st.className='st ok';st.textContent='● TEST';}});
 SCIDS.forEach(id=>{$(id).onclick=()=>scSelect(id);$(id).ondblclick=()=>{if(!$(id).classList.contains('lock'))$('scen-next').click();};});
 setTimeout(()=>scSelect(SCIDS.find(x=>$(x).classList.contains('sel1'))||'sc1',1),0);
 addEventListener('keydown',e=>{if($('scr-scen').classList.contains('hidden')||G.running)return;const ids=SCIDS,k=Math.max(0,ids.findIndex(x=>$(x).classList.contains('sel1')));
