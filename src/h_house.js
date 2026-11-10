@@ -87,7 +87,7 @@ F('mailbox',1,1,0,0,(g,x,y)=>{P(g,x+6,y+12,5,2,SH);P(g,x+8,y+4,1,9,'#4a4a4a');P(
 F('hydrant',1,1,1,0,(g,x,y)=>{P(g,x+5,y+11,7,3,SH);P(g,x+6,y+4,5,8,'#a82a20');P(g,x+5,y+6,7,2,'#c03a30');P(g,x+7,y+3,3,1,'#c03a30');});
 F('grill',1,1,1,0,(g,x,y)=>{P(g,x+3,y+12,10,3,SH);P(g,x+4,y+4,9,7,'#2a2a2c');P(g,x+5,y+5,7,1,'#4a4a4c');P(g,x+5,y+7,7,1,'#4a4a4c');P(g,x+4,y+11,1,2,'#222');P(g,x+12,y+11,1,2,'#222');});
 // detailed police cruiser (top-down, facing east)
-F('police',3,2,1,0,(g,X,Y)=>{const K=Object.assign({b:'#e8eaec',hi:'#f8f9fa',lo:'#aeb2b6',e:'#141518',r:'#e2e5e7',rh:'#f2f4f5',rl:'#bcc0c4',s:null,oy:0},(typeof LD==='function'&&LD().car)||{});
+F('police',3,2,1,0,(g,X,Y,W_,H_,SD)=>{const K=Object.assign({b:'#e8eaec',hi:'#f8f9fa',lo:'#aeb2b6',e:'#141518',r:'#e2e5e7',rh:'#f2f4f5',rl:'#bcc0c4',s:null,oy:0},(typeof LD==='function'&&LD().car)||{});
  const x=X,Y0=Y+K.oy+3,E=K.e,GL='#141c24',GR='#40607a',CH='#a0a6ac',sd=c=>shade(c,-40);
  const T=(dx,dy,w,h,c)=>P(g,x+dx,Y0+dy,w,h,c),R=(dx,dy,w,h,c)=>P(g,x+dx,Y0-3+dy,w,h,c);
  // cień
@@ -112,7 +112,7 @@ F('police',3,2,1,0,(g,X,Y)=>{const K=Object.assign({b:'#e8eaec',hi:'#f8f9fa',lo:
  // dach
  R(14,2,15,13,K.r);R(14,2,15,1,K.rh);R(14,14,15,1,K.rl);R(14,3,1,11,K.rh);
  const dg=(ox,rows)=>rows.forEach((r,j)=>{for(let k=0;k<3;k++)if(r[k]==='1')R(ox+k,6+j,1,1,'#1a1c20');});
- dg(16,['010','110','010','010','111']);dg(25,['101','101','111','001','001']);
+ const DGF=['111101101101111','010110010010111','111001111100111','111001111001111','101101111001001','111100111001111','111100111101111','111001010010010','111101111101111','111101111001111'],nn=10+((SD>>>0)*7919)%89;dg(16,DGF[(nn/10)|0].match(/.../g));dg(25,DGF[nn%10].match(/.../g));
  // belka świetlna
  R(20,1,4,14,'#0e0f12');R(20,1,4,1,CH);R(21,2,2,5,'#b81a14');R(21,2,1,5,'#ff4a3a');R(21,9,2,5,'#1640b8');R(21,9,1,5,'#4a7aff');R(21,7,2,2,'#e8eef4');R(20,15,4,1,'#2a2c30');
  // lusterka, szperacz
