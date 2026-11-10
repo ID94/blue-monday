@@ -337,12 +337,19 @@ function updateOne(op,dt){op.t+=dt;const d=op.d;op.mem=op.mem.filter(u=>u.alive&
  case'stack':{const st=op.mem.every(u=>u.task&&u.task.done)||op.t>10;if(st&&op.wait&&!op.ready){op.ready=true;radio(op.mem[0].name,teamName(op.team)+' gotowy na pozycji. Czekamy na sygnał.');}
   if(st&&(!op.wait||op.go)){op.t=0;
    if(d.broken||d.open>.6){op.stage='post';break;}
+   if(op.mode.startsWith('shot')){const sg=op.mem.find(u=>u.alive&&u.weap==='shotgun');if(sg){op.sg=sg;setGoto(sg,op.sd.nx,op.sd.ny,fc);op.stage='shotgo';break;}}
    const br=op.mode.includes('breach')&&op.mem.find(u=>u.spec==='breach'&&(u.charges>0||u.ram));
    if(br&&br.ram){op.opener=br;setGoto(br,op.sd.nx,op.sd.ny,fc);op.stage='goopen';}
    else if(br){op.br=br;setGoto(br,op.sd.nx,op.sd.ny,fc);op.stage='plant';}
    else{const w=pickOpener(op.mem,d,op.sd);op.opener=w;setGoto(w,op.sd.nx,op.sd.ny,fc);op.stage='goopen';}}}break;
  case'plant':if(!op.br.alive){op.stage='stack';break;}if(op.br.task&&op.br.task.done||op.t>6){op.t=0;if(!plantCharge(op.br,d)){op.stage='post';break;}
    const sp=op.spots[op.mem.indexOf(op.br)%Math.max(1,op.spots.length)]||op.spots[0];if(sp)setGoto(op.br,sp[0],sp[1],fc);op.stage='boom';}break;
+ case'shotgo':{const u=op.sg;if(!u.alive){op.stage='stack';op.mode='open';break;}if(u.task&&u.task.done||op.t>7){op.stage='shooting';op.t=0;op.n=0;radio(u.name,pick(['Zamek, strzelba!','Rozwalam zamek!','Strzelam w zamek, uwaga!']),{prio:1});}}break;
+ case'shooting':{const u=op.sg,x=d.x*TS+8,y=d.y*TS+8+(op.sd.oy?0:2);if(!u.alive){op.stage='post';break;}u.ang=Math.atan2(y-u.y,x-u.x);if(u.task)u.task.face=u.ang;
+   if(op.t>.45+op.n*.55&&op.n<2){op.n++;SND.gun('shotgun',u.x,u.y,!isOutdoor(u.x,u.y));makeNoise(u.x,u.y,20,'shot',u);G.shake=Math.max(G.shake||0,.12);
+    for(let i=0;i<9;i++){G.fx.push({k:'spark',x,y:y-6,vx:rand(-70,70),vy:rand(-70,70),t:0,life:rand(.08,.2)});G.fx.push({k:'debris',x,y:y-6,z:0,vx:rand(-50,50),vy:rand(-50,50),vz:rand(10,45),t:0,life:rand(.3,.7),c:'#6b4a32'});}
+    for(let i=0;i<4;i++)G.fx.push({k:'smoke',x,y:y-6,vx:rand(-8,8),vy:-rand(2,8),r:2,gr:8,a:.35,t:0,life:rand(1,2),c:'#a8aaa8'});G.fx.push({k:'mflash',x:u.mzx||u.x,y:u.mzy||u.y-8,a:u.ang,t:0,life:.05,big:true});if(u.mag>0)u.mag--;}
+   if(op.n>=2&&op.t>1.4){d.locked=false;d.shot=true;kickDoor(u,d);logEv(u.name+' rozstrzelał zamek ('+roomName(x,y)+')');op.stage='post';op.t=0;}}break;
  case'boom':if(d.broken||(!d.charge&&op.t>4)){op.stage='post';op.t=0;}break;
  case'goopen':if(!op.opener.alive){op.stage='stack';break;}if(op.opener.task&&op.opener.task.done||op.t>8){op.stage='opening';op.t=0;aiOpenDoor(op.opener,d,()=>{op.stage='post';op.t=0;});}break;
  case'opening':if(op.t>8){op.stage='post';op.t=0;}break;

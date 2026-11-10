@@ -138,6 +138,8 @@ function openCtx(e){G.ctxEv=e;const T_=G.ctxTeam||'all',W_=!!G.ctxWait;const wx=
   items.push({t:'Ustawcie się pod drzwiami — wejście na rozkaz',f:()=>startOp('clear',d,'open',T_,true)});
   items.push({t:'Otwórz i czyść'+(shieldAI()?' (tarcza pierwsza)':''),f:()=>startOp('clear',d,'open',T_,W_)});
   items.push({t:'Granat hukowy i czyść (Ofc. Grant)',dis:!hasF(),f:()=>startOp('clear',d,'flash',T_,W_)});
+  {const sg=aiMembers(T_).find(u=>u.weap==='shotgun');items.push({t:'Rozstrzel zamek strzelbą i czyść'+(sg?' ('+sg.name.split(' ').map((w,i)=>i?w[0]+w.slice(1).toLowerCase():w[0]+w.slice(1).toLowerCase()).join(' ')+')':''),dis:!sg,f:()=>startOp('clear',d,'shot',T_,W_)});
+   items.push({t:'Rozstrzel zamek + granat i czyść',dis:!(sg&&hasF()),f:()=>startOp('clear',d,'shotflash',T_,W_)});}
   items.push({t:'Wysadź i czyść (Cpl. Hayes)',dis:!hasB(),f:()=>startOp('clear',d,'breach',T_,W_)});
   items.push({t:'Wysadź + granat i czyść',dis:!(hasF()&&hasB()),f:()=>startOp('clear',d,'breachflash',T_,W_)});}
  else if(d&&(d.broken||d.open>=.5)){title='Przejście';

@@ -84,7 +84,8 @@ function fire(u){const W=u.W;if(!W||u.rel>0||u.fireCd>0||!u.active())return fals
 function hitscan(sh,x0,y0,a,maxD){const dx=Math.cos(a),dy=Math.sin(a);let x=x0,y=y0,d=0,hit=null;
  if(bulletBlock(x0/TS|0,y0/TS|0)){x0=sh.x;y0=sh.y-2;x=x0;y=y0;}
  while(d<maxD){x+=dx*2;y+=dy*2;d+=2;const tx=x/TS|0,ty=y/TS|0;
-  if(bulletBlock(tx,ty)){if(LD().breakable&&LV.t[I(tx,ty)]===T.WIN&&!(LV.bw&&LV.bw.has(I(tx,ty)))){breakWin(tx,ty,x,y,a);continue;}impact(x-dx*2,y-dy*2,tx,ty,a);break;}
+  if(bulletBlock(tx,ty)){if(sh.W&&sh.W.pel>1&&sh.team==='squad'&&LV.t[I(tx,ty)]===T.DOOR&&d<TS*1.8){const dr=LV.doorAt[I(tx,ty)];if(dr&&dr.locked){dr.locked=false;dr.shot=true;dr.knownLocked=false;if(sh.human)toast('Zamek rozstrzelany — kopnij lub otwórz drzwi');logEv(sh.name+' rozstrzelał zamek strzelbą');}}
+   if(LD().breakable&&LV.t[I(tx,ty)]===T.WIN&&!(LV.bw&&LV.bw.has(I(tx,ty)))){breakWin(tx,ty,x,y,a);continue;}impact(x-dx*2,y-dy*2,tx,ty,a);break;}
   if(G.carBlk&&d>6&&G.carBlk(x,y)){carImpact(x,y,a);break;}
   for(const u of G.units){if(!u.alive||u===sh||u.pose==='sleep')continue;const cy=u.y-2,rr=u.pose==='inbed'?3.6:(u.pose==='kneel'||u.pose==='hands'||u.pose==='sit')?4.2:5.2;
    if((u.x-x)**2+(cy-y)**2<(rr+(u.shield?2:0))**2){if(u.shield&&Math.abs(angDiff(u.ang,a+Math.PI))<(u.human?1.15:1.45)){for(let i=0;i<5;i++)G.fx.push({k:'spark',x,y:y-6,vx:rand(-60,60),vy:rand(-60,60),t:0,life:.15});SND.clang(x,y);hit='shield';break;}hit=u;break;}}
