@@ -62,7 +62,7 @@ function startPark(){G.hostage=null;G.deadline=1e9;G.police=[];
  H.jake=q('JAKE',43,31,'stand',Math.PI/2,jakeUpd,TEEN_PAL.jake);H.jake.state='idle';H.sam=q('SAM',47,31,'stand',Math.PI/2,samUpd,TEEN_PAL.sam);
  for(const c of[H.tyler,H.mia,H.jake,H.sam])c.x+=0;H.tyler.x-=4;H.mia.x+=2;
  logEv('Zgłoszenie: zakłócanie spokoju, Riverside Park');
- setTimeout(()=>{radio('DISPATCH','Unit 4-Charlie-12, Riverside Park, wejście od Linden Street. Sąsiadka zgłasza grupę młodzieży przy fontannie: głośna muzyka, alkohol, krzyki. Park zamknięty od dwudziestej drugiej.');radio(G.p1.name,'4-Charlie-12, przyjąłem, jesteśmy na miejscu.',{radio:1});},700);}
+ setTimeout(()=>{radio('DISPATCH','Unit 4-Charlie-12, Riverside Park, wejście od Linden Street. Kobieta zgłasza grupę młodzieży przy fontannie: głośna muzyka, alkohol, krzyki. Park zamknięty od dwudziestej drugiej.');radio(G.p1.name,'4-Charlie-12, przyjąłem, jesteśmy na miejscu.',{radio:1});},700);}
 const near=(a,b,r)=>a&&b&&dist(a.x,a.y,b.x,b.y)<r;
 function teenBase(c,dt){if(c.state==='cuffed'){if(c.escort&&c.escort.alive){if(dist(c.escort.x,c.escort.y,c.x,c.y)>TS*1.3){c.pose='stand';npcGo(c,dt,c.escort.x/TS|0,c.escort.y/TS|0,40);}else{moveUnit(c,dt,0,0,0);turnTo(c,Math.atan2(c.escort.y-c.y,c.escort.x-c.x),dt,3);}}else{moveUnit(c,dt,0,0,0);c.pose='kneel';}return true;}
  if(c.state==='leave'){if(npcGo(c,dt,PK.lot[0],PK.lot[1],34)){c.alive=false;G.units.splice(G.units.indexOf(c),1);G.civs.splice(G.civs.indexOf(c),1);G.h.gone[c.name]=1;}return true;}
@@ -200,5 +200,5 @@ LVL.park={id:'park',patrol:true,weather:'night',autumn:true,crew:{names:['OFC. B
  start:startPark,update:updatePark,interact:parkInteract,render:parkRender,over:parkOver,stress:NOOP,obj:parkObj,debrief:parkDebrief,
  wallCol:()=>['#7a7468','#5a5448'],win:'4-Charlie-12, przyjęłam. Dobra robota.',planTitle:'RIVERSIDE PARK · LINDEN STREET',
  nb:{no:'#26-314-2347',pri:'P3',code:'10-91 / MIP',small:'MIEJSCE',addr:'RIVERSIDE PARK<br>LINDEN ST',facts:[['JEDNOSTKA','4-Charlie-12 · Ofc. Brennan, Ofc. Salazar'],['GODZINA','23:47 · zimna, wietrzna noc'],['ZGŁOSZENIE','zakłócanie spokoju w parku']],
-  title:'911 · ZAPIS ROZMOWY',clock:[23,44,8],who:{D:'DYSPOZYTOR',C:'SĄSIADKA'},bg:[24,14,56,38],
+  title:'911 · ZAPIS ROZMOWY',clock:[23,44,8],who:{D:'DYSPOZYTOR',C:'KOBIETA'},bg:[24,14,56,38],
   call:[['D','Portland, numer alarmowy. Co się stało?'],['C','Dzwonię z Linden Street, przy parku. Znowu ta młodzież przy fontannie. Muzyka na cały regulator, krzyczą, słychać tłuczone butelki.'],['D','Ile osób?'],['C','Czworo, może pięcioro. To dzieciaki. Jeden ciągle się wydziera i rzuca puszkami.'],['D','Czy ktoś jest ranny albo czy widziała pani broń?'],['C','Broni nie... ale jeden chyba wymiotował w krzakach. Jest prawie północ, park jest zamknięty od dziesiątej.'],['D','Wysyłam patrol. Proszę nie wychodzić do nich.']]}};
