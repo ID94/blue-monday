@@ -61,7 +61,7 @@ const FURN_SCHOOL=[];
  // druga strona ulicy: taśma, gapie, sztab, ogródki
  for(let x=0;x<80;x++)if(x!==40&&x!==41)F_('ptape',x,52);F_('camtri',10,53);F_('ctent',64,53);
  for(let x=0;x<80;x+=1)if(x%13!==6&&x%13!==7)F_('pfence',x,55);for(const[x,y]of[[10,56],[30,56],[50,56],[70,56],[20,57],[60,57]])F_('tree',x,y);for(const x of[3,16,24,36,44,57,76])F_('bush',x,56);}
-const LAMPS_SCHOOL=[];for(const x of[18,30,42,54])LAMPS_SCHOOL.push([x,29,1,'#f4f8ff',46],[x,8,1,'#f4f8ff',46]);LAMPS_SCHOOL.push([38,34,1,'#f4f8ff',60],[55,34,1,'#f4f8ff',50],[28,33,1,'#fff4d8',50]);
+const LAMPS_SCHOOL=[];for(const x of[18,30,42,54])LAMPS_SCHOOL.push([x,29,x===30?1:0,'#f4f8ff',46],[x,8,x===42?1:0,'#f4f8ff',46]);LAMPS_SCHOOL.push([38,34,0,'#f4f8ff',60],[55,34,0,'#f4f8ff',50],[28,33,0,'#fff4d8',50]);
 const ENTRIES_SCHOOL=[{n:'Przy radiowozie',s:'Ulica przed szkołą.',x:42,y:48.6,a:-Math.PI/2,px:42,py:48,drawn:1}];
 function schoolTerrain(M,set,fillR,H,V){fillR(0,0,79,57,T.GRASS,'lawn');
  fillR(1,23,11,41,T.ASPH,'pklot');fillR(4,42,7,44,T.ASPH,'road');fillR(65,23,78,35,T.ASPH,'pklot');fillR(65,36,67,44,T.ASPH,'road');

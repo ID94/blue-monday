@@ -108,6 +108,7 @@ function inputP2(){const u=G.p2;if(!u||!u.alive)return;let mx=(K.ArrowRight?1:0)
 function humanUpdate(u,dt){const inp=u.in||{};u.fireCd-=dt;if(u.shoutCd>0)u.shoutCd-=dt;
  if(u.rel>0){u.rel-=dt;if(u.rel<=0){const n=Math.min(u.W.mag-u.mag,u.res);u.mag+=n;u.res-=n;}}
  if(u.stun>0){u.stun-=dt;moveUnit(u,dt,(inp.mx||0)*.4,(inp.my||0)*.4,18);if(inp.aim!=null)turnTo(u,inp.aim,dt,2);return;}
+ if(G.camv&&G.camv.u===u&&G.camv.robot){moveUnit(u,dt,0,0,0);u.pose='kneel';if(LD().robotIn)LD().robotIn(u,inp,dt);return;}
  if(G.camv&&G.camv.u===u&&G.camv.cctv){moveUnit(u,dt,0,0,0);u.pose='stand';if(inp.firePressed||inp.nextCam)startCCTV(u,G.camv.ci+1);else if(Math.hypot(inp.mx||0,inp.my||0)>.2||inp.abil||inp.usePressed)G.camv.stop=true;return;}
  if(G.camv&&G.camv.u===u){moveUnit(u,dt,0,0,0);u.pose='kneel';if(Math.hypot(inp.mx||0,inp.my||0)>.2||inp.abil||inp.usePressed||inp.firePressed)G.camv.stop=true;return;}
  if(u.action){const a=u.action;if(a.hold&&!inp.use){u.action=null;u.pose='stand';}else{a.t+=dt;u.pose=a.pose||'stand';if(a.tick)a.tick(dt);moveUnit(u,dt,0,0,0);if(inp.aim!=null)turnTo(u,inp.aim,dt,4);if(a.t>=a.dur){u.action=null;u.pose='stand';a.done&&a.done();}return;}}
@@ -454,7 +455,7 @@ function updateHUD(){let r='',ri=0;for(const s of SPECS.map((_,i)=>G.squad[i])){
  else bar.classList.add('hidden');
  setH('prompt',promptHTML(pr));}
 function promptHTML(pr){if(!pr)return'';return pr.split(' · ').map(x=>{const m=x.match(/^\[(przytrzymaj )?([^\]]+)\] ?(.*)$/i);return m?'<k'+(m[1]?' class="hold"':'')+'>'+m[2]+'</k>'+m[3]:x;}).join('<span class="sep">·</span>');}
-const BC_AG={house:['RIDGEFIELD PD','-0500'],road:['WYOMING HWY PATROL','-0700'],apt:['CHICAGO PD','-0600'],motel:['NYE COUNTY SO','-0800'],air:['PHOENIX PD','-0700'],hosp:['RIDGEFIELD PD S.W.A.T.','-0500'],school:['FAIRVIEW PD','-0500']};
+const BC_AG={house:['RIDGEFIELD PD','-0500'],road:['WYOMING HWY PATROL','-0700'],apt:['CHICAGO PD','-0600'],motel:['NYE COUNTY SO','-0800'],air:['PHOENIX PD','-0700'],hosp:['RIDGEFIELD PD S.W.A.T.','-0500'],school:['FAIRVIEW PD','-0500'],park:['PORTLAND POLICE BUREAU','-0800'],mall:['PASADENA PD S.W.A.T.','-0600']};
 function bcHash(s){let h=7;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;return h;}
 function bodycamHUD(){const u=G.p1;if(!u)return;const ag=BC_AG[G.lvl]||BC_AG.house,swat=!u.patrol,h=bcHash(u.name);
  const nm=u.name.replace(/^(OFC|TPR|DEP|SGT|CPL)\. /,'');setH('bc-who','· '+u.name+' #'+(1000+h%9000));
@@ -481,10 +482,10 @@ $('mm-coop').onclick=()=>{SND.click();$('mode2').onclick();showScreen('scen');};
 function ctTab(n){$('ct1').classList.toggle('sel',n===1);$('ct2').classList.toggle('sel',n===2);$('ctp1').classList.toggle('hidden',n!==1);$('ctp2').classList.toggle('hidden',n!==2);$('ct-sub').textContent=n===1?'KLAWIATURA + MYSZ':'PAD LUB KLAWIATURA · TRYB CO-OP';}
 $('ct1').onclick=()=>{SND.click();ctTab(1);};$('ct2').onclick=()=>{SND.click();ctTab(2);};
 addEventListener('keydown',e=>{if($('scr-ctrl').classList.contains('hidden')||G.running&&!G.paused)return;if(e.code==='ArrowLeft'||e.code==='KeyA'){ctTab(1);e.preventDefault();}else if(e.code==='ArrowRight'||e.code==='KeyD'){ctTab(2);e.preventDefault();}else if(e.code==='Enter'||e.code==='Backspace'||e.code==='Escape'){$('scr-ctrl').querySelector('[data-go]').click();e.preventDefault();e.stopImmediatePropagation();}});
-const SCIDS=['sc1','sc2','sc3','sc4','sc5','sc6','sc7'];[['sc1','house'],['sc2','road'],['sc3','apt'],['sc4','motel'],['sc5','air'],['sc6','school'],['sc7','hosp']].forEach(([id,l])=>{$(id).onclick=()=>{if($(id).classList.contains('lock')){SND.click();toast('Scenariusz chwilowo niedostępny');return;}G.pendLvl=l;SCIDS.forEach(x=>$(x).classList.toggle('sel1',x===id));SND.click();};$(id).ondblclick=()=>{if(!$(id).classList.contains('lock'))$('scen-next').click();};});
+const SCIDS=['sc1','sc2','sc3','sc4','sc5','sc6','sc7','sc8','sc9'];[['sc1','house'],['sc2','road'],['sc3','apt'],['sc4','motel'],['sc5','air'],['sc6','school'],['sc7','hosp'],['sc8','park'],['sc9','mall']].forEach(([id,l])=>{$(id).onclick=()=>{if($(id).classList.contains('lock')){SND.click();toast('Scenariusz chwilowo niedostępny');return;}G.pendLvl=l;SCIDS.forEach(x=>$(x).classList.toggle('sel1',x===id));SND.click();};$(id).ondblclick=()=>{if(!$(id).classList.contains('lock'))$('scen-next').click();};});
 addEventListener('keydown',e=>{if($('scr-scen').classList.contains('hidden')||G.running)return;const ids=SCIDS,k=ids.findIndex(x=>$(x).classList.contains('sel1'));
- if(e.code==='ArrowRight'||e.code==='ArrowLeft'||e.code==='KeyA'||e.code==='KeyD'){const d=(e.code==='ArrowRight'||e.code==='KeyD')?1:-1;let n=k;for(let t=0;t<7;t++){n=(n+d+7)%7;if(!$(ids[n]).classList.contains('lock'))break;}if(n!==k)$(ids[n]).click();else{SND.click();toast('Pozostałe scenariusze są jeszcze zablokowane');}e.preventDefault();}
- else if(e.code==='ArrowUp'||e.code==='ArrowDown'||e.code==='KeyW'||e.code==='KeyS'){const n=(k+((e.code==='ArrowUp'||e.code==='KeyW')?-4:4)+8)%8;if(ids[n]&&!$(ids[n]).classList.contains('lock'))$(ids[n]).click();else SND.click();e.preventDefault();}
+ if(e.code==='ArrowRight'||e.code==='ArrowLeft'||e.code==='KeyA'||e.code==='KeyD'){const d=(e.code==='ArrowRight'||e.code==='KeyD')?1:-1;let n=k;for(let t=0;t<ids.length;t++){n=(n+d+ids.length)%ids.length;if(!$(ids[n]).classList.contains('lock'))break;}if(n!==k)$(ids[n]).click();else{SND.click();toast('Pozostałe scenariusze są jeszcze zablokowane');}e.preventDefault();}
+ else if(e.code==='ArrowUp'||e.code==='ArrowDown'||e.code==='KeyW'||e.code==='KeyS'){const n=(k+((e.code==='ArrowUp'||e.code==='KeyW')?-5:5)+10)%10;if(ids[n]&&!$(ids[n]).classList.contains('lock'))$(ids[n]).click();else SND.click();e.preventDefault();}
  else if(e.code==='Enter'){$('scen-next').click();e.preventDefault();}else if(e.code==='Escape'||e.code==='Backspace'){showScreen('menu');e.preventDefault();}});
 $('mode2').onclick=()=>{G.players=2;$('mode2').classList.add('sel');$('mode1').classList.remove('sel');$('modehint').textContent='Gracz 1 prowadzi zespół, gracz 2 steruje partnerem (pad lub strzałki). Reszta to AI. Kamera wspólna.';SND.click();};
 let pickStage=1;
@@ -518,7 +519,7 @@ document.querySelectorAll('.pz-i').forEach(b=>b.addEventListener('mouseenter',()
 addEventListener('keydown',e=>{if($('scr-pause').classList.contains('hidden'))return;const it=[...document.querySelectorAll('.pz-i')],k=it.findIndex(x=>x.classList.contains('on'));
  if(e.code==='ArrowDown'||e.code==='ArrowUp'||e.code==='KeyW'||e.code==='KeyS'){const n=(k+((e.code==='ArrowDown'||e.code==='KeyS')?1:-1)+it.length)%it.length;it.forEach((x,i)=>x.classList.toggle('on',i===n));e.preventDefault();}
  else if(e.code==='Enter'||e.code==='Space'){(it[k]||it[0]).click();e.preventDefault();}});
-const PZ_SC={house:1,road:2,apt:3,motel:4,air:5,school:6,hosp:7};
+const PZ_SC={house:1,road:2,apt:3,motel:4,air:5,school:6,hosp:7,park:8,mall:9};
 function fillPause(){const c=$('sc'+(PZ_SC[G.lvl]||1));$('pz-tt').textContent=c?c.querySelector('.tt').textContent:'';$('pz-fa').textContent=c?c.querySelector('.fa').textContent:'';
  $('pz-ts').textContent=$('bc-t').textContent;$('pz-obj').innerHTML=$('obj').innerHTML;$('pz-time').textContent=fmtT(G.stats.time);
  document.querySelectorAll('.pz-i').forEach(x=>{x.classList.toggle('on',x.id==='p-res');x.classList.remove('warn');x.querySelector('small').textContent=x.id==='p-res'?'ESC':'';});

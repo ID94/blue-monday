@@ -35,13 +35,13 @@ function updateCam(dt){const cv=G.camv;if(!cv)return;cv.t+=dt;const u=cv.u;
  if(!u.alive||cv.t>cv.max||cv.stop){endCam();return;}
  let tgt;if(u.human===1)tgt=Math.atan2(G.mouse.wy-cv.y,G.mouse.wx-cv.x);else if(u.human===2&&u.in&&u.in.aim!=null)tgt=u.in.aim;else tgt=cv.base+Math.sin(cv.t*1.25)*1.25;
  const lim=cv.cctv?.95:1.45,off=clamp(angDiff(cv.base,tgt),-lim,lim);cv.ang+=clamp(angDiff(cv.ang,cv.base+off),-2.2*dt,2.2*dt);
- const vis=!!u.human;cv.poly=vis?camPoly(cv):null;if(vis){mc.fillStyle='#fff';mc.beginPath();polyPath(mc,cv.poly,0,0);mc.fill();}
+ const vis=!!u.human;cv.poly=vis?camPoly(cv):null;if(vis){mc.fillStyle='#fff';mc.beginPath();polyPath(mc,cv.poly,0,0);mc.fill();if(cv.robot){mc.beginPath();mc.arc(cv.robot.x,cv.robot.y-2,18,0,6.283);mc.fill();}}
  for(const o of G.units){if(o.team==='squad'||!o.alive&&o.kind!=='corpse'&&o.team!=='enemy')continue;if(camSees(cv,o)){if(vis)o.camSeen=G.time;cv.seen.add(o);}}
  if(cv.cctv){cv.cam.a=cv.ang;u.pose='stand';}else if(u.pose!=='kneel')u.pose='kneel';}
 function endCam(){const cv=G.camv;if(!cv)return;G.camv=null;const u=cv.u;if(!u.human&&u.task&&u.task.mirrorEnd)u.task=null;if(u.alive&&u.human)u.pose='stand';if(!u.alive)return;
  let ne=0,nc=0,hh=false;for(const o of cv.seen){if(!o.alive)continue;if(o.team==='enemy'){if(o.active())ne++;}else if(o.kind==='director')hh=true;else if(o.team==='civ')nc++;}
  let s='';if(ne)s+='Widziałem '+(NUMW[ne]||ne)+' '+(ne===1?'napastnika':'napastników');if(nc)s+=(s?' i ':'Widziałem ')+(NUMW[nc]||nc)+' '+(nc===1?'cywila':'cywili');
- if(hh){s+=(s?'. ':'')+'Zakładnik jest w zasięgu!';G.obj.found=true;}if(!s)s=cv.mirror?'Za rogiem czysto.':cv.cctv?'Na kamerach nic nie widać.':'W zasięgu kamery nic nie widać.';radio(u.name,(cv.mirror?'Peryskop. ':cv.cctv?'Monitoring. ':'Kamera. ')+s);}
+ if(hh){s+=(s?'. ':'')+'Zakładnik jest w zasięgu!';G.obj.found=true;}if(!s)s=cv.mirror?'Za rogiem czysto.':cv.cctv?'Na kamerach nic nie widać.':'W zasięgu kamery nic nie widać.';if(cv.robot){cv.robot.on=false;return;}radio(u.name,(cv.mirror?'Peryskop. ':cv.cctv?'Monitoring. ':'Kamera. ')+s);}
 function throwNade(u,tx,ty){if(u.flash<=0)return false;u.flash--;logEv(u.name+' rzucił granat hukowy');const a=Math.atan2(ty-u.y,tx-u.x),d=clamp(dist(u.x,u.y,tx,ty),TS*1.5,TS*7);
  const sp=d*1.5;G.nades.push({x:u.x+Math.cos(a)*6,y:u.y+Math.sin(a)*6,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,z:6,vz:55,t:1.6,by:u});
  radio(u.name,pick(['Granat!','Hukowy, uwaga!','Rzucam hukowy!']),{prio:1});return true;}

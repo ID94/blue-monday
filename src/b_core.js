@@ -50,6 +50,10 @@ function drawFloor(g,tx,ty,s,r){const x=tx*TS,y=ty*TS;
  case'schc':{P(g,x,y,16,16,'#c9c3b2');speck(g,x,y,'#b4ad9a',18,r);speck(g,x,y,'#ddd8c8',12,r);speck(g,x,y,'#8a8478',4,r);if(tx%4===0)P(g,x,y,1,16,'#9e9888');if(((ty)%2)===0)P(g,x,y,16,1,'#b0aa9a');break;}
  case'schk':{const k=((tx+ty)%2)===0;P(g,x,y,16,16,k?'#d8d4c8':'#9a3a34');speck(g,x,y,k?'#c8c4b8':'#8a3230',10,r);P(g,x,y,16,1,'rgba(0,0,0,.12)');P(g,x,y,1,16,'rgba(0,0,0,.12)');break;}
  case'schb':{P(g,x,y,16,16,'#3a5068');for(let j=0;j<16;j+=2)for(let i=(j/2)%2*2;i<16;i+=4)P(g,x+i,y+j,1,1,'#45607a');speck(g,x,y,'#2e4256',8,r);break;}
+ case'gravel':{P(g,x,y,16,16,'#36322c');speck(g,x,y,'#433e36',34,r);speck(g,x,y,'#2a2622',26,r);speck(g,x,y,'#524c42',8,r);break;}
+ case'cobble':{for(let j=0;j<2;j++)for(let i=0;i<2;i++)P(g,x+i*8,y+j*8,8,8,((tx*2+i+ty*2+j)%3)?'#3e3c38':'#36342f');P(g,x,y,16,1,'#2a2825');P(g,x,y+8,16,1,'#2a2825');P(g,x,y,1,16,'#2a2825');P(g,x+8,y,1,16,'#2a2825');speck(g,x,y,'#4a4842',5,r);break;}
+ case'water':{P(g,x,y,16,16,'#101c24');speck(g,x,y,'#16262e',20,r);if(r()<.5)P(g,x+(r()*10|0),y+(r()*14|0),5,1,'rgba(150,180,200,.14)');break;}
+ case'sand':{P(g,x,y,16,16,'#6a5c44');speck(g,x,y,'#7a6c52',30,r);speck(g,x,y,'#5a4e3a',24,r);break;}
  case'lawn':{P(g,x,y,16,16,'#3a5a2a');speck(g,x,y,'#446a32',30,r);speck(g,x,y,'#31502a',22,r);speck(g,x,y,'#58803e',7,r);if(tx%4<2)P(g,x,y,16,16,'rgba(255,255,230,.04)');break;}
  case'walk':{P(g,x,y,16,16,'#8e8c86');speck(g,x,y,'#9a9892',14,r);speck(g,x,y,'#7e7c76',12,r);P(g,x,y,16,1,'#6e6c66');P(g,x,y,1,16,'#6e6c66');if(r()<.06)P(g,x+3,y+5,5,3,'rgba(40,36,30,.25)');break;}
  case'road':{P(g,x,y,16,16,'#3a3b3e');speck(g,x,y,'#45464a',30,r);speck(g,x,y,'#323336',30,r);if(r()<.04)P(g,x+2,y+6,9,1,'#2a2b2e');break;}
