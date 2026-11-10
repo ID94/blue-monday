@@ -73,11 +73,12 @@ function fire(u){const W=u.W;if(!W||u.rel>0||u.fireCd>0||!u.active())return fals
  const mv=Math.hypot(u.vx,u.vy)/50;const spread=W.spread*(1+mv*1.1)*(u.team==='squad'&&!u.human?.75:1)*(u.quiet?.8:1)*(u.wounded&&!u.treated?1.6:1);
  const ox=u.x+Math.cos(u.ang)*4,oy=u.y-2+Math.sin(u.ang)*4;
  for(let p=0;p<W.pel;p++)hitscan(u,ox,oy,u.ang+(Math.random()-.5)*2*spread,W.range*TS);
- SND.gun(W.snd,u.x,u.y);makeNoise(u.x,u.y,W.noise,W.noise>8?'shot':'quiet',u);
+ const ind=!isOutdoor(u.x,u.y);SND.gun(W.snd,u.x,u.y,ind);makeNoise(u.x,u.y,W.noise*(ind&&W.noise>8?1.35:1),W.noise>8?'shot':'quiet',u);
  G.fx.push({k:'mflash',x:u.mzx||mz.x,y:u.mzy||mz.y-6,a:u.ang,t:0,life:.05,big:W.pel>1});
  if(W.snd!=='silenced')G.lights.push({x:mz.x,y:mz.y,r:W.pel>1?60:48,t:.07});else G.lights.push({x:mz.x,y:mz.y,r:18,t:.04});
  u.heat=Math.min(4,(u.heat||0)+(W.pel>1?1.2:.35));const sx=u.mzx||mz.x,sy=u.mzy||mz.y-6;
- for(let i=0;i<(W.pel>1?5:2);i++)G.fx.push({k:'smoke',x:sx,y:sy,vx:Math.cos(u.ang)*rand(8,25)+rand(-6,6),vy:Math.sin(u.ang)*rand(5,18)-rand(4,10),r:rand(1.5,3),gr:rand(5,9),a:W.snd==='silenced'?.12:.32,t:0,life:rand(.7,1.4),c:'#9a9c9a'});
+ const sil=W.snd==='silenced';for(let i=0;i<(W.pel>1?5:2)*(ind?2:1);i++)G.fx.push({k:'smoke',x:sx,y:sy,vx:Math.cos(u.ang)*rand(8,25)+rand(-6,6),vy:Math.sin(u.ang)*rand(5,18)-rand(4,10),r:rand(1.5,3),gr:rand(5,9)*(ind?1.3:1),a:sil?.12:ind?.4:.32,t:0,life:rand(.7,1.4)*(ind?1.8:1),c:'#9a9c9a'});
+ if(ind&&!sil)for(let i=0;i<(W.pel>1?3:1);i++)G.fx.push({k:'smoke',x:sx+rand(-4,4),y:sy+rand(-3,3),vx:Math.cos(u.ang)*rand(2,8)+rand(-3,3),vy:-rand(1,4),r:rand(3,5),gr:rand(3,5),a:.2,t:0,life:rand(3.5,6),c:'#a8aaa8'});
  if(W.pel===1||u.weap==='shotgun'){const ea=u.ang+Math.PI/2*(Math.cos(u.ang)>0?-1:1),del=u.weap==='shotgun';G.fx.push({k:'shell',x:u.x+Math.cos(u.ang)*3,y:u.y-1,z:9,vx:Math.cos(ea)*rand(30,55),vy:Math.sin(ea)*rand(10,25)-15,vz:rand(40,70),t:0,life:rand(.6,.9),red:del});}
  return true;}
 function hitscan(sh,x0,y0,a,maxD){const dx=Math.cos(a),dy=Math.sin(a);let x=x0,y=y0,d=0,hit=null;
@@ -86,7 +87,7 @@ function hitscan(sh,x0,y0,a,maxD){const dx=Math.cos(a),dy=Math.sin(a);let x=x0,y
   if(bulletBlock(tx,ty)){if(LD().breakable&&LV.t[I(tx,ty)]===T.WIN&&!(LV.bw&&LV.bw.has(I(tx,ty)))){breakWin(tx,ty,x,y,a);continue;}impact(x-dx*2,y-dy*2,tx,ty,a);break;}
   if(G.carBlk&&d>6&&G.carBlk(x,y)){carImpact(x,y,a);break;}
   for(const u of G.units){if(!u.alive||u===sh||u.pose==='sleep')continue;const cy=u.y-2,rr=u.pose==='inbed'?3.6:(u.pose==='kneel'||u.pose==='hands'||u.pose==='sit')?4.2:5.2;
-   if((u.x-x)**2+(cy-y)**2<(rr+(u.shield?2:0))**2){if(u.shield&&Math.abs(angDiff(u.ang,a+Math.PI))<1.05){for(let i=0;i<5;i++)G.fx.push({k:'spark',x,y:y-6,vx:rand(-60,60),vy:rand(-60,60),t:0,life:.15});SND.clang(x,y);hit='shield';break;}hit=u;break;}}
+   if((u.x-x)**2+(cy-y)**2<(rr+(u.shield?2:0))**2){if(u.shield&&Math.abs(angDiff(u.ang,a+Math.PI))<(u.human?1.15:1.45)){for(let i=0;i<5;i++)G.fx.push({k:'spark',x,y:y-6,vx:rand(-60,60),vy:rand(-60,60),t:0,life:.15});SND.clang(x,y);hit='shield';break;}hit=u;break;}}
   if(hit)break;}
  if(hit==='shield'){G.tracers.push({x0,y0:y0-6,x1:x,y1:y-6,t:0,e:sh.team==='enemy'});return;}
  G.tracers.push({x0,y0:y0-6,x1:x,y1:y-6,t:0,e:sh.team==='enemy'});
@@ -178,6 +179,7 @@ function drawHuman(g,u,sx,sy){const SQ=u.team==='squad'&&!u.patrol;const p=u.pal
   if(u.stun>0&&((G.time*6)|0)%2){P(g,sx-5,hy-3,1,1,'#ffe');P(g,sx+4,hy-2,1,1,'#ffe');P(g,sx,hy-4,1,1,'#ffe');}
 }
 function drawArms(g,u,sx,ty){const p=u.pal,a=u.ang;
+ if(u.holster&&u.W&&u.pose!=='hands'&&u.state!=='surr'&&(G.torchOff||W8()==='day')){P(g,sx-5,ty+1,1,4,p.body);P(g,sx+4,ty+1,1,4,p.body);P(g,sx-5,ty+5,1,1,p.glove||p.skin||'#c49a7c');P(g,sx+4,ty+5,1,1,p.glove||p.skin||'#c49a7c');P(g,sx+(Math.cos(a)<0?3:-4),ty+4,1,3,'#141416');u.mzx=null;return;}
  if(u.holster&&u.W&&u.pose!=='hands'&&u.state!=='surr'){const ox=sx+Math.round(Math.cos(a)*2),oy=ty+3,ex=ox+Math.cos(a)*5,ey=oy+Math.sin(a)*3.75;line(g,ox,oy,ex,ey,'#3a3c40');P(g,Math.round(ex)-1,Math.round(ey)-1,2,2,'#c8c8c0');P(g,Math.round(ex+Math.cos(a)),Math.round(ey+Math.sin(a)*.75),1,1,'#fff8d8');P(g,Math.round(ox+Math.cos(a)*1.5)-1,Math.round(oy+Math.sin(a))-1,2,2,p.glove||'#222');P(g,sx+(Math.cos(a)<0?3:-4),ty+4,1,3,'#141416');u.mzx=ex+G.cam.rx;u.mzy=ey+G.cam.ry;return;}
  if(!u.W||u.pose==='hands'||u.pose==='sit'||u.state==='surr'){P(g,sx-5,ty+1,1,4,p.body);P(g,sx+4,ty+1,1,4,p.body);u.mzx=null;return;}
  const L=u.W.len-(u.recoil||0)*2,ox=sx+Math.round(Math.cos(a)*2),oy=ty+3;

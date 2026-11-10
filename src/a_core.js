@@ -80,8 +80,8 @@ function tone(dest,t0,dur,o={}){const c=A.ctx,os=c.createOscillator();os.type=o.
  os.connect(e);e.connect(dest);os.start(t0);os.stop(t0+dur+.05);}
 function ui(v=.3){const g=A.ctx.createGain();g.gain.value=v;g.connect(A.master);return g;}
 const SND={
- gun(t,x,y){if(!A.ctx)return;const C={rifle:[1.25,1900,.18,72,1],smg:[1,2300,.13,90,.9],pistol:[.85,2100,.13,100,.85],shotgun:[1.6,1300,.32,50,1.2],silenced:[.22,800,.07,160,.1],enemy:[1.2,1600,.22,66,1.05],epistol:[.95,1900,.15,92,.95]}[t];
-  const o=out(x,y,C[0],{rev:C[4]});if(!o)return;const c=A.ctx,t0=c.currentTime,sil=t==='silenced';
+ gun(t,x,y,ind){if(!A.ctx)return;const C={rifle:[1.25,1900,.18,72,1],smg:[1,2300,.13,90,.9],pistol:[.85,2100,.13,100,.85],shotgun:[1.6,1300,.32,50,1.2],silenced:[.22,800,.07,160,.1],enemy:[1.2,1600,.22,66,1.05],epistol:[.95,1900,.15,92,.95]}[t];
+  const o=out(x,y,C[0]*(ind?1.45:1),{rev:C[4]*(ind?1.7:.75)});if(!o)return;const c=A.ctx,t0=c.currentTime,sil=t==='silenced';if(ind&&!sil){nz(o,t0+.03,.35,{type:'lowpass',f:700,g:.5});nz(o,t0+.12,.5,{type:'bandpass',f:1400,g:.18});}
   const SM={pistol:['p9',1,1.1],smg:['p9',1.04,1],epistol:['p9',.97,1.05],rifle:['r308',1.12,1.05],enemy:['r308',1,1.15],shotgun:['sg20',.92,1.3],silenced:['p9',1.35,.3]}[t],buf=SM&&A.smp&&A.smp[SM[0]];
   if(buf){playSmp(o,SM[0],t0,SM[1]*rand(.96,1.04),SM[2]*1.15,sil?1100:0);}
   else{const ws=c.createWaveShaper();ws.curve=A.dist;ws.connect(o);
