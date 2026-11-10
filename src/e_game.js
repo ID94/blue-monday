@@ -22,7 +22,7 @@ const CORPSES=[[33,14,'guard'],[33,33,'guard'],[54,30,'guard'],[47,12,'orderly']
 const INTEL=[[56,6,'ZAKŁADNIK?'],[37,31,'WARTA?'],[20,34,'?'],[73,29,'?'],[16,11,'?']];
 function startMission(){radioClear();G.torchOff=false;G.pings=[];stopCall();buildMap();bakeWorld();LV.doorRows=null;mc.clearRect(0,0,memory.width,memory.height);
  Object.assign(G,{running:true,paused:false,ended:false,time:0,units:[],squad:[],enemies:[],civs:[],fx:[],tracers:[],lights:[],nades:[],ops:[],order:'follow',alarm:false,execT:45,warned:false,
-  camv:null,flashW:0,shake:0,obj:{found:false,freed:false},devs:null,babyT:rand(3,6),panicCD:0,log:[],nvg:false,negT:rand(50,80),negBonus:0,negAlarm:0,traps:[],stats:{roe:0,traps:0,reports:0,wounded:0,healed:0,eKilled:0,eArrest:0,eSed:0,civKilled:0,civSecured:0,squadLost:0,shots:0,time:0},press:{},deadline:720,dl:{},blackT:rand(40,70),blackDur:0,scareT:rand(10,20),trail:[],trailOwner:null,postAnchor:null,stillT:0,lightT:rand(6,15),lightF:0,clankT:rand(8,18),heartT:0,p1:null,p2:null,hudT:0});
+  camv:null,lockIn:false,flashW:0,shake:0,obj:{found:false,freed:false},devs:null,babyT:rand(3,6),panicCD:0,log:[],nvg:false,negT:rand(50,80),negBonus:0,negAlarm:0,traps:[],stats:{roe:0,traps:0,reports:0,wounded:0,healed:0,eKilled:0,eArrest:0,eSed:0,civKilled:0,civSecured:0,squadLost:0,shots:0,time:0},press:{},deadline:720,dl:{},blackT:rand(40,70),blackDur:0,scareT:rand(10,20),trail:[],trailOwner:null,postAnchor:null,stillT:0,lightT:rand(6,15),lightF:0,clankT:rand(8,18),heartT:0,p1:null,p2:null,hudT:0});
  if(!ENTRIES[G.entry])G.entry=0;const E=ENTRIES[G.entry],fx=Math.cos(E.a),fy=Math.sin(E.a),rx=-fy,ry=fx,offs=[[0,0],[-1,-.9],[-1,.9],[-2,-.5],[-2,.5]];
  if(isPat())(LD().spawn||spawnPatrolPair)(E);else{const order=[G.p1Spec,...SPECS.map((_,i)=>i).filter(i=>i!==G.p1Spec)];
  order.forEach((si,k)=>{const s=SPECS[si],o=offs[k];const u=new Unit({team:'squad',spec:s.id,name:s.name,role:s.role,weap:s.weap,fov:s.fov,range:s.range,acc:s.acc,pal:PAL.squad,charges:s.id==='breach'?2:0,flash:s.id==='scout'?3:0,sed:s.id==='medic'?4:0,shoutCd:0});applyLoad(u,(G.load||defaultLoad())[si]);
@@ -55,7 +55,7 @@ function onSquadDeath(u){const was=u.human;u.human=0;if(was===1)G.p1=null;if(was
  if(!G.squad.some(s=>s.alive)){endMission(false,'Cały oddział poległ.');return;}
  if(was)setTimeout(()=>{if(G.ended)return;const n=G.squad.find(s=>s.alive&&!s.human);if(n){n.human=was;n.task=null;n.action=null;n.path=null;if(was===1)G.p1=n;else G.p2=n;toast((was===2?'Gracz 2 przejmuje: ':'Przejmujesz: ')+n.name);for(const o of G.ops)o.mem=o.mem.filter(m=>m!==n);}},1300);}
 function onHostageDeath(){radio('TOC','Zakładnik nie żyje... Operacja zakończona niepowodzeniem.',{prio:1});endMission(false,'Zakładnik nie żyje.');}
-function endMission(win,reason){if(G.ended)return;logEv('KONIEC: '+reason);G.ended=true;G.win=win;G.reason=reason;
+function endMission(win,reason){if(G.ended)return;G.lockIn=false;logEv('KONIEC: '+reason);G.ended=true;G.win=win;G.reason=reason;
  if(win)radio(isPat()?(LD().winWho||'DISPATCH'):'TOC',isPat()?LD().win:'Zakładnik bezpieczny. Świetna robota, Alfa. Zabezpieczyć teren.',{prio:1});
  setTimeout(showDebrief,win?3200:2800);}
 
@@ -162,7 +162,7 @@ function closeCtx(){G.ctxOpen=false;$('ctx').classList.add('hidden');}
 // ================= UPDATE =================
 function update(dt){G.time+=dt;if(!G.ended)G.stats.time+=dt;
  G.mouse.wx=G.mouse.sx+(G.cam.rx||0);G.mouse.wy=G.mouse.sy+(G.cam.ry||0);
- if(!G.ended){inputP1();inputP2();}else{if(G.p1)G.p1.in={};if(G.p2)G.p2.in={};}
+ if(!G.ended&&!G.lockIn){inputP1();inputP2();}else{if(G.p1)G.p1.in={};if(G.p2)G.p2.in={};}
  updateTrail();updateTactical(dt);const cnt=aiMembers().length;let ai=0;for(const u of G.squad){if(!u.alive)continue;if(u.human)humanUpdate(u,dt);else updateSquadAI(u,dt,ai++,cnt);}
  updateOp(dt);updateCam(dt);updateTraps();if(G.lvl==='hosp')negotiator(dt);else (LD().update||NOOP)(dt);
  for(const s of G.squad){if(!s.alive||!s.wounded||s.treated)continue;s.bleed-=dt;s.dripT-=dt;if(s.dripT<=0){s.dripT=s.moving?.5:1.6;P(wc,Math.round(s.x+rand(-2,2)),Math.round(s.y+rand(-1,2)),1,1,'#4a0d0d');}
