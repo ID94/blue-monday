@@ -236,14 +236,15 @@ Object.assign(FH,{police:0,freezer:7,fence:4,bedD:5,grill:4,hydrant:3,bucket:0})
 function houseWallCol(rb){const n=rb>=0?ROOMS[rb].n:'';return n==='Sypialnia rodziców'?['#6a5a68','#4a3e48']:n==='Łazienka'?['#8a9698','#6a7678']:n==='Pokój syna'?['#4a5868','#343e4a']:n==='Salon'?['#7a6a50','#4e4232']:n==='Kuchnia'?['#8a8468','#5e5a44']:n==='Garaż'?['#5c5c5a','#444442']:n==='Przedpokój'||n==='Korytarz'?['#857660','#54483a']:['#7a6a5a','#4e4438'];}
 // ---- autumn morning ----
 let OUTM=null;
-function autumnDecor(){const r=rng(1031),C=['#8a3c14','#b0581c','#c8862a','#6a2a12','#9a6a1a','#d09a3a','#5a3a14'];
+function LFpx(x,y,c){const v=hexInt(c);if(v>=0&&SPKB)SPKB.push(x,y,v);else P(wc,x,y,1,1,c);}
+function autumnDecor(){SPKB=[];const r=rng(1031),C=['#8a3c14','#b0581c','#c8862a','#6a2a12','#9a6a1a','#d09a3a','#5a3a14'];
  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=tAt(x,y);if(t!==T.GRASS&&t!==T.ASPH)continue;const gr=t===T.GRASS;
   if(gr)P(wc,x*TS,y*TS,16,16,'rgba(90,72,30,.22)');
   let n=gr?(r()*7|0):(LV.fs[I(x,y)]==='conc'?(r()*4|0):(r()*2|0));
   for(const f of LV.furn)if(f.k==='tree'&&Math.abs(f.x-x)<=2&&Math.abs(f.y-y)<=2){n+=6;break;}
-  for(let k=0;k<n;k++){const lx=x*TS+(r()*15|0),ly=y*TS+(r()*15|0),c=C[(r()*C.length)|0];P(wc,lx,ly,2,1,c);if(r()<.5)P(wc,lx+(r()<.5?0:1),ly+1,1,1,shadeC(c,-20));}
+  for(let k=0;k<n;k++){const lx=x*TS+(r()*15|0),ly=y*TS+(r()*15|0),c=C[(r()*C.length)|0];LFpx(lx,ly,c);LFpx(lx+1,ly,c);if(r()<.5)LFpx(lx+(r()<.5?0:1),ly+1,shadeC(c,-20));}
   if(!gr&&r()<.06){const g=wc.createRadialGradient(x*TS+8,y*TS+8,0,x*TS+8,y*TS+8,10);g.addColorStop(0,'rgba(120,140,160,.12)');g.addColorStop(1,'rgba(120,140,160,0)');wc.fillStyle=g;wc.fillRect(x*TS-4,y*TS-4,24,24);}}
- buildOUTM();}
+ flushSpk();buildOUTM();}
 const LEAVES=[];for(let i=0;i<46;i++)LEAVES.push({x:Math.random()*VW,y:Math.random()*VH,s:rand(9,20),ph:rand(0,6.28),c:['#b0581c','#c8862a','#8a3c14','#d09a3a','#9a4a1c'][i%5]});
 function drawLeaves(cx,cy){const dt=1/60,wind=8+Math.sin(G.time*.3)*6;
  for(const l of LEAVES){l.ph+=dt*rand(2,3.5);l.y+=l.s*dt;l.x+=(wind+Math.sin(l.ph)*10)*dt;if(l.y>VH+4){l.y=-4;l.x=Math.random()*VW;}if(l.x>VW+4)l.x=-4;

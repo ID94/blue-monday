@@ -15,7 +15,7 @@ LVL.house={id:'house',patrol:true,car:{oy:-5,b:'#c9cdd1',hi:'#dde0e3',lo:'#9a9ea
   title:'911 · ZAPIS ROZMOWY',clock:[5,52,14],who:{D:'DYSPOZYTOR',C:'ZGŁASZAJĄCA'},bg:[27,34.2,24,13.5],get call(){return CALL;}}};
 function setLevel(l){G.lvl=l;const d=LD();
  ROOMS=d.rooms;DOORS=d.doors;FURN=d.furn;LAMPS=d.lamps;CAMS=d.cams||[];ENTRIES=d.entries;G.entry=0;OUTM=null;SNOWC=null;INM=null;SUNM=null;
- buildMap();bakeWorld();LV.doorRows=null;_wf=null;G.devs=null;}
+ buildMap();bakeWorld();G.bakedFor=l;LV.doorRows=null;_wf=null;G.devs=null;}
 // ---- outdoor mask (daylight / moonlight reaches outdoor tiles) ----
 function buildOUTM(){OUTM=document.createElement('canvas');OUTM.width=MW*TS;OUTM.height=MH*TS;const og=OUTM.getContext('2d');og.fillStyle='#fff';
  const od=(x,y)=>{const t=tAt(x,y);return t===T.GRASS||t===T.ASPH;};

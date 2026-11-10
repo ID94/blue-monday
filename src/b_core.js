@@ -43,7 +43,9 @@ function floodRoom(sx,sy,lim=300){const out=[],seen=new Set([I(sx,sy)]),q=[[sx,s
 // ================= TEXTURES / BAKE =================
 const world=document.createElement('canvas');world.width=MW*TS;world.height=MH*TS;const wc=world.getContext('2d');
 const memory=document.createElement('canvas');memory.width=MW*TS;memory.height=MH*TS;const mc=memory.getContext('2d');
-function speck(g,x,y,c,n,r,w=16,h=16){g.fillStyle=c;for(let i=0;i<n;i++)g.fillRect(x+Math.floor(r()*w),y+Math.floor(r()*h),1,1);}
+let SPKB=null;const HEXC={};function hexInt(c){let v=HEXC[c];if(v===undefined){v=/^#[0-9a-f]{6}$/i.test(c)?parseInt(c.slice(1),16):-1;HEXC[c]=v;}return v;}
+function speck(g,x,y,c,n,r,w=16,h=16){if(SPKB&&g===wc){const v=hexInt(c);if(v>=0){for(let i=0;i<n;i++)SPKB.push(x+Math.floor(r()*w),y+Math.floor(r()*h),v);return;}}g.fillStyle=c;for(let i=0;i<n;i++)g.fillRect(x+Math.floor(r()*w),y+Math.floor(r()*h),1,1);}
+function flushSpk(){const B=SPKB;SPKB=null;if(!B||!B.length)return;const W=world.width,H=world.height,id=wc.getImageData(0,0,W,H),D=id.data;for(let i=0;i<B.length;i+=3){const x=B[i],y=B[i+1];if(x<0||y<0||x>=W||y>=H)continue;const o=(y*W+x)*4,v=B[i+2];D[o]=v>>16;D[o+1]=(v>>8)&255;D[o+2]=v&255;D[o+3]=255;}wc.putImageData(id,0,0);}
 function drawFloor(g,tx,ty,s,r){const x=tx*TS,y=ty*TS;
  switch(s){
  case'schl':{P(g,x,y,16,16,'#bdb8a8');speck(g,x,y,'#c8c3b4',14,r);speck(g,x,y,'#aea998',10,r);P(g,x,y,16,1,'#a9a493');P(g,x,y,1,16,'#a9a493');if(((tx*7+ty*13)%11)===0)P(g,x+1,y+1,15,15,'rgba(90,110,150,.22)');if(r()<.05)P(g,x+4,y+6,6,3,'rgba(80,70,50,.18)');break;}
@@ -169,8 +171,16 @@ F('tree',1,1,1,0,(g,x,y,w,h,s)=>{const TP=LD().autumn?[['#4a2410','#7a3c14','#a8
 F('bush',1,1,1,0,(g,x,y)=>{const h=!!LD().autumn;P(g,x+1,y+11,15,4,'rgba(0,0,0,.4)');P(g,x+1,y+2,14,10,h?'#3a3414':'#16230f');P(g,x+3,y+1,9,4,h?'#5a4418':'#1e2f15');P(g,x+4,y+3,3,2,h?'#8a5a20':'#28401b');if(h){P(g,x+10,y+4,2,2,'#9a4a1c');P(g,x+6,y+7,2,1,'#7a3a16');}});
 F('lamp',1,1,1,0,(g,x,y)=>{P(g,x+6,y+12,5,3,SH);P(g,x+7,y-14,2,27,'#2e3236');P(g,x+4,y-16,8,3,'#45494e');P(g,x+5,y-14,6,1,'#e8c070');});
 const FR=[],FRH=64,FH={bed:5,bedH:5,bench:4,benchL:4,table:6,tableL:6,tableS:6,desk:6,deskPC:6,reception:8,counter:8,sofa:5,gurney:5,gurneyV:5,cart:6,crate:7,bins:6,car:8,police:0,van:11,ambul:11,bearcat:11,sink:6,stove:7,washer:8,tub:4,toilet:4,crib:5,incub:6,slab:5,ect:5,barr:4,monitors:6,ekg:3,tv:3,wheel:3,plant:3};
+let F3C=null,F3N=null;
 function furn3D(f){const ft=FT[f.k],h=FH[f.k]||0,W=f.w*TS+32,H=f.h*TS+48,ox=16,oy=32;
- const tc=document.createElement('canvas');tc.width=W;tc.height=H;const tg=tc.getContext('2d');ft.d(tg,ox,oy,f.w,f.h,f.seed);
+ const many=F3N&&F3N[f.k]>10,sd=many?((f.seed>>>0)%7):f.seed,key=many?f.k+'|'+f.w+'|'+f.h+'|'+sd:null;let oc,scv;
+ if(key&&F3C[key]){[oc,scv]=F3C[key];}else{[oc,scv]=furn3DMake(ft,h,W,H,ox,oy,f,sd);if(key)F3C[key]=[oc,scv];}
+ const bx=f.x*TS-ox,by=f.y*TS-oy;wc.drawImage(scv,bx,by);
+ if(h)P(wc,f.x*TS+1,(f.y+f.h)*TS-2,f.w*TS-2,2,'rgba(0,0,0,.3)');
+ const row=f.y+f.h-1;let c=FR[row];if(!c){c=document.createElement('canvas');c.width=MW*TS;c.height=FRH;FR[row]=c;}
+ c.getContext('2d').drawImage(oc,bx,by-(row*TS+TS-FRH));}
+function furn3DMake(ft,h,W,H,ox,oy,f,sd){
+ const tc=document.createElement('canvas');tc.width=W;tc.height=H;const tg=tc.getContext('2d',{willReadFrequently:true});ft.d(tg,ox,oy,f.w,f.h,sd);
  const src=tg.getImageData(0,0,W,H),S=src.data,oc=document.createElement('canvas');oc.width=W;oc.height=H;const og=oc.getContext('2d'),out=og.createImageData(W,H),O=out.data;
  const solid=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&S[(y*W+x)*4+3]>=200;
  const sh=new Uint8ClampedArray(S.length);
@@ -183,12 +193,9 @@ function furn3D(f){const ft=FT[f.k],h=FH[f.k]||0,W=f.w*TS+32,H=f.h*TS+48,ox=16,o
  og.putImageData(out,0,0);
  // shadows stay on the floor
  const scv=document.createElement('canvas');scv.width=W;scv.height=H;scv.getContext('2d').putImageData(new ImageData(sh,W,H),0,0);
- const bx=f.x*TS-ox,by=f.y*TS-oy;wc.drawImage(scv,bx,by);
- if(h)P(wc,f.x*TS+1,(f.y+f.h)*TS-2,f.w*TS-2,2,'rgba(0,0,0,.3)');
- const row=f.y+f.h-1;let c=FR[row];if(!c){c=document.createElement('canvas');c.width=MW*TS;c.height=FRH;FR[row]=c;}
- c.getContext('2d').drawImage(oc,bx,by-(row*TS+TS-FRH));}
+ return[oc,scv];}
 function bakeWorld(){const r=rng(1337);wc.clearRect(0,0,world.width,world.height);
- for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=tAt(x,y);if(t!==T.WALL&&t!==T.WIN)drawFloor(wc,x,y,LV.fs[I(x,y)],r);}
+ SPKB=[];for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=tAt(x,y);if(t!==T.WALL&&t!==T.WIN)drawFloor(wc,x,y,LV.fs[I(x,y)],r);}flushSpk();
  for(const f of LV.furn){const ft=FT[f.k];if(!ft.s)ft.d(wc,f.x*TS,f.y*TS,f.w,f.h,f.seed);}
  {const rr=rng(4242);for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const i=I(x,y);if(LV.t[i]!==T.FLOOR||LV.fsolid[i])continue;if(rr()<.08){const k=DECALS[(rr()*DECALS.length)|0];FT[k].d(wc,x*TS,y*TS,1,1,0);}
   if(LV.fs[i]!=='pad'&&rr()<.04){const ox=(rr()*10)|0,oy=(rr()*10)|0;P(wc,x*TS+ox,y*TS+oy,4,1,'rgba(30,25,20,.35)');P(wc,x*TS+ox+1,y*TS+oy+3,3,1,'rgba(30,25,20,.3)');}}}
@@ -198,7 +205,7 @@ function bakeWorld(){const r=rng(1337);wc.clearRect(0,0,world.width,world.height
   if(tAt(x-1,y)===T.WALL)P(wc,x*TS,y*TS,2,16,'rgba(0,0,0,.2)');if(tAt(x+1,y)===T.WALL)P(wc,x*TS+14,y*TS,2,16,'rgba(0,0,0,.2)');}
  const solids=LV.furn.filter(f=>FT[f.k].s).sort((a,b)=>(a.y+a.h)-(b.y+b.h));
  bakeWalls();for(const r of FR)if(r)r.getContext('2d').clearRect(0,0,r.width,r.height);
- for(const f of solids)furn3D(f);
+ F3C={};F3N={};for(const f of solids)F3N[f.k]=(F3N[f.k]||0)+1;for(const f of solids)furn3D(f);F3C=null;F3N=null;
  if(LD().autumn)autumnDecor();else if(isPat())buildOUTM();if(LD().decor)LD().decor();
  // parking text-like marks & entrance sign
  if(G.lvl==='hosp')P(wc,29*TS,41*TS+4,48,2,'rgba(200,200,180,.25)');
