@@ -358,7 +358,7 @@ function updateOne(op,dt){op.t+=dt;const d=op.d;op.mem=op.mem.filter(u=>u.alive&
  case'flashwait':if(op.t>1.75){op.stage='enter';op.t=0;}break;
  case'enter':{const R=room();op.cx=R.cx;op.cy=R.cy;const rr=LV.room[I(op.sd.fx,op.sd.fy)],first=roomTargets(op.sd,1),posts=rr>=0?roomPosts(rr,{x:d.x*TS+8,y:d.y*TS+8},d,6):[];
    let tg=[...first.map(t=>({tx:t[0],ty:t[1],face:null})),...posts.filter(p=>!first.some(f=>f[0]===p.tx&&f[1]===p.ty))];if(tg.length<op.mem.length)tg=tg.concat(roomTargets(op.sd,op.mem.length+1).map(t=>({tx:t[0],ty:t[1],face:null})));
-   const ord=[...op.mem].sort((a,b)=>dist(a.x,a.y,d.x*TS+8,d.y*TS+8)-dist(b.x,b.y,d.x*TS+8,d.y*TS+8));
+   const ord=[...op.mem].sort((a,b)=>((b.shield?1:0)-(a.shield?1:0))||(dist(a.x,a.y,d.x*TS+8,d.y*TS+8)-dist(b.x,b.y,d.x*TS+8,d.y*TS+8)));
    ord.forEach((u,i)=>{const t=tg[i]||tg[0];if(t)setGoto(u,t.tx,t.ty,{delay:i*.55,aimX:R.cx,aimY:R.cy,spd:30,holdFace:t.face});});
    op.stage='moving';op.t=0;radio(ord[0].name,pick(['Wchodzimy!','Ruch, ruch!','Wejście!']),{prio:1});break;}
  case'moving':if(op.mem.every(u=>u.task&&u.task.done)||op.t>14){const R=room(),ts=new Set(R.tl.map(([x,y])=>I(x,y)));

@@ -2,9 +2,9 @@ const tAt=(x,y)=>inb(x,y)?LV.t[I(x,y)]:T.WALL;
 function isOutdoor(x,y){const tx=x/TS|0,ty=y/TS|0;if(!inb(tx,ty))return true;const t=LV.t[I(tx,ty)];return t===T.GRASS||t===T.ASPH;}
 function solidAt(tx,ty){if(!inb(tx,ty))return true;const i=I(tx,ty),t=LV.t[i];if(t===T.WALL||t===T.WIN)return true;if(LV.fsolid[i])return true;
  if(t===T.DOOR){const d=LV.doorAt[i];return !(d.broken||d.open>.6);}return false;}
-function opaqueAt(tx,ty){if(!inb(tx,ty))return true;const i=I(tx,ty),t=LV.t[i];if(t===T.WALL)return true;if(LV.fopq[i])return true;
+function opaqueAt(tx,ty){if(!inb(tx,ty))return true;const i=I(tx,ty),t=LV.t[i];if(t===T.WALL)return true;if(LV.fopq[i])return true;if(t===T.WIN&&LV.curt&&LV.curt.has(i)&&!(LV.bw&&LV.bw.has(i)))return true;
  if(t===T.DOOR){const d=LV.doorAt[i];return !d.glass&&!(d.broken||d.open>.45);}return false;}
-function bulletBlock(tx,ty){if(!inb(tx,ty))return true;const i=I(tx,ty),t=LV.t[i];if(t===T.WALL||t===T.WIN)return true;if(LV.fopq[i])return true;
+function bulletBlock(tx,ty){if(!inb(tx,ty))return true;const i=I(tx,ty),t=LV.t[i];if(t===T.WALL)return true;if(t===T.WIN)return !(LV.bw&&LV.bw.has(i));if(LV.fopq[i])return true;
  if(t===T.DOOR){const d=LV.doorAt[i];return !(d.broken||d.open>.45);}return false;}
 function walkable(tx,ty){if(!inb(tx,ty))return false;const i=I(tx,ty),t=LV.t[i];if(t===T.WALL||t===T.WIN||LV.fsolid[i])return false;
  if(t===T.DOOR){const d=LV.doorAt[i];if(d.locked&&!d.broken&&d.open<.5)return false;}return true;}

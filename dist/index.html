@@ -756,7 +756,7 @@ const LAMPS_HOSP=[[6,22,1],[12,22,2],[18,22,0],[26,22,1],[38,22,2],[46,22,0],[54
  [5,17,1,'#c8d8ff',40],[12,17,2],[20,17,0],[27,17,1],[56,6,0,'#ffcf88',60],[46,6,2],[38,6,1],[70,7,2],[40,17,1],[51,17,2],[61,17,0],[68,17,1],[74,17,2],
  [10,46,0,'#ffb060',90],[27,46,0,'#ffb060',90],[62,46,0,'#ffb060',90]];
 const CAMS_HOSP=[[75.4,22.25,Math.PI,'Korytarz główny — wschód'],[3.6,22.25,0,'Korytarz główny — zachód'],[43.4,24.7,2.4,'Hol główny'],[35.6,11.25,0,'Korytarz administracyjny — zachód'],[75.4,11.25,Math.PI,'Korytarz administracyjny — wschód'],[32.6,3.3,Math.PI/2,'Korytarz A'],[43.6,3.3,.7,'Sekretariat'],[51.6,3.3,.6,'Gabinet dyrektora'],[64.6,3.3,.5,'Sala konferencyjna'],[72.6,14.3,.9,'Klatka schodowa']];
-function buildMap(){const M=LV;
+function buildMap(){LV.bw=null;LV.curt=null;const M=LV;
  M.t.fill(T.GRASS);M.fs.fill('grass');M.fsolid.fill(0);M.fopq.fill(0);M.room.fill(-1);M.doorAt.fill(null);M.doors=[];M.furn=[];
  const set=(x,y,v,fs)=>{if(!inb(x,y))return;M.t[I(x,y)]=v;if(fs)M.fs[I(x,y)]=fs;};
  const fillR=(x1,y1,x2,y2,v,fs)=>{for(let y=y1;y<=y2;y++)for(let x=x1;x<=x2;x++)set(x,y,v,fs);};
@@ -801,9 +801,9 @@ const tAt=(x,y)=>inb(x,y)?LV.t[I(x,y)]:T.WALL;
 function isOutdoor(x,y){const tx=x/TS|0,ty=y/TS|0;if(!inb(tx,ty))return true;const t=LV.t[I(tx,ty)];return t===T.GRASS||t===T.ASPH;}
 function solidAt(tx,ty){if(!inb(tx,ty))return true;const i=I(tx,ty),t=LV.t[i];if(t===T.WALL||t===T.WIN)return true;if(LV.fsolid[i])return true;
  if(t===T.DOOR){const d=LV.doorAt[i];return !(d.broken||d.open>.6);}return false;}
-function opaqueAt(tx,ty){if(!inb(tx,ty))return true;const i=I(tx,ty),t=LV.t[i];if(t===T.WALL)return true;if(LV.fopq[i])return true;
+function opaqueAt(tx,ty){if(!inb(tx,ty))return true;const i=I(tx,ty),t=LV.t[i];if(t===T.WALL)return true;if(LV.fopq[i])return true;if(t===T.WIN&&LV.curt&&LV.curt.has(i)&&!(LV.bw&&LV.bw.has(i)))return true;
  if(t===T.DOOR){const d=LV.doorAt[i];return !d.glass&&!(d.broken||d.open>.45);}return false;}
-function bulletBlock(tx,ty){if(!inb(tx,ty))return true;const i=I(tx,ty),t=LV.t[i];if(t===T.WALL||t===T.WIN)return true;if(LV.fopq[i])return true;
+function bulletBlock(tx,ty){if(!inb(tx,ty))return true;const i=I(tx,ty),t=LV.t[i];if(t===T.WALL)return true;if(t===T.WIN)return !(LV.bw&&LV.bw.has(i));if(LV.fopq[i])return true;
  if(t===T.DOOR){const d=LV.doorAt[i];return !(d.broken||d.open>.45);}return false;}
 function walkable(tx,ty){if(!inb(tx,ty))return false;const i=I(tx,ty),t=LV.t[i];if(t===T.WALL||t===T.WIN||LV.fsolid[i])return false;
  if(t===T.DOOR){const d=LV.doorAt[i];if(d.locked&&!d.broken&&d.open<.5)return false;}return true;}
@@ -1121,7 +1121,8 @@ function fire(u){const W=u.W;if(!W||u.rel>0||u.fireCd>0||!u.active())return fals
 function hitscan(sh,x0,y0,a,maxD){const dx=Math.cos(a),dy=Math.sin(a);let x=x0,y=y0,d=0,hit=null;
  if(bulletBlock(x0/TS|0,y0/TS|0)){x0=sh.x;y0=sh.y-2;x=x0;y=y0;}
  while(d<maxD){x+=dx*2;y+=dy*2;d+=2;const tx=x/TS|0,ty=y/TS|0;
-  if(bulletBlock(tx,ty)){impact(x-dx*2,y-dy*2,tx,ty,a);break;}
+  if(bulletBlock(tx,ty)){if(LD().breakable&&LV.t[I(tx,ty)]===T.WIN&&!(LV.bw&&LV.bw.has(I(tx,ty)))){breakWin(tx,ty,x,y,a);continue;}impact(x-dx*2,y-dy*2,tx,ty,a);break;}
+  if(G.carBlk&&d>6&&G.carBlk(x,y)){carImpact(x,y,a);break;}
   for(const u of G.units){if(!u.alive||u===sh||u.pose==='sleep')continue;const cy=u.y-2,rr=u.pose==='inbed'?3.6:(u.pose==='kneel'||u.pose==='hands'||u.pose==='sit')?4.2:5.2;
    if((u.x-x)**2+(cy-y)**2<(rr+(u.shield?2:0))**2){if(u.shield&&Math.abs(angDiff(u.ang,a+Math.PI))<1.05){for(let i=0;i<5;i++)G.fx.push({k:'spark',x,y:y-6,vx:rand(-60,60),vy:rand(-60,60),t:0,life:.15});SND.clang(x,y);hit='shield';break;}hit=u;break;}}
   if(hit)break;}
@@ -1680,7 +1681,7 @@ function updateOne(op,dt){op.t+=dt;const d=op.d;op.mem=op.mem.filter(u=>u.alive&
  case'flashwait':if(op.t>1.75){op.stage='enter';op.t=0;}break;
  case'enter':{const R=room();op.cx=R.cx;op.cy=R.cy;const rr=LV.room[I(op.sd.fx,op.sd.fy)],first=roomTargets(op.sd,1),posts=rr>=0?roomPosts(rr,{x:d.x*TS+8,y:d.y*TS+8},d,6):[];
    let tg=[...first.map(t=>({tx:t[0],ty:t[1],face:null})),...posts.filter(p=>!first.some(f=>f[0]===p.tx&&f[1]===p.ty))];if(tg.length<op.mem.length)tg=tg.concat(roomTargets(op.sd,op.mem.length+1).map(t=>({tx:t[0],ty:t[1],face:null})));
-   const ord=[...op.mem].sort((a,b)=>dist(a.x,a.y,d.x*TS+8,d.y*TS+8)-dist(b.x,b.y,d.x*TS+8,d.y*TS+8));
+   const ord=[...op.mem].sort((a,b)=>((b.shield?1:0)-(a.shield?1:0))||(dist(a.x,a.y,d.x*TS+8,d.y*TS+8)-dist(b.x,b.y,d.x*TS+8,d.y*TS+8)));
    ord.forEach((u,i)=>{const t=tg[i]||tg[0];if(t)setGoto(u,t.tx,t.ty,{delay:i*.55,aimX:R.cx,aimY:R.cy,spd:30,holdFace:t.face});});
    op.stage='moving';op.t=0;radio(ord[0].name,pick(['Wchodzimy!','Ruch, ruch!','Wejście!']),{prio:1});break;}
  case'moving':if(op.mem.every(u=>u.task&&u.task.done)||op.t>14){const R=room(),ts=new Set(R.tl.map(([x,y])=>I(x,y)));
@@ -2455,46 +2456,73 @@ const ROOMS_ROAD=[];const DOORS_ROAD=[];const FURN_ROAD=[];
  F_('police',33,32);F_('mm',41,24);F_('mm',13,24);F_('mm',69,24);
  for(let x=3;x<MW;x+=6){F_('post',x,34);F_('post',x+3,23);}
  const taken=new Set();const put=(k,x,y)=>{const key=x+','+y;if(taken.has(key))return;taken.add(key);F_(k,x,y);};
- for(let y=1;y<=20;y++)for(let x=1;x<MW-1;x++){const edge=y>17?.25:.55;if(x>=64&&x<=67)continue;if(r()<edge&&!(x>36&&x<46&&y>14))put('tree',x,y);else if(r()<.05)put('bush',x,y);}
+ for(let y=1;y<=20;y++)for(let x=1;x<MW-1;x++){const edge=y>17?.25:.55;if(x>=64&&x<=67)continue;if((x>=55&&x<=66&&y>=3&&y<=10)||(x>=14&&x<=22&&y>=17))continue;if(r()<edge&&!(x>36&&x<46&&y>14))put('tree',x,y);else if(r()<.05)put('bush',x,y);}
  for(let y=38;y<=56;y++)for(let x=1;x<MW-1;x++){const edge=y<41?.22:.5;if(r()<edge)put('tree',x,y);else if(r()<.05)put('bush',x,y);}
  for(const[x,y]of[[66,36],[67,37],[69,36],[65,38],[70,38]])put('tree',x,y);
  for(let x=2;x<30;x+=1)if(x%5)F_('fence',x,22);
+ for(let x=0;x<MW;x++)if(x<44||x>48)F_('grail',x,24);F_('hwsign',50,23);F_('bboard',16,19);F_('farmh',60,6);for(let x=4;x<MW;x+=9)F_('ppole',x,37);F_('tire',24,33);F_('cans',47,34);F_('tire',63,24);F_('mbox',58,23);
  for(const[x,y]of[[20,35],[52,35],[58,24],[8,35]])F_('puddle',x,y);}
-const LAMPS_ROAD=[[37,32,0,'#f4f0d8',64],[38,33,0,'#f4f0d8',52]];
+const LAMPS_ROAD=[[37,32,0,'#f4f0d8',64],[38,33,0,'#f4f0d8',52],[17,20,0,'#ffe8b0',40],[19,20,0,'#ffe8b0',40],[61,7,0,'#ffcf80',30]];
 const ENTRIES_ROAD=[{n:'Highway 287',s:'Radiowóz za zatrzymanym pojazdem.',x:35.5,y:34.6,a:0,px:35,py:34}];
+function roadDecor(){const L=(x,y,w,h,c)=>P(wc,x,y,w,h,c);for(let x=0;x<MW*TS;x+=6){L(x,26*TS+3,3,2,'rgba(200,200,190,.18)');L(x,31*TS+11,3,2,'rgba(200,200,190,.18)');}
+ const r=rng(287);for(let i=0;i<120;i++){const x=r()*MW*TS|0,y=(26+r()*6)*TS|0;L(x,y,(r()*10|0)+4,1,'rgba(10,10,12,.35)');}for(let i=0;i<14;i++){const x=r()*MW*TS|0,y=(26.5+r()*5)*TS|0;L(x,y,18,2,'rgba(20,20,22,.5)');}}
 function roadTerrain(M,set,fillR,H,V){fillR(0,ROAD_Y0,79,ROAD_Y1,T.ASPH,'asph');fillR(0,24,79,25,T.ASPH,'conc');fillR(0,32,79,33,T.ASPH,'conc');}
 function roadWindows(){}
+F('grail',1,1,1,0,(g,x,y,w,h,s)=>{P(g,x,y+11,16,2,SH);P(g,x,y+5,16,4,'#8a8e92');P(g,x,y+5,16,1,'#c8ccd0');P(g,x,y+8,16,1,'#5a5e62');if(s%2===0){P(g,x+7,y+4,2,9,'#5a5e62');P(g,x+7,y+6,2,2,'#e8b020');}});
+F('hwsign',3,1,1,0,(g,x,y)=>{P(g,x+6,y+12,36,3,SH);P(g,x+8,y-6,2,19,'#7a7e82');P(g,x+38,y-6,2,19,'#7a7e82');P(g,x+1,y-26,46,21,'#1a5a32');P(g,x+2,y-25,44,19,'#1e6a3a');P(g,x+2,y-25,44,1,'#e8f0e8');
+ const L=(px,py,w)=>P(g,x+px,y+py,w,2,'#e8f0e8');L(4,-22,22);L(36,-22,6);L(4,-17,18);L(36,-17,6);L(4,-12,26);L(36,-12,6);});
+F('bboard',4,1,1,0,(g,x,y)=>{P(g,x+6,y+12,52,3,SH);for(const px of[12,30,48])P(g,x+px,y-14,3,27,'#5a4a3a');P(g,x,y-40,64,28,'#1a1a1c');P(g,x+2,y-38,60,24,'#e8d8a8');P(g,x+4,y-36,26,10,'#c8301a');P(g,x+6,y-34,22,2,'#f0e0c0');P(g,x+6,y-30,16,2,'#f0e0c0');P(g,x+34,y-36,24,4,'#2a2a2a');P(g,x+34,y-30,18,2,'#2a2a2a');P(g,x+4,y-23,54,6,'#1e3c8a');P(g,x+8,y-21,30,2,'#f0f0e8');P(g,x+16,y-13,2,2,'#ffe8b0');P(g,x+46,y-13,2,2,'#ffe8b0');});
+F('farmh',3,2,1,0,(g,x,y)=>{P(g,x+2,y+28,44,3,SH);P(g,x+2,y-2,44,30,'#5a4a3c');P(g,x+2,y-2,44,2,'#7a6a5c');P(g,x,y-14,48,14,'#3a2a24');P(g,x,y-14,48,2,'#5a4a3c');P(g,x+8,y+8,6,6,'#ffcf80');P(g,x+30,y+8,6,6,'#1a1a1a');P(g,x+20,y+16,6,12,'#3a2a20');P(g,x+38,y-20,4,8,'#4a3a2c');});
+F('ppole',1,1,1,0,(g,x,y)=>{P(g,x+6,y+12,5,3,SH);P(g,x+7,y-44,3,57,'#4a3a2a');P(g,x+1,y-42,15,2,'#3a2a1e');for(const px of[2,8,14])P(g,x+px,y-45,1,3,'#c8c8c0');});
+F('tire',1,1,0,0,(g,x,y)=>{P(g,x+3,y+6,10,4,'#141414');P(g,x+5,y+5,7,1,'#2a2a2a');P(g,x+4,y+8,3,1,'#2a2a2a');});
+F('mbox',1,1,1,0,(g,x,y)=>{P(g,x+7,y+2,2,11,'#5a5e62');P(g,x+4,y-3,8,6,'#2a3a6a');P(g,x+4,y-3,8,1,'#4a5a8a');P(g,x+12,y-4,1,4,'#c8201a');});
+Object.assign(FH,{hwsign:0,bboard:0,farmh:0,ppole:0,grail:3});
 F('laneY',1,1,0,0,(g,x,y)=>{P(g,x+2,y+14,11,2,'rgba(200,170,60,.75)');});
 F('laneW',1,1,0,0,(g,x,y)=>{P(g,x,y,16,1,'rgba(210,210,200,.55)');});
 F('laneWb',1,1,0,0,(g,x,y)=>{P(g,x,y+15,16,1,'rgba(210,210,200,.55)');});
 F('mm',1,1,1,0,(g,x,y)=>{P(g,x+7,y+4,2,11,'#6a6e72');P(g,x+4,y-4,8,9,'#1e5a36');P(g,x+4,y-4,8,1,'#2e7a4e');P(g,x+5,y-2,6,1,'#d8e0d8');P(g,x+6,y,4,2,'#d8e0d8');P(g,x+6,y+13,5,2,SH);});
 F('post',1,1,0,0,(g,x,y)=>{P(g,x+7,y+4,2,9,'#cfcfc8');P(g,x+7,y+4,2,2,'#e8a020');P(g,x+8,y+13,3,1,SH);});
-// silver sedan, one tail light dead
-function mkSedan(){const c=document.createElement('canvas');c.width=48;c.height=32;const g=c.getContext('2d'),b='#8e949a';
- P(g,4,28,42,3,SH);for(const wx of[8,32]){P(g,wx,3,8,3,'#0e0e10');P(g,wx,26,8,3,'#0e0e10');}
- P(g,2,5,44,22,b);P(g,2,5,44,1,'#b8bec4');P(g,2,26,44,1,'#5a6066');P(g,13,8,20,16,'#7a8086');P(g,13,8,20,1,'#a0a6ac');
- P(g,33,8,6,16,'#16202a');P(g,34,9,1,6,'#3a5468');P(g,8,8,5,16,'#16202a');P(g,9,9,1,5,'#2f4558');P(g,22,5,1,22,'#6a7076');
- P(g,45,7,1,4,'#e8e4c8');P(g,45,21,1,4,'#e8e4c8');P(g,2,7,1,3,'#2a0a0a');P(g,2,22,1,3,'#c0201a');P(g,30,3,2,2,'#2a2e33');P(g,30,27,2,2,'#2a2e33');return c;}
-function carTiles(on){const C=G.car;if(!C)return;const x0=Math.floor(C.x/TS),y0=Math.floor(C.y/TS);for(let y=y0;y<y0+2;y++)for(let x=x0;x<x0+3;x++)if(inb(x,y))LV.fsolid[I(x,y)]=on?1:0;}
+// srebrny minivan (Toyota Sienna), lewe tylne światło nie działa
+function mkMinivan(win,side){const c=document.createElement('canvas');c.width=60;c.height=32;const g=c.getContext('2d'),b='#9aa0a6';
+ P(g,4,28,54,3,SH);for(const wx of[9,43]){P(g,wx,3,9,3,'#0e0e10');P(g,wx,26,9,3,'#0e0e10');P(g,wx+3,3,3,1,'#5a5e62');P(g,wx+3,28,3,1,'#5a5e62');}
+ P(g,2,5,56,22,b);P(g,2,5,56,1,'#c4cad0');P(g,2,26,56,1,'#5a6066');P(g,3,6,1,20,'#7a8086');
+ P(g,48,7,9,18,'#a8aeb4');P(g,48,7,9,1,'#c4cad0');P(g,55,9,1,14,'#7a8086');
+ P(g,41,7,7,18,'#16202a');P(g,42,8,1,7,'#3a5468');P(g,44,8,1,3,'#3a5468');
+ P(g,10,7,31,18,'#868c92');P(g,10,7,31,1,'#a8aeb4');P(g,12,9,27,1,'#5a6066');P(g,12,22,27,1,'#5a6066');P(g,23,12,8,8,'#7a8086');P(g,24,13,6,1,'#9aa0a6');
+ P(g,4,8,6,16,'#16202a');P(g,5,9,1,5,'#2f4558');P(g,2,14,2,4,'#5a6066');
+ const sw=(y,x0,x1,c)=>P(g,x0,y,x1-x0,2,c);for(const y of[5,25]){sw(y,10,19,'#1a242e');sw(y,21,32,'#1a242e');P(g,20,y,1,2,'#5a6066');P(g,32,y,1,2,'#5a6066');}
+ for(const y of[5,25]){const me=(y===5&&side!=='pas')||(y===25&&side==='pas');const st=me?win:0;sw(y,33,40,st===0?'#16202a':st===1?'#2a3540':'#3a2e26');if(st===0)P(g,34,y,2,1,'#3a5468');if(st===1)P(g,33,y,7,1,'#0a0c0e');if(st===2){P(g,35,y,3,2,'#4a4a3a');}}
+ P(g,57,7,1,4,'#e8e4c8');P(g,57,21,1,4,'#e8e4c8');P(g,2,6,1,4,'#2a0a0a');P(g,2,22,1,4,'#c0201a');P(g,1,13,1,6,'#d8d0a0');P(g,38,4,2,1,'#2a2e33');P(g,38,27,2,1,'#2a2e33');return c;}
+function carTiles(on){const C=G.car;if(!C)return;const x0=Math.floor(C.x/TS),y0=Math.floor(C.y/TS);for(let y=y0;y<y0+2;y++)for(let x=x0;x<x0+4;x++)if(inb(x,y))LV.fsolid[I(x,y)]=on?1:0;}
 function roadScen(){}
 function startRoad(){G.hostage=null;G.deadline=1e9;
- G.h={stage:'stop',approach:null,docs:false,plates:false,lic:false,k9T:null,knockT:2,knocks:0,peek:false,twist:null,trunk:false,girl:false,drv:null,said:{},t:0,truckT:12,endT:null,res:null};
- G.truck=null;G.car={x:40*TS,y:32*TS,vx:0,vy:0,ang:0,mode:'parked',spr:mkSedan()};carTiles(true);
+ G.h={win:0,winSide:null,keys:false,flares:false,reach:null,reachDone:false,sawGun:false,stage:'stop',approach:null,docs:false,plates:false,lic:false,k9T:null,knockT:2,knocks:0,peek:false,twist:null,trunk:false,girl:false,drv:null,said:{},t:0,truckT:12,endT:null,res:null};
+ G.truck=null;G.traffic=[];G.trafT=2;G.car={x:40*TS,y:32*TS,vx:0,vy:0,ang:0,mode:'parked',spr:mkMinivan(0,'drv'),engine:true};carTiles(true);G.carBlk=carBlocks;
  G.police=[];logEv('WHP 14: zatrzymanie pojazdu, US-287, mila 41');
  setTimeout(()=>{radio('DISPATCH','WHP 14, przyjęłam zatrzymanie o pierwszej dwanaście. Najbliższe wsparcie piętnaście minut od was.');},600);}
-const RD={drvWin:()=>({x:G.car.x+30,y:G.car.y-8}),pasWin:()=>({x:G.car.x+30,y:G.car.y+40}),rearWin:()=>({x:G.car.x+14,y:G.car.y+40}),trunk:()=>({x:G.car.x-8,y:G.car.y+16}),mdt:()=>({x:34*TS+8,y:34*TS+4})};
+const RD={drvWin:()=>({x:G.car.x+38,y:G.car.y-8}),pasWin:()=>({x:G.car.x+38,y:G.car.y+40}),rearWin:()=>({x:G.car.x+22,y:G.car.y+40}),trunk:()=>({x:G.car.x-8,y:G.car.y+16}),mdt:()=>({x:34*TS+8,y:34*TS+4})};
 function roadInteract(u){const H=G.h,C=G.car;if(!H)return null;
  if(H.stage==='stop'){
   const dw=RD.drvWin(),pw=RD.pasWin(),rw=RD.rearWin(),fx=u.x+Math.cos(u.ang)*8,fy=u.y+Math.sin(u.ang)*8,dd=p=>Math.min(dist(fx,fy,p.x,p.y),dist(u.x,u.y,p.x,p.y));
   if(!H.peek&&dd(rw)<18&&dd(rw)<dd(pw))return{k:'house',label:'Zajrzyj na tylne siedzenie',dur:.6,f:peekBack};
-  if(dd(dw)<20||dd(pw)<20){if(!H.approach){H.approach=dd(pw)<dd(dw)?'pas':'drv';logEv('Podejście od strony '+(H.approach==='pas'?'pasażera':'kierowcy'));}return{k:'house',label:'Rozmowa z kierowcą',dur:0,f:driverTalk};}
+  if(H.reach&&(dd(dw)<34||dd(pw)<34))return{k:'house',label:'„RĘCE NA KIEROWNICĘ!”',dur:0,f:handsUp};
+  if(dd(dw)<20||dd(pw)<20){if(!H.approach){H.approach=dd(pw)<dd(dw)?'pas':'drv';logEv('Podejście od strony '+(H.approach==='pas'?'pasażera':'kierowcy'));}
+   if(H.win===0)return{k:'house',label:'Zapukaj w szybę',dur:0,f:(u)=>knockWin(u,dd(pw)<dd(dw)?'pas':'drv')};return{k:'house',label:'Rozmowa z kierowcą',dur:0,f:driverTalk};}
   const tk=RD.trunk();if(nearPt(u,tk.x,tk.y,18))return{k:'house',label:'Bagażnik',dur:0,f:trunkMenu};
   const m=RD.mdt();if(nearPt(u,m.x,m.y,22))return{k:'house',label:'Radiowóz — komputer i radio',dur:0,f:mdtMenu};}
  else{const tk=RD.trunk();if(!H.trunk&&nearPt(u,tk.x,tk.y,20))return{k:'house',label:'Otwórz bagażnik',dur:1.2,f:openTrunk};
   const rw=RD.rearWin();if(!H.girl&&nearPt(u,rw.x,rw.y,20))return{k:'house',label:'Pomóż dziewczynie z tyłu',dur:1,f:freeGirl};}
  return null;}
+function setWin(n){const H=G.h;H.win=n;G.car.spr=mkMinivan(n,H.winSide);}
+function knockWin(u,side){const H=G.h;H.winSide=side;const p=side==='pas'?RD.pasWin():RD.drvWin();if(A.ctx){const o=out(p.x,p.y,.5);if(o)for(let k=0;k<3;k++)tone(o,A.ctx.currentTime+k*.16,.05,{f:1800,f2:1200,g:.5,type:'triangle'});}
+ say(u.name,'Proszę opuścić szybę.');setTimeout(()=>{if(G.ended)return;setWin(1);say('KIEROWCA (PRZEZ SZPARĘ)','...Tak? Coś się stało, panie władzo?');logEv('Kierowca uchyla szybę na kilka centymetrów');
+  const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o&&!H.said.crack){H.said.crack=1;say(o.name,'Uchylił tylko trochę. Pilnuj rąk.');}},1300);}
+function handsUp(u){const H=G.h;H.reach=null;H.reachDone=true;H.nervous=(H.nervous||0)+1;say(u.name,'RĘCE NA KIEROWNICĘ! TERAZ!');say('KIEROWCA','Dobra! Dobra! Szukałem tylko... ubezpieczenia. Spokojnie.');logEv('Kierowca sięgał pod siedzenie — polecenie: ręce na kierownicę');}
 function driverTalk(u){const H=G.h;const it=[];
- if(!H.docs)it.push({t:'„Dobry wieczór. Prawo jazdy, dowód rejestracyjny i ubezpieczenie.”',f:()=>{H.docs=true;say(u.name,'Dobry wieczór. Prawo jazdy, dowód rejestracyjny i ubezpieczenie.');say('KIEROWCA','Oczywiście, panie władzo. Proszę bardzo. Coś się stało?');setTimeout(showDaleId,2600);logEv('Kierowca podaje dokumenty: Dale Pruitt');}});
+ if(H.win===1)it.push({t:'„Proszę opuścić szybę do końca.”',f:()=>{say(u.name,'Proszę opuścić szybę do końca. Nie będę rozmawiał przez szparę.');setTimeout(()=>{if(G.ended)return;setWin(2);say('KIEROWCA','...Proszę bardzo.');logEv('Szyba opuszczona');},900);}});
+ if(H.win===2&&!H.sawGun)it.push({t:'Poświeć latarką do kabiny',f:()=>{H.sawGun=true;say(u.name,'Rolka szarej taśmy na konsoli. Na podłodze po stronie pasażera koc... spod niego wystaje kolba strzelby.');logEv('W kabinie: taśma i kolba strzelby pod kocem');const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)setTimeout(()=>{if(!G.ended)say(o.name,'(cicho) Widziałem. Kryję cię.');},1400);}});
+ if(H.win>=1&&!H.keys)it.push({t:'„Proszę zgasić silnik i położyć kluczyki na dachu.”',f:()=>{H.keys=true;G.car.engine=false;say(u.name,'Proszę zgasić silnik i położyć kluczyki na dachu.');say('KIEROWCA','Na dachu? ...Dobra. Jak pan chce.');logEv('Silnik zgaszony, kluczyki na dachu');}});
+ if(!H.docs)it.push({t:'„Dobry wieczór. Prawo jazdy, dowód rejestracyjny i ubezpieczenie.”',f:()=>{H.docs=true;H.docsT=H.t;say(u.name,'Dobry wieczór. Prawo jazdy, dowód rejestracyjny i ubezpieczenie.');say('KIEROWCA','Oczywiście, panie władzo. Proszę bardzo. Coś się stało?');setTimeout(showDaleId,2600);logEv('Kierowca podaje dokumenty: Dale Pruitt');}});
  if(!H.said.why)it.push({t:'„Wie pan, dlaczego pana zatrzymałem?”',f:()=>{H.said.why=1;say(u.name,'Wie pan, dlaczego pana zatrzymałem?');say('KIEROWCA','Nie mam pojęcia. Jechałem przepisowo, prawda? Zawsze jeżdżę przepisowo.');say(u.name,'Nie świeci panu lewe tylne światło.');say('KIEROWCA','Ach, to. Naprawię jutro z samego rana. Dziękuję, że pan mówi.');}});
  if(!H.said.where)it.push({t:'„Dokąd pan jedzie o tej porze?”',f:()=>{H.said.where=1;say(u.name,'Dokąd pan jedzie o tej porze?');say('KIEROWCA','Do siostry, do Millbrook. Wiozę jej... to znaczy, wracamy od rodziny.');}});
  if(!H.said.who)it.push({t:'„Kto siedzi z tyłu?”',f:()=>{H.said.who=1;say(u.name,'Kto siedzi z tyłu?');say('KIEROWCA','Moja siostrzenica. Śpi. Długi dzień, sam pan rozumie.');}});
@@ -2503,14 +2531,15 @@ function driverTalk(u){const H=G.h;const it=[];
  it.push({t:'„Proszę wysiąść z samochodu.”',f:()=>{say(u.name,'Proszę zgasić silnik i wysiąść z samochodu.');say('KIEROWCA','...Jasne. Już wysiadam.');logEv('Polecenie wyjścia z pojazdu');setTimeout(()=>roadTwist(u),2200);}});
  if(H.docs)it.push({t:'„Proszę zaczekać w aucie.”',f:()=>{say(u.name,'Proszę zaczekać w samochodzie.');say('KIEROWCA','Nigdzie się nie wybieram.');}});
  it.push({t:'„Dostaje pan pouczenie. Proszę naprawić światło.” (puść kierowcę)',f:()=>{say(u.name,'Tym razem pouczenie. Proszę naprawić to światło.');say('KIEROWCA','Dziękuję, panie władzo. Dobrej nocy.');releaseCar();}});
- choiceMenu('Kierowca — srebrna Toyota',it);}
+ choiceMenu('Kierowca — srebrna Toyota Sienna',it);}
 function showDaleId(){if(G.ended)return;const el=$('idcard');el.innerHTML='<div class="idh"><span>STATE OF INDIANA</span><span>DRIVER LICENSE</span></div><div class="idb"><canvas id="idph" width="18" height="22"></canvas><div class="idf"><div><i>DL</i> 4471-08-9925</div><div class="idn">PRUITT</div><div class="idn2">DALE ROBERT</div><div><i>DOB</i> 09/02/1979</div><div>88 COUNTY RD 300<br>MUNCIE IN</div><div><i>HGT</i> 6\'1" &nbsp;<i>EYES</i> BLU &nbsp;<i>SEX</i> M</div><div><i>EXP</i> 09/02/2028</div></div></div><div class="idsig">D. Pruitt</div>';
  const c=$('idph'),g=c.getContext('2d');P(g,0,0,18,22,'#a8b4bc');P(g,3,15,12,7,'#4a4a3a');P(g,7,12,4,4,'#b08868');P(g,5,4,8,10,'#c49a7c');P(g,5,2,8,3,'#8a7050');P(g,6,8,2,1,'#2a2a3a');P(g,10,8,2,1,'#2a2a3a');P(g,7,11,4,1,'#8a5a4a');P(g,6,12,6,1,'#7a6a50');
  el.classList.add('on');setTimeout(()=>el.classList.remove('on'),6500);}
 function mdtMenu(u){const H=G.h;const it=[];
- it.push({t:'Sprawdź tablice rejestracyjne',dis:H.plates,f:()=>{H.plates=true;radio(u.name,'Dispatch, WHP 14, proszę sprawdzić tablice Indiany: Lincoln-Mary-siedem-dwa-cztery-jeden.',{radio:1});setTimeout(()=>{if(G.ended)return;radio('DISPATCH','WHP 14, tablice na srebrną Toyotę Camry. Właścicielka: Margaret Lindqvist z Millbrook. Zgłoszona jako zaginiona wczoraj wieczorem, razem z córką, Lily, szesnaście lat.');logEv('Dispatch: właścicielka auta i jej córka zaginione');},5200);}});
+ it.push({t:'Sprawdź tablice rejestracyjne',dis:H.plates,f:()=>{H.plates=true;radio(u.name,'Dispatch, WHP 14, proszę sprawdzić tablice Indiany: Lincoln-Mary-siedem-dwa-cztery-jeden.',{radio:1});setTimeout(()=>{if(G.ended)return;radio('DISPATCH','WHP 14, tablice na srebrną Toyotę Siennę, minivan. Właścicielka: Margaret Lindqvist z Millbrook. Zgłoszona jako zaginiona wczoraj wieczorem, razem z córką, Lily, szesnaście lat.');logEv('Dispatch: właścicielka auta i jej córka zaginione');},5200);}});
  it.push({t:'Sprawdź prawo jazdy kierowcy',dis:!H.docs||H.lic,f:()=>{H.lic=true;radio(u.name,'Dispatch, sprawdźcie osobę: Pruitt, Dale, dziewiąty wrzesień siedemdziesiąt dziewięć.',{radio:1});setTimeout(()=>{if(G.ended)return;radio('DISPATCH','Pruitt Dale, prawo jazdy ważne. Wyrok sprzed ośmiu lat za napaść i pozbawienie wolności. Obecnie bez nakazów.');logEv('Dispatch: kierowca karany za pozbawienie wolności');},5200);}});
  it.push({t:'Wezwij jednostkę K-9',dis:H.k9T!=null,f:()=>{H.k9T=0;radio(u.name,'Dispatch, proszę o jednostkę K-9 na mile czterdzieści jeden.',{radio:1});setTimeout(()=>{if(!G.ended)radio('DISPATCH','K-9 w drodze, będą za około sześć minut.');},4200);logEv('Wezwano K-9');}});
+ it.push({t:'Rozstaw flary za radiowozem',dis:H.flares,f:()=>{H.flares=true;say(u.name,'Rozstawiam flary. Niech zwalniają.');logEv('Flary rozstawione na jezdni');SND.pick(u.x,u.y);}});
  it.push({t:'Poproś o wsparcie',dis:H.said.bk,f:()=>{H.said.bk=1;radio(u.name,'Dispatch, prośba o drugą jednostkę.',{radio:1});setTimeout(()=>{if(!G.ended)radio('DISPATCH','Najbliższa jednostka to 3-Baker-9, piętnaście minut od was.');},4000);}});
  choiceMenu('Radiowóz WHP 14',it);}
 function peekBack(u){const H=G.h;H.peek=true;logEv('Dziewczyna na tylnym siedzeniu ma związane ręce');say(u.name,'Dziewczyna z tyłu nie śpi. Patrzy prosto w latarkę... ma taśmę na nadgarstkach.');say('KIEROWCA','Proszę nie świecić jej po oczach. Mówiłem, że jest zmęczona.');}
@@ -2520,10 +2549,11 @@ function trunkKnock(force){const H=G.h,tk=RD.trunk();H.knocks++;const o=out(tk.x
 function releaseCar(){const H=G.h;H.stage='released';logEv('Kierowca puszczony z pouczeniem');setTimeout(()=>{G.car.mode='leave';carTiles(false);},2500);}
 function roadTwist(u){const H=G.h;if(H.stage!=='stop'||G.ended)return;H.stage='twist';drawAll();carTiles(false);
  const near=G.squad.some(q=>q&&q.alive&&dist(q.x,q.y,G.car.x+24,G.car.y+16)<TS*2.4);
- H.twist=(near&&Math.random()<.6)||H.said.trunkAsk?'gun':'flee';
- if(H.twist==='gun'){spawnDriver(G.car.x+30,G.car.y-10);say('KIEROWCA','Nie zabierzecie mi ich!');const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Broń! Ma strzelbę!');}
+ H.twist=H.forceGun||(near&&Math.random()<.6)||H.said.trunkAsk?'gun':H.keys?'run':'flee';
+ if(H.twist==='gun'){spawnDriver(G.car.x+38,G.car.y-10);say('KIEROWCA','Nie zabierzecie mi ich!');const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Broń! Ma strzelbę!');}
+ else if(H.twist==='run'){spawnDriver(G.car.x+38,G.car.y-10);const e=H.drv;e.state='search';e.goal={x:66*TS+8,y:1*TS+8};e.searchT=999;e.react=.6;H.run=true;say('KIEROWCA','...!');const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Wyskoczył! Biegnie przez jezdnię do lasu!');radio(G.p1.name,'Dispatch, WHP 14, kierowca ucieka pieszo na północ, do lasu!',{radio:1});}
  else{G.car.mode='flee';G.car.vx=40;say('KIEROWCA','...');const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Ucieka! Rusza!');radio(G.p1.name,'Dispatch, WHP 14, pojazd ucieka na wschód, Highway 287!',{radio:1});}
- logEv(H.twist==='gun'?'Kierowca wyskakuje ze strzelbą':'Kierowca ucieka autem');}
+ logEv(H.twist==='gun'?'Kierowca wyskakuje ze strzelbą':H.twist==='run'?'Kierowca ucieka pieszo (kluczyki na dachu)':'Kierowca ucieka autem');}
 function spawnDriver(x,y){const H=G.h;const e=mkEnemy({tx:x/TS|0,ty:y/TS|0,weap:'eShot',pal:{body:'#4a4a3a',legs:'#2a2e3a',head:'#c49a7c',face:'#c49a7c',visor:'#2a1a12',hair:'#8a7050',skin:'#c49a7c',eyes:1},name:'Dale Pruitt',kind:'suspect',st:'guard'});
  e.x=x;e.y=y;unstick(e);const q=nearestSquad(e);e.state='search';e.goal={x:q?q.x:x,y:q?q.y:y};e.searchT=6;e.arrived=false;e.react=.45;H.drv=e;return e;}
 function openTrunk(u){const H=G.h;H.trunk=true;const tk=RD.trunk();logEv('Bagażnik: związana kobieta, żyje');say(u.name,'Bagażnik... jest tu kobieta. Związana. Żyje!');
@@ -2531,11 +2561,25 @@ function openTrunk(u){const H=G.h;H.trunk=true;const tk=RD.trunk();logEv('Bagaż
  say('MARGARET LINDQVIST','Lily... gdzie jest Lily? On ma moją córkę...');radio(u.name,'Dispatch, potrzebna karetka na milę czterdzieści jeden. Mamy dwie ofiary porwania.',{radio:1});}
 function freeGirl(u){const H=G.h;H.girl=true;const rw=RD.rearWin();logEv('Lily Lindqvist bezpieczna');say(u.name,'Spokojnie. Jesteś bezpieczna. Policja.');say('LILY','Mama... mama jest w bagażniku...');
  mkNPC({tx:rw.x/TS|0,ty:(rw.y/TS|0),kind:'victim',pal:{body:'#c8c0b0',legs:'#3a4a6a',head:'#e0c0a8',face:'#e0c0a8',visor:'#2a1a12',hair:'#d8b070',skin:'#e0c0a8',eyes:1},state:'calm',pose:'kneel'});}
+const VCOL=['#7a1e1a','#1e2a4a','#2a2a2c','#c8c8c4','#4a5a3a','#5a4a3a','#8a8a86'];
+function spawnVeh(){const eb=Math.random()<.55,k=Math.random(),type=k<.28?'semi':k<.5?'pickup':'car',len=type==='semi'?112:type==='pickup'?50:44;
+ G.traffic.push({type,len,eb,x:eb?-len-60:MW*TS+60,y:(eb?30.1:27.2)*TS,vx:(eb?1:-1)*rand(270,330),col:pick(VCOL),snd:0,honk:0,slow:0});}
+function updateTraffic(dt){const H=G.h;G.trafT-=dt;if(G.trafT<=0){G.trafT=rand(5,11);spawnVeh();}const L=G.p1;
+ for(const v of G.traffic){const near=Math.abs(v.x-G.car.x)<TS*22;let tgt=v.eb?(near?(H.flares?150:210):300):300;if(v.eb&&near)v.y+=((29.5*TS)-v.y)*Math.min(1,dt*1.5);
+  v.vx+=(Math.sign(v.vx)*tgt-v.vx)*Math.min(1,dt*1.2);v.x+=v.vx*dt;
+  if(L&&!v.snd&&Math.abs(v.x-L.x)<TS*16){v.snd=1;if(A.ctx){const dy=Math.abs(v.y-L.y)/TS,vol=Math.max(.06,.5-dy*.04)*(v.type==='semi'?1.4:1),o=ui(vol),t0=A.ctx.currentTime;nz(o,t0,2,{type:'bandpass',f:v.type==='semi'?380:700,g:.8,attack:.9});if(v.type==='semi')tone(o,t0,2.2,{f:78,f2:52,g:.35,type:'sawtooth'});else tone(o,t0+.6,.9,{f:220,f2:150,g:.08});}}
+  for(const q of G.squad){if(!q||!q.alive)continue;const fx=v.x+(v.vx>0?v.len:0),inLane=Math.abs(q.y-v.y-10)<16,ahead=v.vx>0?(q.x>v.x&&q.x-v.x<v.len+TS*6):(q.x<v.x+v.len&&v.x-q.x<TS*6);
+   if(inLane&&ahead&&!v.honk){v.honk=1;if(A.ctx){const o=out(v.x,v.y,.7);if(o)tone(o,A.ctx.currentTime,.8,{type:'sawtooth',f:v.type==='semi'?180:330,g:.45});}const o2=G.squad.find(s2=>s2&&s2.alive&&s2!==q);if(o2)say(o2.name,'Uważaj! Zejdź z jezdni!');}
+   if(inLane&&q.x>v.x-4&&q.x<v.x+v.len+4&&!q.hitByCar){q.hitByCar=1;G.shake=.5;SND.body(q.x,q.y);kill(q,null,v.vx>0?0:Math.PI);logEv(q.name+' potrącony przez przejeżdżający pojazd');H.hitCar=(H.hitCar||0)+1;}}
+  if(L&&Math.abs(v.x+v.len/2-L.x)<TS*2&&Math.abs(v.y-L.y)<TS*3)G.shake=Math.max(G.shake||0,.12);}
+ G.traffic=G.traffic.filter(v=>v.x>-200&&v.x<MW*TS+200);}
+function carBlocks(x,y){const C=G.car;if(!C)return false;const W=C.spr.width/2,cx=C.x+W,cy=C.y+16,ca=Math.cos(-C.ang),sa=Math.sin(-C.ang),dx=x-cx,dy=y-cy,lx=dx*ca-dy*sa,ly=dx*sa+dy*ca;return Math.abs(lx)<W-2&&Math.abs(ly)<11;}
+function carImpact(x,y,a){for(let i=0;i<6;i++)G.fx.push({k:'spark',x,y:y-6,vx:rand(-70,70)-Math.cos(a)*40,vy:rand(-70,70)-Math.sin(a)*40,t:0,life:rand(.08,.2)});SND.clang(x,y);if(Math.random()<.5)P(wc,0,0,0,0,'#000');}
 function updateRoad(dt){const H=G.h,C=G.car;if(!H||G.ended)return;H.t+=dt;
  // car motion
  if(C.mode==='flee'){C.vx=Math.min(250,C.vx+120*dt);if(C.x>52*TS){C.vy=Math.min(110,C.vy+130*dt);C.ang=Math.min(.4,C.ang+dt*.6);}C.x+=C.vx*dt;C.y+=C.vy*dt;
   if(C.y>=35*TS){C.mode='crashed';C.vx=C.vy=0;carTiles(true);const cx=C.x+40,cy=C.y+16;SND.kick(cx,cy);SND.glass(cx,cy);makeNoise(cx,cy,30,'boom');G.shake=.3;for(let i=0;i<14;i++)G.fx.push({k:'smoke',x:cx+rand(-8,8),y:cy+rand(-6,6),vx:rand(-6,6),vy:rand(-14,-4),r:2,gr:6,a:.35,t:0,life:rand(2,4),c:'#9a9a96'});
-   spawnDriver(C.x+30,C.y-10);const e=H.drv;e.state='search';e.goal={x:66*TS+8,y:1*TS+8};e.searchT=999;e.react=.6;H.run=true;logEv('Toyota w rowie przy drzewach, kierowca ucieka do lasu');const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Rozbił się! Wyskoczył i biegnie do lasu!');}}
+   spawnDriver(C.x+38,C.y-10);const e=H.drv;e.state='search';e.goal={x:66*TS+8,y:1*TS+8};e.searchT=999;e.react=.6;H.run=true;logEv('Toyota w rowie przy drzewach, kierowca ucieka do lasu');const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Rozbił się! Wyskoczył i biegnie do lasu!');}}
  if(C.mode==='leave'){C.vx=Math.min(160,C.vx+60*dt);C.x+=C.vx*dt;if(C.x>MW*TS+60&&!G.ended){endMission(false,'Puszczony kierowca okazał się porywaczem. Margaret i Lily Lindqvist odnaleziono dwa dni później.');}}
  // knocks from the trunk
  if(H.stage==='stop'||(!H.trunk&&C.mode!=='leave')){const tk=RD.trunk();if(anySquadNear(tk.x,tk.y,TS*2.4)){H.knockT-=dt;if(H.knockT<=0){H.knockT=rand(5,9);trunkKnock();if(H.knocks===1&&H.stage==='stop'){const o=G.squad.find(q=>q&&q.alive&&!q.human)||G.p1;say(o.name,'Słyszałeś? Coś stuknęło w bagażniku.');}}}}
@@ -2544,36 +2588,51 @@ function updateRoad(dt){const H=G.h,C=G.car;if(!H||G.ended)return;H.t+=dt;
   if(H.t>240)roadTwist(G.p1);}
  // runaway reaching the woods edge
  const e=H.drv;if(e&&e.alive&&e.state!=='cuffed'&&e.state!=='surr'&&H.run&&dist(e.x,e.y,66*TS+8,1*TS+8)<TS*2.2){endMission(false,'Kierowca zbiegł do lasu.');return;}
- // passing trucks
- H.truckT-=dt;if(H.truckT<=0&&!G.truck){H.truckT=rand(28,55);G.truck={x:MW*TS+80,y:26.4*TS,vx:-330,honk:false};}
- if(G.truck){const tr=G.truck;tr.x+=tr.vx*dt;const L=leader();if(L){const d=Math.abs(tr.x-L.x);if(A.ctx&&d<TS*30&&!tr.snd){tr.snd=1;const o=ui(.12);nz(o,A.ctx.currentTime,2.2,{type:'lowpass',f:500,g:.6,attack:1});}}
-  for(const q of G.squad)if(q&&q.alive&&q.y<29*TS&&q.y>25*TS&&Math.abs(tr.x-q.x)<TS*8&&!tr.honk){tr.honk=true;if(A.ctx){const o=out(tr.x,tr.y,.6);if(o)tone(o,A.ctx.currentTime,.9,{type:'sawtooth',f:220,g:.4});}const o2=G.squad.find(s=>s&&s.alive&&s!==q);if(o2)say(o2.name,'Uważaj! Zejdź z jezdni!');}
-  if(tr.x<-120)G.truck=null;}
+ // sięganie pod siedzenie
+ if(H.stage==='stop'&&H.docs&&!H.reachDone&&!H.reach&&H.t>(H.docsT||0)+rand(18,30)*0+22&&H.win>=1&&anySquadNear(G.car.x+38,G.car.y+16,TS*2.6)&&Math.random()<dt*.15){H.reach={t:0};const o=G.squad.find(q=>q&&q.alive&&!q.human)||G.p1;say(o.name,'Sięga pod siedzenie!');}
+ if(H.reach){H.reach.t+=dt;const L=G.p1;if(L&&L.shoutCd>2.9){handsUp(L);}else if(H.reach.t>3.6){H.reach=null;H.reachDone=true;H.forceGun=true;roadTwist(G.p1);}}
+ updateTraffic(dt);
  // win
  const drvDone=!e||!e.alive||e.state==='cuffed';
  if(H.endT==null&&H.stage==='twist'&&H.trunk&&H.girl&&e&&drvDone){H.endT=2;H.res=e.alive?'arrested':'killed';}
  if(H.endT!=null){H.endT-=dt;if(H.endT<=0&&!G.ended)endMission(true,H.res==='arrested'?'Kierowca zatrzymany, Margaret i Lily Lindqvist uratowane.':'Kierowca nie żyje. Margaret i Lily Lindqvist uratowane.');}}
-function roadStress(dt,L){G.crT=(G.crT||0)-dt;if(G.crT<=0&&A.ctx&&isOutdoor(L.x,L.y)){G.crT=rand(.25,.6);const o=ui(.012);tone(o,A.ctx.currentTime,.04,{f:rand(4200,4700),g:.4});}
+function roadStress(dt,L){const c=A.ctx;if(c&&!A.rdHum){A.rdHum=c.createGain();A.rdHum.gain.value=0;A.rdHum.connect(A.master);const s=c.createBufferSource();s.buffer=A.noise;s.loop=true;const f=c.createBiquadFilter();f.type='lowpass';f.frequency.value=160;s.connect(f);f.connect(A.rdHum);s.start();
+  A.rdIdle=c.createGain();A.rdIdle.gain.value=0;A.rdIdle.connect(A.master);const o=c.createOscillator();o.type='sawtooth';o.frequency.value=34;const f2=c.createBiquadFilter();f2.type='lowpass';f2.frequency.value=110;const lf=c.createOscillator();lf.frequency.value=7;const lg=c.createGain();lg.gain.value=3;lf.connect(lg);lg.connect(o.frequency);o.connect(f2);f2.connect(A.rdIdle);o.start();lf.start();}
+ if(c&&A.rdHum){const on=G.lvl==='road'&&G.running&&!G.ended,t=c.currentTime;let nv=0;for(const v of G.traffic||[])nv=Math.max(nv,1-Math.min(1,Math.abs(v.x-L.x)/(TS*40)));A.rdHum.gain.setTargetAtTime(on?.025+nv*.05:0,t,.4);
+  const C=G.car,d=C?dist(L.x,L.y,C.x+30,C.y+16):999;A.rdIdle.gain.setTargetAtTime(on&&C&&C.engine!==false&&C.mode==='parked'?Math.max(0,.07-d/TS*.006):0,t,.3);
+  G.radT=(G.radT||rand(14,24))-dt;if(on&&G.radT<=0){G.radT=rand(22,40);const o=ui(.05),t0=c.currentTime;nz(o,t0,.35,{type:'bandpass',f:1800,g:.6});tone(o,t0+.36,.08,{f:1400,g:.3});}}
+G.crT=(G.crT||0)-dt;if(G.crT<=0&&A.ctx&&isOutdoor(L.x,L.y)){G.crT=rand(.25,.6);const o=ui(.012);tone(o,A.ctx.currentTime,.04,{f:rand(4200,4700),g:.4});}
  for(const s of G.squad){if(!s||!s.alive||!s.wounded)continue;s.breathT=(s.breathT||0)-dt;if(s.breathT<=0){s.breathT=2;if(s.human)SND.breath(s.x,s.y,.3);}}}
 function roadRender(c,cx,cy){const C=G.car;if(!C)return;const x=C.x-cx,y=C.y-cy;
- c.save();c.translate(x+24,y+16);c.rotate(C.ang);c.drawImage(C.spr,-24,-16);
- if(!G.h.girl&&C.mode!=='leave')P(c,-10,-7,4,4,'#d8b070');if(C.mode==='parked'||C.mode==='flee'||C.mode==='leave'){P(c,6,-8,4,4,'#8a7050');}
+ const HW=C.spr.width/2;c.save();c.translate(x+HW,y+16);c.rotate(C.ang);c.drawImage(C.spr,-HW,-16);
+ if(!G.h.girl&&C.mode!=='leave')P(c,-10,3,4,4,'#d8b070');if(C.mode==='parked'||C.mode==='flee'||C.mode==='leave'){P(c,8,-8,4,4,'#8a7050');if(G.h.win===2&&!G.h.drv)P(c,10,-11,3,2,'#c49a7c');}
  c.restore();
  c.globalCompositeOperation='lighter';const tl=c.createRadialGradient(x+1,y+22,0,x+1,y+22,10);tl.addColorStop(0,'rgba(255,40,30,.45)');tl.addColorStop(1,'rgba(255,40,30,0)');c.fillStyle=tl;c.fillRect(x-10,y+12,22,22);
- if(C.mode!=='crashed'){const hl=c.createRadialGradient(x+60,y+16,0,x+60,y+16,40);hl.addColorStop(0,'rgba(255,250,220,.18)');hl.addColorStop(1,'rgba(255,250,220,0)');c.fillStyle=hl;c.fillRect(x+20,y-24,80,80);}
- if(G.truck){const t=G.truck,tx=t.x-cx,ty=t.y-cy;c.globalCompositeOperation='source-over';P(c,tx,ty,70,26,'#2a2c30');P(c,tx,ty,14,26,'#4a2a20');P(c,tx+14,ty+2,56,22,'#5a5e64');c.globalCompositeOperation='lighter';const g2=c.createRadialGradient(tx-20,ty+13,0,tx-20,ty+13,60);g2.addColorStop(0,'rgba(255,250,220,.35)');g2.addColorStop(1,'rgba(255,250,220,0)');c.fillStyle=g2;c.fillRect(tx-80,ty-47,120,120);}
+ if(C.mode!=='crashed'&&C.engine!==false){const hl=c.createRadialGradient(x+70,y+16,0,x+70,y+16,44);hl.addColorStop(0,'rgba(255,250,220,.18)');hl.addColorStop(1,'rgba(255,250,220,0)');c.fillStyle=hl;c.fillRect(x+20,y-24,80,80);}
+ c.globalCompositeOperation='source-over';
+ for(const v of G.traffic){const vx=v.x-cx,vy=v.y-cy;if(vx<-140||vx>VW+140)continue;const fw=v.vx>0;
+  if(v.type==='semi'){const cab=22,tr=v.len-cab-2,cx0=fw?vx+tr+2:vx,tx0=fw?vx:vx+cab+2;P(c,vx+2,vy+20,v.len,4,SH);P(c,tx0,vy-2,tr,24,'#c8c8c4');P(c,tx0,vy-2,tr,1,'#e8e8e4');for(let i=6;i<tr;i+=12)P(c,tx0+i,vy-1,1,22,'#a8a8a4');P(c,cx0,vy,cab,20,v.col);P(c,fw?cx0+cab-7:cx0+2,vy+2,5,16,'#101418');}
+  else{P(c,vx+2,vy+18,v.len,3,SH);P(c,vx,vy,v.len,18,v.col);P(c,vx,vy,v.len,1,shade(v.col,30));const ws=fw?vx+v.len-16:vx+10;P(c,ws,vy+2,6,14,'#101418');if(v.type==='pickup'){P(c,fw?vx+2:vx+v.len-20,vy+2,18,14,shade(v.col,-25));}else P(c,fw?vx+8:vx+v.len-14,vy+3,6,12,'#141a20');}
+  c.globalCompositeOperation='lighter';const hx=fw?vx+v.len:vx,hd=fw?1:-1;const g2=c.createRadialGradient(hx+hd*30,vy+9,0,hx+hd*30,vy+9,62);g2.addColorStop(0,'rgba(255,250,220,.32)');g2.addColorStop(1,'rgba(255,250,220,0)');c.fillStyle=g2;c.fillRect(hx+hd*30-62,vy-53,124,124);
+  const tx2=fw?vx:vx+v.len,g3=c.createRadialGradient(tx2,vy+9,0,tx2,vy+9,12);g3.addColorStop(0,'rgba(255,30,20,.5)');g3.addColorStop(1,'rgba(255,30,20,0)');c.fillStyle=g3;c.fillRect(tx2-12,vy-3,24,24);c.globalCompositeOperation='source-over';
+  P(c,hx-(fw?1:0),vy+2,1,3,'#fff8d8');P(c,hx-(fw?1:0),vy+13,1,3,'#fff8d8');P(c,tx2-(fw?0:1),vy+2,1,3,'#e8201a');P(c,tx2-(fw?0:1),vy+13,1,3,'#e8201a');}
+ if(G.h.flares){c.globalCompositeOperation='lighter';for(const[fx,fy]of[[30.5,31.4],[27.5,30.9],[24.5,30.5]]){const px=fx*TS-cx,py=fy*TS-cy,k=.7+.3*Math.sin(G.time*23+fx)*Math.sin(G.time*7);const g4=c.createRadialGradient(px,py,0,px,py,34);g4.addColorStop(0,'rgba(255,60,40,'+(.45*k)+')');g4.addColorStop(1,'rgba(255,60,40,0)');c.fillStyle=g4;c.fillRect(px-34,py-34,68,68);}c.globalCompositeOperation='source-over';for(const[fx,fy]of[[30.5,31.4],[27.5,30.9],[24.5,30.5]]){P(c,fx*TS-cx|0,fy*TS-cy|0,3,1,'#ffd0a0');if(Math.random()<.3)G.fx.push({k:'smoke',x:fx*TS,y:fy*TS,vx:rand(-4,4),vy:rand(-10,-4),r:1,gr:4,a:.25,t:0,life:1.4,c:'#c8a0a0'});}}
  c.globalCompositeOperation='source-over';}
+function roadOver(c,cx,cy){const blink=((G.time*.8)%1)<.18;for(const[tx,ty,ph]of[[8,4,0],[27,2,1.3],[46,3,2.1],[72,5,.7]]){const bx=tx*TS-cx,by=ty*TS-cy;if(bx<-80||bx>VW+80||by<-120||by>VH+40)continue;
+  P(c,bx-1|0,by-60|0,3,62,'rgba(150,155,160,.55)');const a0=G.time*.9+ph;for(let k=0;k<3;k++){const a=a0+k*2.094;for(let r=2;r<28;r+=1.5)P(c,bx+Math.cos(a)*r|0,by-60+Math.sin(a)*r*.55|0,2,1,'rgba(170,175,180,.5)');}
+  if(blink){c.globalCompositeOperation='lighter';const g=c.createRadialGradient(bx,by-62,0,bx,by-62,8);g.addColorStop(0,'rgba(255,30,20,.9)');g.addColorStop(1,'rgba(255,30,20,0)');c.fillStyle=g;c.fillRect(bx-8,by-70,16,16);c.globalCompositeOperation='source-over';P(c,bx|0,by-63|0,2,2,'#ff4030');}}
+ c.strokeStyle='rgba(30,30,32,.75)';c.lineWidth=1;c.beginPath();for(let x=4;x+9<MW;x+=9){const x1=x*TS+8-cx,x2=(x+9)*TS+8-cx,yy=37*TS-44-cy;if(x2<-20||x1>VW+20)continue;for(const o of[-6,0,6]){c.moveTo(x1+o,yy);c.quadraticCurveTo((x1+x2)/2+o,yy+7,x2+o,yy);}}c.stroke();}
 function roadObj(){const H=G.h;if(!H)return'';const e=H.drv,done=e&&(!e.alive||e.state==='cuffed');
  return objRows('WHP 14 · HIGHWAY 287',[[H.docs,'Kontrola drogowa'],H.stage==='twist'?[done,'Zatrzymaj kierowcę']:null,H.stage==='twist'&&(H.trunk||H.girl||done)?[H.trunk&&H.girl,'Udziel pomocy pasażerom']:null]);}
 function roadDebrief(){const H=G.h||{};const e=H.drv;const drv=!e?'—':!e.alive?'nie żyje':e.state==='cuffed'?'zatrzymany':'zbiegł';
  let sc=0;if(H.approach==='pas')sc+=10;if(H.plates)sc+=10;if(H.peek)sc+=5;if(H.lic)sc+=5;if(e&&e.alive&&e.state==='cuffed')sc+=15;
  patrolDebrief([['Podejście do auta',H.approach==='pas'?'od strony pasażera (bezpieczne)':H.approach==='drv'?'od strony kierowcy (od jezdni)':'—'],['Sprawdzone tablice',H.plates?'tak':'nie'],['Kierowca',drv],['Margaret Lindqvist',H.trunk?'uratowana':'—'],['Lily Lindqvist',H.girl?'uratowana':'—']],sc);}
 LVL.road={id:'road',patrol:true,weather:'fog',crew:{role:'State Trooper',shout:'State Police! Hands!',names:['TPR. HALE','TPR. DIETZ'],uni:{body:'#5c4a34',legs:'#2c2a26',acc:'#d8b048'}},car:{b:'#1c1d20',hi:'#34363a',lo:'#0e0f11',e:'#c8a860',r:'#e4e2da',rh:'#f2f0e8',rl:'#b8b4a8',s:'#c8a860'},ext:'none',terrain:roadTerrain,windows:roadWindows,rooms:ROOMS_ROAD,doors:DOORS_ROAD,furn:FURN_ROAD,lamps:LAMPS_ROAD,cams:[],entries:ENTRIES_ROAD,
- start:startRoad,update:updateRoad,interact:roadInteract,render:roadRender,stress:roadStress,obj:roadObj,debrief:roadDebrief,
+ start:startRoad,update:updateRoad,interact:roadInteract,render:roadRender,over:roadOver,decor:roadDecor,stress:roadStress,obj:roadObj,debrief:roadDebrief,
  win:'WHP 14, przyjęłam. Karetka i detektywi są w drodze. Dobra robota.',planTitle:'HIGHWAY 287 · MILA 41',
  nb:{no:'#26-119-0112',pri:'P3',code:'10-38',small:'MIEJSCE',addr:'HIGHWAY 287<br>MILE MARKER 41',facts:[['JEDNOSTKA','WHP 14 · Tpr. Hale, Tpr. Dietz'],['GODZINA','01:12'],['POWÓD','Niesprawne tylne światło']],
   title:'RADIO · ZAPIS',clock:[1,11,40],who:{D:'DISPATCH',C:'WHP 14'},bg:[26,20,28,15.75],
-  call:[['C','WHP 14, zatrzymanie pojazdu, Highway 287 przy mili czterdziestej pierwszej.'],['D','WHP 14, przyjęłam. Opis pojazdu?'],['C','Srebrna Toyota Camry, tablice Indiany, Lincoln-Mary-siedem-dwa-cztery-jeden. Kierowca i chyba jeden pasażer z tyłu.'],['D','Przyjęłam, zatrzymanie o pierwszej dwanaście.'],['C','Przyjąłem. Podchodzimy.']]}};
+  call:[['C','WHP 14, zatrzymanie pojazdu, Highway 287 przy mili czterdziestej pierwszej.'],['D','WHP 14, przyjęłam. Opis pojazdu?'],['C','Srebrny minivan, Toyota Sienna, tablice Indiany, Lincoln-Mary-siedem-dwa-cztery-jeden. Kierowca i chyba jeden pasażer z tyłu.'],['D','Przyjęłam, zatrzymanie o pierwszej dwanaście.'],['C','Przyjąłem. Podchodzimy.']]}};
 
 // ================= MISSION 03: WELFARE CHECK, APT 3B =================
 const ROOMS_APT=[
@@ -2736,28 +2795,39 @@ function motelScenTxt(){}
 function startMotel(){G.hostage=null;G.deadline=1e9;
  G.h={phase:1,t:0,drawn:true,neg:0,trust:0,said:{},evac:0,guests:[],swatCalled:false,fadeT:null,dw:null,cr:null,crT:null,crStage:null,gunFound:false,endT:null,peek:false};
  const H=G.h;
- [[9,'MR. & MRS. COLE'],[10,'TRUCKER'],[12,'STUDENTKA'],[13,'STARSZY PAN']].forEach(([i,n],k)=>{const x=MOT_X0(i);const g=mkNPC({tx:x+1,ty:18,kind:'guest',pal:{...PAL.patient,body:['#6a5a4a','#3a4a6a','#8a4a5a','#5a5a5a'][k],legs:'#2a2a3a',hair:['#3a2418','#1e1410','#c8a050','#c8c8c0'][k]},state:'calm',a:Math.PI/2,name:n,upd:guestUpd});g.room=i;g.gi=i;g.ev=false;H.guests.push(g);});
+ const GP=(b,h,sk)=>({...PAL.patient,body:b,legs:'#2a2a3a',hair:h,head:sk||'#c8a080',face:sk||'#c8a080',visor:'#2a1a12',eyes:1});
+ H.rooms=[{i:9,kind:'drunk',n:'Pokój 10',ppl:[['GARY (PIJANY)',GP('#7a6a4a','#5a4a3a','#d0a088')]],exit:[5,34]},
+  {i:10,kind:'family',n:'Pokój 11',ppl:[['OJCIEC',GP('#3a4a6a','#2a1a12')],['MATKA',GP('#8a4a5a','#c8a050','#e0c0a8')],['LILY (6)',GP('#e8a0c0','#c8a050','#e0c0a8')],['NOAH (9)',GP('#3a8a5a','#3a2418','#e0c0a8')]],exit:[5,34]},
+  {i:12,kind:'couple',n:'Pokój 13',ppl:[['PAN HOLT',GP('#5a5a5a','#c8c8c0')],['PANI HOLT',GP('#6a3a5a','#d8d8d0','#e0c0a8')]],exit:[78,25]}];
+ for(const R of H.rooms){R.knocks=0;R.done=false;R.out=0;const x0=MOT_X0(R.i),free=[];for(let y=18;y<=20;y++)for(let x=x0;x<=x0+3;x++)if(walkable(x,y)&&!LV.fsolid[I(x,y)])free.push([x,y]);free.sort((p,q)=>Math.abs(p[0]-(x0+1))-Math.abs(q[0]-(x0+1)));R.units=R.ppl.map(([n,pal],k)=>{const sp=free[k%free.length]||[x0+1,19];const g=mkNPC({tx:sp[0],ty:sp[1],kind:'guest',pal,state:'calm',a:Math.PI/2,name:n,upd:guestUpd});g.R=R;g.k=k;if(n.includes('(6)')||n.includes('(9)'))g.kid=1;H.guests.push(g);return g;});}
  H.mgr=mkNPC({tx:4,ty:32,kind:'clerk',pal:{...PAL.cook,body:'#6a3a3a'},state:'calm',a:Math.PI/2,name:'Ray'});
  H.cr=mkNPC({tx:61,ty:18,kind:'woman',pal:{body:'#8a3a5a',legs:'#2a2a3a',head:'#d8b098',face:'#d8b098',visor:'#2a1a12',hair:'#e0c070',skin:'#d8b098',eyes:1},state:'calm',pose:'kneel',a:Math.PI/2,name:'Crystal',upd:crystalUpd});
- H.dw=mkEnemy({tx:63,ty:19,weap:'ePistol',a:Math.PI/2,st:'guard',pal:{...PAL.boss},name:'Dwayne Pruitt'});
+ H.dw=mkEnemy({tx:63,ty:19,weap:'ePistol',a:Math.PI/2,st:'guard',pal:{...PAL.boss},name:'Dwayne Pruitt'});H.dw.upd=dwUpd;LV.bw=new Set();LV.curt=new Set([I(MW12().x,MW12().y)]);
  G.police=[];logEv('Nye 7: Starlight Motel, pokój 12 — mężczyzna z bronią');
  setTimeout(()=>{radio('DISPATCH','Nye 7, Starlight Motel, pokój dwunasty. Recepcjonista słyszał kłótnię i widział broń. W środku kobieta. Zachowajcie dystans, wsparcie w drodze.');radio(G.p1.name,'Przyjąłem, jesteśmy na parkingu.',{radio:1});},600);}
-function guestUpd(c,dt){if(c.state==='go'){if(npcGo(c,dt,5,34,52)){c.state='calm';c.ev=true;G.h.evac++;logEv('Gość ewakuowany do recepcji');}}else{moveUnit(c,dt,0,0,0);npcFace(c,dt,6);}}
+function guestUpd(c,dt){const R=c.R;if(c.state==='go'){c.wT=(c.wT||0)+dt;if(c.wT<c.k*.45){moveUnit(c,dt,0,0,0);return;}const drunk=R.kind==='drunk',sp=drunk?24:c.kid?44:48;
+  if(drunk){c.sw=(c.sw||0)+dt;if(((c.sw*.6)|0)%4===3){moveUnit(c,dt,Math.cos(c.sw*3),Math.sin(c.sw*2),10);return;}}
+  if(npcGo(c,dt,R.exit[0]+(c.k%2),R.exit[1]+((c.k/2)|0),sp)){c.state='calm';c.ev=true;R.out++;if(R.out>=R.units.length&&!R.done){R.done=true;G.h.evac++;logEv(R.n+' ewakuowany');}}}
+ else{moveUnit(c,dt,0,0,0);npcFace(c,dt,6);}}
 function motelInteract(u){const H=G.h;if(!H)return null;
  if(H.phase===1){
-  for(const g of H.guests){if(g.state!=='calm'||g.ev||g.out)continue;const x=MOT_X0(g.gi)+1;if(nearPt(u,x*TS+8,21*TS+8,20)&&u.y>21*TS)return{k:'house',label:'Zapukaj — ewakuuj gości z '+(g.gi+1),dur:.6,f:()=>evacGuest(u,g)};}
+  for(const R of H.rooms){if(R.opened)continue;const x=MOT_X0(R.i)+1;if(nearPt(u,x*TS+8,21*TS+8,20)&&u.y>21*TS)return{k:'house',label:'Zapukaj — '+R.n,dur:.6,f:()=>evacRoom(u,R)};}
   const dx=MOT_X0(11)+1;if(nearPt(u,dx*TS+8,21*TS+8,20)&&u.y>21*TS)return{k:'house',label:'Pokój 12',dur:0,f:negMenu};
   const wx=MOT_X0(11)+3;if(!H.peek&&nearPt(u,wx*TS+8,21*TS+8,16)&&u.y>21*TS)return{k:'house',label:'Przyjrzyj się',dur:.8,f:()=>{H.peek=true;say(u.name,'Zasłony zaciągnięte. Dwa cienie. Jeden stoi przy drzwiach... drugi spokojnie chodzi po pokoju.');}};
   if(H.mgr.alive&&!H.said.mgr&&nearPt(u,H.mgr.x,H.mgr.y,26))return{k:'house',label:'Porozmawiaj z recepcjonistą',dur:0,f:()=>mgrTalk(u)};}
  else{const bx=MOT_X0(11)+3;if(!H.gunFound&&H.crStage!=='armed'&&nearPt(u,bx*TS+8,14*TS+8,16))return{k:'house',label:'Przyjrzyj się',dur:.8,f:()=>{H.gunFound=true;say(u.name,'Pod ręcznikami rewolwer. Naładowany. To nie był jego.');logEv('Rewolwer ukryty w łazience pokoju 12');}};}
  return null;}
-function evacGuest(u,g){const H=G.h,x=MOT_X0(g.gi)+1,d=LV.doorAt[I(x,21)];knockAt(x*TS+8,21*TS+8);
- setTimeout(()=>{if(G.ended)return;d.locked=false;if(d.target===0)toggleDoor(d,g);g.state='go';g.out=true;
-  say(g.name,pick(['Co się dzieje? ...Dobrze, już idziemy.','Słyszałem krzyki całą noc. Już wychodzę.','O Boże... mam tylko buty założyć.','Ta para z dwunastki? Wiedziałem, że coś będzie.']));
-  if(!H.said.ev1){H.said.ev1=1;say(u.name,'Proszę iść do recepcji i tam zostać. Nie przy oknach.');}},1200);}
+function evacRoom(u,R){const H=G.h,x=MOT_X0(R.i)+1,d=LV.doorAt[I(x,21)];knockAt(x*TS+8,21*TS+8);R.knocks++;
+ const open=()=>{R.opened=true;d.locked=false;if(d.target===0)toggleDoor(d,R.units[0]);for(const g of R.units){g.state='go';g.out=true;g.path=null;}};
+ setTimeout(()=>{if(G.ended)return;
+  if(R.kind==='drunk'){if(R.knocks===1){say('GARY (ZZA DRZWI)','Spadajcie... śpię... nie zamawiałem żadnej pizzy...');if(!H.said.dr1){H.said.dr1=1;const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Pijany. Zapukaj jeszcze raz, mocniej.');}return;}
+   open();say('GARY (PIJANY)','Co?! Jaki znowu... strzelec? Ja tu płacę, panie władzo! ...Dobra, dobra, idę. Gdzie moje buty...');say(u.name,'Do recepcji. Prosto i nie zatrzymuj się przy oknach.');}
+  else if(R.kind==='family'){open();say('MATKA','Boże... dzieci śpią... Lily, Noah, wstajemy, szybko!');say('NOAH (9)','Mamo, co się dzieje?');say(u.name,'Proszę iść do recepcji. Nisko, za mną, nie przy oknach.');}
+  else{open();say('PANI HOLT','Słyszeliśmy krzyki przez ścianę od godziny. Bill, weź leki.');say(u.name,'W prawo, na koniec budynku. Nie idźcie w stronę dwunastki.');}
+  if(!H.said.ev1){H.said.ev1=1;logEv('Ewakuacja pokoi obok dwunastki');}},1200);}
 function mgrTalk(u){const H=G.h;H.said.mgr=1;logEv('Rozmowa z recepcjonistą');
  say(u.name,'Kto wynajął dwunastkę?');say('RAY (RECEPCJA)','Ona. Kobieta, blondynka. Płaciła gotówką za trzy noce. Jego przywiozła wczoraj w nocy.');
- say('RAY (RECEPCJA)','Kłócili się od rana. Potem on wybiegł do auta, wrócił z bronią. Zadzwoniłem.');say(u.name,'Kto jeszcze tu nocuje?');say('RAY (RECEPCJA)','Dziesiątka, jedenastka, trzynastka, czternastka. Reszta pusta.');}
+ say('RAY (RECEPCJA)','Kłócili się od rana. Potem on wybiegł do auta, wrócił z bronią. Zadzwoniłem.');say(u.name,'Kto jeszcze tu nocuje?');say('RAY (RECEPCJA)','Obok dwunastki: w jedenastce rodzina z dziećmi, w trzynastce starsze małżeństwo. W dziesiątce facet, który od południa pije. Reszta pusta.');}
 function negMenu(u){const H=G.h,it=[];const D='DWAYNE (ZZA DRZWI)',C='KOBIETA (ZZA DRZWI)';
  const step=(t,tr,lines)=>({t,f:()=>{H.neg++;H.trust+=tr;for(const[w,s]of lines)say(w===1?u.name:w,s);if(tr<0&&H.trust<=-2&&!H.said.warn){H.said.warn=1;setTimeout(()=>{if(G.ended)return;SND.gun('pistol',MOT_X0(11)*TS+40,19*TS);makeNoise(MOT_X0(11)*TS+40,19*TS,20,'shot');say(D,'Następnym razem celuję w drzwi!');logEv('Strzał ostrzegawczy w pokoju 12');},2500);}}});
  if(H.neg===0){it.push(step('„Biuro szeryfa. Nazywam się Crane. Jak masz na imię?”',1,[[D,'...Dwayne. Odejdźcie od drzwi.'],[C,'Proszę! Pomóżcie mi, on ma broń!']]));
@@ -2772,7 +2842,7 @@ function negMenu(u){const H=G.h,it=[];const D='DWAYNE (ZZA DRZWI)',C='KOBIETA (Z
  else it.push({t:'(Nie odpowiada. Słychać szepty.)',dis:true,f:NOOP});
  if(H.neg>=3&&!H.swatCalled)it.push({t:'Wezwij SWAT (radio)',f:()=>callSwat(u)});
  choiceMenu('Pokój 12 · rozmowa przez drzwi',it);}
-function callSwat(u){const H=G.h;if(H.evac<H.guests.length){const o=G.squad.find(q=>q&&q.alive&&q!==u)||u;say(o.name,'Najpierw wyprowadźmy ludzi z sąsiednich pokoi.');return;}
+function callSwat(u){const H=G.h;if(H.evac<H.rooms.length){const o=G.squad.find(q=>q&&q.alive&&q!==u)||u;say(o.name,'Najpierw wyprowadźmy ludzi z sąsiednich pokoi.');return;}
  H.swatCalled=true;radio(u.name,'Dispatch, Nye 7. Podejrzany zabarykadowany z kobietą, odmawia wyjścia. Goście ewakuowani. Prosimy SWAT.',{radio:1});
  setTimeout(()=>{if(G.ended)return;radio('DISPATCH','Przyjęłam. SWAT szeryfa w drodze, czas dojazdu dwadzieścia minut. Trzymajcie perymetr.');H.fadeT=0;},3500);}
 function fadeCard(txt,sub){let el=$('mfade');if(!el){el=document.createElement('div');el.id='mfade';el.style.cssText='position:absolute;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:60;opacity:0;transition:opacity 1.2s;pointer-events:none;font-family:inherit;letter-spacing:.3em;color:#d8d8d0;font-size:calc(var(--u)*2.2)';$('wrap').appendChild(el);}
@@ -2781,11 +2851,11 @@ function swatPhase(){const H=G.h;H.phase=2;radioClear();
  // patrol becomes perimeter
  for(const q of G.squad){if(!q)continue;G.units.splice(G.units.indexOf(q),1);const pu=new Unit({team:'police',weap:'ePistol',pal:q.pal});pu.x=(41+G.police.length*3)*TS;pu.y=32*TS;pu.ang=-Math.PI/2;pu.pose='kneel';G.police.push(pu);}
  G.squad=[];const E={x:30,y:30,a:-Math.PI/2},fx=0,fy=-1,rx=1,ry=0,offs=[[0,0],[-1,-.9],[-1,.9],[-2,-.5],[-2,.5]];
- SPECS.forEach((s,si)=>{const o=offs[si];const u=new Unit({team:'squad',spec:s.id,name:s.name,role:s.role,weap:s.weap,fov:s.fov,range:s.range,acc:s.acc,pal:PAL.squad,charges:s.id==='breach'?2:0,flash:s.id==='scout'?3:0,sed:s.id==='medic'?4:0,shoutCd:0});applyLoad(u,(G.load||defaultLoad())[si]);
+ SPECS.forEach((s,si)=>{const o=offs[si];const u=new Unit({team:'squad',spec:s.id,name:s.name,role:s.role,weap:s.weap,fov:s.fov,range:s.range,acc:s.acc,pal:PAL.squad,charges:s.id==='breach'?2:0,flash:s.id==='scout'?3:0,sed:s.id==='medic'?4:0,shoutCd:0});applyLoad(u,s.id==='scout'?{...(G.load||defaultLoad())[si],armor:'heavy',extra:'shield'}:(G.load||defaultLoad())[si]);
   u.x=E.x*TS+8+fx*o[0]*TS+rx*o[1]*TS;u.y=E.y*TS+fy*o[0]*TS+ry*o[1]*TS;u.ang=E.a;u.heading=E.a;unstick(u);G.squad[si]=u;G.units.push(u);});
  G.p1=G.squad[G.p1Spec||0];G.p1.human=1;if(G.players===2){G.p2=G.squad[G.p2Spec||1];G.p2.human=2;}G.order='follow';G.ops=[];G.cam.x=G.p1.x;G.cam.y=G.p1.y;
  G.h.drawn=true;logEv('SWAT szeryfa na miejscu');
- setTimeout(()=>{radio('SGT. WALKER','Patrol, dzięki. Przejmujemy. Pokój dwunasty, jeden uzbrojony, jedna kobieta w środku.',{radio:1});radio('SGT. WALKER','Hayes, ładunek albo taran na drzwi. Wchodzimy na mój znak.',{radio:1});},1500);}
+ setTimeout(()=>{radio('SGT. WALKER','Patrol, dzięki. Przejmujemy. Pokój dwunasty, jeden uzbrojony, jedna kobieta w środku.',{radio:1});radio('SGT. WALKER','Hayes, ładunek albo taran na drzwi. Grant, tarcza, wchodzisz pierwszy. Uważać na okno — on już raz przez nie patrzył.',{radio:1});},1500);}
 function crystalUpd(c,dt){const H=G.h;
  if(c.state==='cuffed'||c.state==='comply'){moveUnit(c,dt,0,0,0);if(c.state==='cuffed'&&!H.said.crc){H.said.crc=1;say('CRYSTAL',H.crStage==='run'?'Puszczaj! To był jego pomysł, nie mój!':'Co wy robicie?! To ja jestem ofiarą!');}return;}
  if(H.phase<2){moveUnit(c,dt,0,0,0);return;}
@@ -2796,7 +2866,22 @@ function crystalArm(c){const H=G.h;H.crStage='armed';const e=new Unit({team:'ene
  const q=nearestSquad(e);e.state='search';e.goal={x:q?q.x:e.x,y:q?q.y:e.y};e.searchT=12;e.arrived=false;e.path=null;e.ico='!';e.icoT=2;e.res=12;
  G.civs.splice(G.civs.indexOf(c),1);G.units.splice(G.units.indexOf(c),1,e);G.enemies.push(e);H.cr=e;H.gunFound=true;
  say('CRYSTAL','Nie weźmiecie nas żywych!');const o=G.squad.find(q=>q&&q.alive&&!q.human)||G.p1;say(o.name,'Ona ma broń! Łazienka!');logEv('Crystal wyciąga drugą broń z łazienki');}
-function updateMotel(dt){const H=G.h;if(!H||G.ended)return;H.t+=dt;
+const MW12=()=>({x:MOT_X0(11)+3,y:21});
+function motelWinWatch(dt){const H=G.h,dw=H.dw,w=MW12();if(!dw||!dw.alive||dw.state==='cuffed'||dw.state==='surr'||H.winBroke||H.ws)return;if(H.phase===2&&dw.target)return;
+ let who=null;for(const q of [...G.squad,...G.police])if(q&&q.alive&&q.x>(w.x-.6)*TS&&q.x<(w.x+1.6)*TS&&q.y>21.5*TS&&q.y<25*TS){who=q;break;}
+ if(who&&!H.said.winWarn&&who.human){H.said.winWarn=1;const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Uważaj, stoisz w oknie! Zasłony zasłonięte, ale widzi twój cień.');}
+ H.winT=who?(H.winT||0)+dt:Math.max(0,(H.winT||0)-dt);if(H.winT>(H.phase===1?3.2:1.6)&&who){H.winT=0;H.ws={t:0,tg:who,n:0};say('DWAYNE (ZA SZYBĄ)','Myślisz, że cię nie widzę?!');}}
+function dwUpd(e,dt){const H=G.h,ws=H.ws;if(!ws)return false;if(e.stun>0||e.state==='surr'||e.state==='cuffed'){H.ws=null;return false;}const w=MW12();
+ ws.t+=dt;const px=w.x*TS+8,py=20*TS+6;if(dist(e.x,e.y,px,py)>3){const a=Math.atan2(py-e.y,px-e.x);moveUnit(e,dt,Math.cos(a),Math.sin(a),60);turnTo(e,a,dt,8);if(ws.t<2.5)return true;}
+ const tg=ws.tg;turnTo(e,Math.atan2(tg.y-e.y,tg.x-e.x),dt,20);e.pose='stand';if(e.mag<1)e.mag=6;e.fireCd=Math.min(e.fireCd||0,.5);
+ if(ws.t>.6&&(e.fireCd||0)<=0&&e.rel<=0){e.ang=Math.atan2(tg.y-2-e.y,tg.x-e.x)+(H.winBroke?rand(-.06,.06):rand(-.22,.22));fire(e);ws.n++;}if(ws.n>=3||ws.t>4){H.ws=null;}return true;}
+function breakWin(tx,ty,x,y,a){const i=I(tx,ty);if(!LV.bw)LV.bw=new Set();if(LV.bw.has(i))return;LV.bw.add(i);SND.glass(x,y);SND.glass(x+4,y);
+ for(let k=0;k<16;k++)G.fx.push({k:'debris',x:x+rand(-6,6),y:y-6,z:6,vx:Math.cos(a)*rand(20,80)+rand(-30,30),vy:Math.sin(a)*rand(20,80)+rand(-30,30),vz:rand(10,40),t:0,life:rand(.4,.9),c:pick(['#c8e0e8','#e8f4f8','#a8c8d0'])});
+ const g=WR[ty]&&WR[ty].getContext('2d');if(g){const bx=tx*TS;P(g,bx+2,17,12,9,'#0c0e10');for(let k=0;k<7;k++){P(g,bx+2+(k*2),17+(k%3),1,2+(k%4),'rgba(200,225,235,.7)');P(g,bx+3+(k*2)%11,25-(k%3),1,1,'rgba(200,225,235,.6)');}if(LV.curt&&LV.curt.has(i)){P(g,bx+2,17,3,9,'#6a2a20');P(g,bx+11,17,3,8,'#6a2a20');}}
+ for(let k=0;k<26;k++){const sx=tx*TS+rand(0,16),sy=(ty+1)*TS+rand(0,22),s2=(ty)*TS-rand(0,10);P(wc,sx|0,sy|0,1,1,'rgba(210,235,245,.75)');if(k%3===0)P(wc,sx|0,s2|0,1,1,'rgba(210,235,245,.6)');}
+ if(G.lvl==='motel'&&tx===MW12().x&&ty===21&&G.h){G.h.winBroke=true;logEv('Szyba pokoju 12 przestrzelona');}}
+function motelDecor(){const w=MW12(),g=WR[w.y]&&WR[w.y].getContext('2d');if(g){const bx=w.x*TS;P(g,bx+2,17,12,9,'#7a3226');for(let k=0;k<12;k+=3)P(g,bx+3+k,17,1,9,'#5a2218');P(g,bx+2,17,12,1,'#9a4a36');}}
+function updateMotel(dt){const H=G.h;if(!H||G.ended)return;H.t+=dt;motelWinWatch(dt);
  if(H.fadeT!=null){H.fadeT+=dt;if(H.fadeT>.1&&!H.said.f1){H.said.f1=1;fadeCard('20 MINUT PÓŹNIEJ','NYE COUNTY SHERIFF · S.W.A.T.');}
   if(H.fadeT>2.2&&!H.said.f2){H.said.f2=1;swatPhase();}if(H.fadeT>4){fadeCard(null);H.fadeT=null;}}
  if(H.phase===2){const dw=H.dw,cr=H.cr,res=x=>!x.alive||x.state==='cuffed';
@@ -2804,12 +2889,12 @@ function updateMotel(dt){const H=G.h;if(!H||G.ended)return;H.t+=dt;
   if(H.endT!=null){H.endT-=dt;if(H.endT<=0)endMission(true,'Pokój 12 zabezpieczony. '+(dw.alive?'Dwayne Pruitt zatrzymany':'Dwayne Pruitt nie żyje')+', '+(cr.alive?'Crystal zatrzymana':'Crystal nie żyje')+'.');}}}
 function motelRender(c,cx,cy){const H=G.h;const x=22*TS+8-cx,y=25*TS-14-cy;const fl=(Math.sin(G.time*13)>-.85)?1:.4;
  c.globalCompositeOperation='lighter';const g=c.createRadialGradient(x,y,0,x,y,70);g.addColorStop(0,'rgba(255,90,168,'+(.28*fl)+')');g.addColorStop(1,'rgba(255,90,168,0)');c.fillStyle=g;c.fillRect(x-70,y-70,140,140);c.globalCompositeOperation='source-over';}
-function motelObj(){const H=G.h;if(!H)return'';if(H.phase===1)return objRows('NYE 7 · STARLIGHT MOTEL',[[H.evac>=H.guests.length,'Ewakuuj sąsiednie pokoje ('+H.evac+'/'+H.guests.length+')'],[H.neg>0,'Nawiąż kontakt z pokojem 12'],H.neg>=3?[H.swatCalled,'Zdecyduj o dalszych krokach']:null]);
+function motelObj(){const H=G.h;if(!H)return'';if(H.phase===1)return objRows('NYE 7 · STARLIGHT MOTEL',[[H.evac>=H.rooms.length,'Ewakuuj pokoje obok ('+H.evac+'/'+H.rooms.length+')'],[H.neg>0,'Nawiąż kontakt z pokojem 12'],H.neg>=3?[H.swatCalled,'Zdecyduj o dalszych krokach']:null]);
  const dw=H.dw,cr=H.cr,res=x=>!x.alive||x.state==='cuffed';return objRows('SWAT · POKÓJ 12',[[res(dw),'Zneutralizuj podejrzanego'],[res(cr),'Zabezpiecz kobietę']]);}
-function motelDebrief(){const H=G.h||{};const dw=H.dw,cr=H.cr;let sc=(H.evac||0)*4+Math.max(0,H.trust||0)*4;if(dw&&dw.alive)sc+=10;if(cr&&cr.alive&&cr.state==='cuffed')sc+=H.crStage==='armed'?5:15;
- patrolDebrief([['Goście ewakuowani',(H.evac||0)+' / 4'],['Negocjacje',(H.neg||0)+' wymiany · zaufanie '+(H.trust||0)],['Dwayne Pruitt',!dw?'—':!dw.alive?'nie żyje':dw.state==='cuffed'?'zatrzymany':'—'],['Crystal',!cr?'—':!cr.alive?'nie żyje':cr.state==='cuffed'?(H.crStage==='armed'?'zatrzymana (uzbrojona)':'zatrzymana zanim sięgnęła po broń'):'—'],['Druga broń',H.gunFound?'zabezpieczona':'—']],sc);}
+function motelDebrief(){const H=G.h||{};const dw=H.dw,cr=H.cr;let sc=(H.evac||0)*6-(H.winBroke?8:0)+Math.max(0,H.trust||0)*4;if(dw&&dw.alive)sc+=10;if(cr&&cr.alive&&cr.state==='cuffed')sc+=H.crStage==='armed'?5:15;
+ patrolDebrief([['Pokoje ewakuowane',(H.evac||0)+' / 3'],['Szyba pokoju 12',H.winBroke?'przestrzelona przez podejrzanego':'nienaruszona',H.winBroke?'bad':'good'],['Negocjacje',(H.neg||0)+' wymiany · zaufanie '+(H.trust||0)],['Dwayne Pruitt',!dw?'—':!dw.alive?'nie żyje':dw.state==='cuffed'?'zatrzymany':'—'],['Crystal',!cr?'—':!cr.alive?'nie żyje':cr.state==='cuffed'?(H.crStage==='armed'?'zatrzymana (uzbrojona)':'zatrzymana zanim sięgnęła po broń'):'—'],['Druga broń',H.gunFound?'zabezpieczona':'—']],sc);}
 LVL.motel={id:'motel',patrol:true,nvg:true,weather:'dust',crew:{role:'Deputy Sheriff',shout:'Sheriff\'s Office! Don\'t move!',names:['DEP. CRANE','DEP. VEGA'],uni:{body:'#a48c62',legs:'#3a4230',acc:'#d8b048'}},car:{s:'#2e6a3a'},ext:'stucco',terrain:motelTerrain,windows:motelWindows,rooms:ROOMS_MOTEL,doors:DOORS_MOTEL,furn:FURN_MOTEL,lamps:LAMPS_MOTEL,cams:[],entries:ENTRIES_MOTEL,
- start:startMotel,update:updateMotel,interact:motelInteract,render:motelRender,stress:NOOP,obj:motelObj,debrief:motelDebrief,
+ decor:motelDecor,breakable:true,start:startMotel,update:updateMotel,interact:motelInteract,render:motelRender,stress:NOOP,obj:motelObj,debrief:motelDebrief,
  wallCol:rb=>{const n=rb>=0?ROOMS[rb].n:'';return n.startsWith('Łazienka')?['#7a8688','#5a6668']:n==='Recepcja'?['#6a5a48','#4a3e30']:['#6e5a52','#4c3e38'];},
  win:'SWAT, przyjęłam. Koroner i detektywi w drodze. Dobra robota.',planTitle:'STARLIGHT MOTEL · US-95',
  nb:{no:'#26-130-2217',pri:'P1',code:'245 / 207',small:'ADRES',addr:'STARLIGHT MOTEL<br>POKÓJ 12',facts:[['JEDNOSTKA','Nye County Sheriff · Dep. Crane, Dep. Vega'],['GODZINA','23:48'],['ZGŁOSZENIE','mężczyzna z bronią, kobieta w pokoju']],
@@ -3658,9 +3743,9 @@ const CIVS=[{x:19,y:19,k:'nurse',st:'hide'},{x:39,y:5,k:'doctor',st:'hide'},{x:4
  {x:9,y:6,k:'patient',st:'wander'},{x:17,y:6,k:'patient',st:'wander'},{x:25,y:6,k:'patient',st:'wander'},{x:27,y:17,k:'patient',st:'wander'},{x:29,y:16,k:'patient',st:'wander'},{x:5,y:17,k:'patient',st:'wander'},{x:4,y:6,k:'patient',st:'wander'}];
 const CORPSES=[[33,14,'guard'],[33,33,'guard'],[54,30,'guard'],[47,12,'orderly'],[60,9,'doctor']];
 const INTEL=[[56,6,'ZAKŁADNIK?'],[37,31,'WARTA?'],[20,34,'?'],[73,29,'?'],[16,11,'?']];
-function startMission(){radioClear();G.torchOff=false;G.pings=[];stopCall();buildMap();if(G.bakedFor!==G.lvl)bakeWorld();G.bakedFor=null;LV.doorRows=null;mc.clearRect(0,0,memory.width,memory.height);
+function startMission(){if(A.rdHum){A.rdHum.gain.value=0;A.rdIdle.gain.value=0;}radioClear();G.torchOff=false;G.pings=[];stopCall();buildMap();if(G.bakedFor!==G.lvl)bakeWorld();G.bakedFor=null;LV.doorRows=null;mc.clearRect(0,0,memory.width,memory.height);
  Object.assign(G,{running:true,paused:false,ended:false,time:0,units:[],squad:[],enemies:[],civs:[],fx:[],tracers:[],lights:[],nades:[],ops:[],order:'follow',alarm:false,execT:45,warned:false,
-  camv:null,lockIn:false,flashW:0,shake:0,obj:{found:false,freed:false},devs:null,babyT:rand(3,6),panicCD:0,log:[],nvg:false,negT:rand(50,80),negBonus:0,negAlarm:0,traps:[],stats:{roe:0,traps:0,reports:0,wounded:0,healed:0,eKilled:0,eArrest:0,eSed:0,civKilled:0,civSecured:0,squadLost:0,shots:0,time:0},press:{},deadline:720,dl:{},blackT:rand(40,70),blackDur:0,scareT:rand(10,20),trail:[],trailOwner:null,postAnchor:null,stillT:0,lightT:rand(6,15),lightF:0,clankT:rand(8,18),heartT:0,p1:null,p2:null,hudT:0});
+  camv:null,lockIn:false,carBlk:null,traffic:[],flashW:0,shake:0,obj:{found:false,freed:false},devs:null,babyT:rand(3,6),panicCD:0,log:[],nvg:false,negT:rand(50,80),negBonus:0,negAlarm:0,traps:[],stats:{roe:0,traps:0,reports:0,wounded:0,healed:0,eKilled:0,eArrest:0,eSed:0,civKilled:0,civSecured:0,squadLost:0,shots:0,time:0},press:{},deadline:720,dl:{},blackT:rand(40,70),blackDur:0,scareT:rand(10,20),trail:[],trailOwner:null,postAnchor:null,stillT:0,lightT:rand(6,15),lightF:0,clankT:rand(8,18),heartT:0,p1:null,p2:null,hudT:0});
  if(!ENTRIES[G.entry])G.entry=0;const E=ENTRIES[G.entry],fx=Math.cos(E.a),fy=Math.sin(E.a),rx=-fy,ry=fx,offs=[[0,0],[-1,-.9],[-1,.9],[-2,-.5],[-2,.5]];
  if(isPat())(LD().spawn||spawnPatrolPair)(E);else{const order=[G.p1Spec,...SPECS.map((_,i)=>i).filter(i=>i!==G.p1Spec)];
  order.forEach((si,k)=>{const s=SPECS[si],o=offs[k];const u=new Unit({team:'squad',spec:s.id,name:s.name,role:s.role,weap:s.weap,fov:s.fov,range:s.range,acc:s.acc,pal:PAL.squad,charges:s.id==='breach'?2:0,flash:s.id==='scout'?3:0,sed:s.id==='medic'?4:0,shoutCd:0});applyLoad(u,(G.load||defaultLoad())[si]);
@@ -3693,7 +3778,7 @@ function onSquadDeath(u){const was=u.human;u.human=0;if(was===1)G.p1=null;if(was
  if(!G.squad.some(s=>s.alive)){endMission(false,'Cały oddział poległ.');return;}
  if(was)setTimeout(()=>{if(G.ended)return;const n=G.squad.find(s=>s.alive&&!s.human);if(n){n.human=was;n.task=null;n.action=null;n.path=null;if(was===1)G.p1=n;else G.p2=n;toast((was===2?'Gracz 2 przejmuje: ':'Przejmujesz: ')+n.name);for(const o of G.ops)o.mem=o.mem.filter(m=>m!==n);}},1300);}
 function onHostageDeath(){radio('TOC','Zakładnik nie żyje... Operacja zakończona niepowodzeniem.',{prio:1});endMission(false,'Zakładnik nie żyje.');}
-function endMission(win,reason){if(G.ended)return;G.lockIn=false;logEv('KONIEC: '+reason);G.ended=true;G.win=win;G.reason=reason;
+function endMission(win,reason){if(G.ended)return;G.lockIn=false;if(A.rdHum){A.rdHum.gain.value=0;A.rdIdle.gain.value=0;}logEv('KONIEC: '+reason);G.ended=true;G.win=win;G.reason=reason;
  if(win)radio(isPat()?(LD().winWho||'DISPATCH'):'TOC',isPat()?LD().win:'Zakładnik bezpieczny. Świetna robota, Alfa. Zabezpieczyć teren.',{prio:1});
  setTimeout(showDebrief,win?3200:2800);}
 

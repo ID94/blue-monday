@@ -91,7 +91,7 @@ const LAMPS_HOSP=[[6,22,1],[12,22,2],[18,22,0],[26,22,1],[38,22,2],[46,22,0],[54
  [5,17,1,'#c8d8ff',40],[12,17,2],[20,17,0],[27,17,1],[56,6,0,'#ffcf88',60],[46,6,2],[38,6,1],[70,7,2],[40,17,1],[51,17,2],[61,17,0],[68,17,1],[74,17,2],
  [10,46,0,'#ffb060',90],[27,46,0,'#ffb060',90],[62,46,0,'#ffb060',90]];
 const CAMS_HOSP=[[75.4,22.25,Math.PI,'Korytarz główny — wschód'],[3.6,22.25,0,'Korytarz główny — zachód'],[43.4,24.7,2.4,'Hol główny'],[35.6,11.25,0,'Korytarz administracyjny — zachód'],[75.4,11.25,Math.PI,'Korytarz administracyjny — wschód'],[32.6,3.3,Math.PI/2,'Korytarz A'],[43.6,3.3,.7,'Sekretariat'],[51.6,3.3,.6,'Gabinet dyrektora'],[64.6,3.3,.5,'Sala konferencyjna'],[72.6,14.3,.9,'Klatka schodowa']];
-function buildMap(){const M=LV;
+function buildMap(){LV.bw=null;LV.curt=null;const M=LV;
  M.t.fill(T.GRASS);M.fs.fill('grass');M.fsolid.fill(0);M.fopq.fill(0);M.room.fill(-1);M.doorAt.fill(null);M.doors=[];M.furn=[];
  const set=(x,y,v,fs)=>{if(!inb(x,y))return;M.t[I(x,y)]=v;if(fs)M.fs[I(x,y)]=fs;};
  const fillR=(x1,y1,x2,y2,v,fs)=>{for(let y=y1;y<=y2;y++)for(let x=x1;x<=x2;x++)set(x,y,v,fs);};
