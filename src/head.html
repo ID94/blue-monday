@@ -182,18 +182,35 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
 .mm-gr.sc-dim{background:radial-gradient(circle at -5% -10%,rgba(40,80,255,.12),transparent 45%),radial-gradient(circle at 108% 0,rgba(230,40,40,.08),transparent 45%),linear-gradient(180deg,rgba(0,0,0,.8),rgba(0,0,0,.86) 60%,rgba(0,0,0,.95))}
 .sc-top{z-index:3}.sc-modes{display:flex;align-items:center;gap:calc(var(--u)*3)}
 .sc-m{background:none;border:0;border-bottom:1px solid transparent;padding:calc(var(--u)*3) calc(var(--u)*3) calc(var(--u)*1);margin:calc(var(--u)*-3) calc(var(--u)*-3) 0;font-family:inherit;font-size:calc(var(--u)*3.6);letter-spacing:.32em;color:#6c7684;cursor:pointer}.sc-m.sel{color:#fff;border-bottom-color:#3d6bff}
-.sc-row{position:absolute;left:calc(var(--u)*24);right:calc(var(--u)*24);top:calc(var(--u)*38);display:grid;grid-template-columns:repeat(5,1fr);gap:calc(var(--u)*3.5)}
-.sc-card{position:relative;padding:calc(var(--u)*5) calc(var(--u)*5) calc(var(--u)*10);background:rgba(8,10,14,.82);border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:background .25s,border-color .25s,transform .25s;min-height:calc(var(--u)*60)}
-.sc-card:before{content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:2px;background:transparent}
-.sc-card:hover{background:rgba(14,18,24,.7)}
-.sc-card.sel1{background:rgba(16,22,32,.78);border-color:rgba(120,150,255,.28);transform:translateY(calc(var(--u)*-1.5))}.sc-card.sel1:before{background:linear-gradient(90deg,#3d6bff,#e0302a)}
-.sc-card .n{font-weight:200;font-size:calc(var(--u)*12);line-height:1;color:#8fb0f2;letter-spacing:.06em;text-shadow:0 0 calc(var(--u)*5) rgba(70,120,255,.4)}
-.sc-card .tt{margin-top:calc(var(--u)*3);font-weight:300;font-size:calc(var(--u)*5.2);letter-spacing:.12em;color:#eceef0;text-transform:uppercase}
-.sc-card .fa{margin-top:calc(var(--u)*2);font-size:calc(var(--u)*3.3);letter-spacing:.3em;color:#c9a860;text-transform:uppercase}
-.sc-card .ds{margin-top:calc(var(--u)*3);font-size:calc(var(--u)*3.8);line-height:1.55;color:#9aa2ac}
-.sc-card .st{position:absolute;left:calc(var(--u)*7);bottom:calc(var(--u)*5);font-size:calc(var(--u)*3.2);letter-spacing:.3em;color:#5d6773}.sc-card .st.ok{color:#3fd08a}
-.sc-card.lock{opacity:.45;pointer-events:auto;cursor:not-allowed}.sc-card.lock .n{color:#5d6773;text-shadow:none}
-.sc-hint{position:absolute;left:calc(var(--u)*36);bottom:calc(var(--u)*56);font-size:calc(var(--u)*3.8);color:#6c7684;font-style:italic}
+.sc-row{position:absolute;left:calc(var(--u)*24);top:calc(var(--u)*46);width:calc(var(--u)*122);bottom:calc(var(--u)*66);display:flex;flex-direction:column;gap:calc(var(--u)*1.4);overflow-y:auto;padding-right:calc(var(--u)*2);scrollbar-width:thin;scrollbar-color:#2a3442 transparent}
+.sc-card{position:relative;flex:0 0 auto;display:grid;grid-template-columns:calc(var(--u)*13) 1fr auto;grid-template-rows:auto auto;align-items:center;column-gap:calc(var(--u)*3);padding:calc(var(--u)*3) calc(var(--u)*4) calc(var(--u)*3) calc(var(--u)*5);background:rgba(8,10,14,.78);border:1px solid rgba(255,255,255,.06);cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
+.sc-card:before{content:"";position:absolute;left:-1px;top:-1px;bottom:-1px;width:2px;background:transparent}
+.sc-card:hover{background:rgba(16,20,28,.86);border-color:rgba(255,255,255,.12)}
+.sc-card.sel1{background:rgba(18,26,40,.92);border-color:rgba(120,150,255,.32);transform:translateX(calc(var(--u)*2))}.sc-card.sel1:before{background:linear-gradient(180deg,#3d6bff,#e0302a);width:3px}
+.sc-card .n{grid-row:1/3;font-weight:200;font-size:calc(var(--u)*8);line-height:1;color:#8fb0f2;letter-spacing:.04em;text-shadow:0 0 calc(var(--u)*4) rgba(70,120,255,.35)}
+.sc-card .tt{font-weight:400;font-size:calc(var(--u)*4.2);letter-spacing:.1em;color:#eceef0;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-card .fa{grid-column:2;margin-top:calc(var(--u)*.8);font-size:calc(var(--u)*2.8);letter-spacing:.24em;color:#c9a860;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-card .ds{display:none}
+.sc-card .st{grid-column:3;grid-row:1/3;font-size:calc(var(--u)*2.6);letter-spacing:.24em;color:#5d6773}.sc-card .st.ok{color:#3fd08a}
+.sc-card .ty{grid-column:3;grid-row:1/3;display:none}
+.sc-card.lock{opacity:.42}.sc-card.lock .n{color:#5d6773;text-shadow:none}.sc-card.lock.sel1{opacity:.75}
+.sc-det{position:absolute;left:calc(var(--u)*156);right:calc(var(--u)*24);top:calc(var(--u)*46);bottom:calc(var(--u)*66);background:linear-gradient(160deg,rgba(14,20,32,.9),rgba(6,8,12,.92));border:1px solid rgba(120,150,255,.16);padding:calc(var(--u)*9) calc(var(--u)*11);overflow:hidden}
+.sc-det:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--acc,linear-gradient(90deg,#3d6bff,#e0302a))}
+.sc-det .d-n{position:absolute;right:calc(var(--u)*9);top:calc(var(--u)*2);font-weight:100;font-size:calc(var(--u)*46);line-height:1;color:rgba(143,176,242,.12);letter-spacing:-.02em}
+.sc-det .d-ty{font-size:calc(var(--u)*3);letter-spacing:.4em;color:var(--accT,#8fb0f2)}
+.sc-det .d-tt{margin-top:calc(var(--u)*3);font-weight:300;font-size:calc(var(--u)*11);letter-spacing:.06em;color:#f2f3f5;text-transform:uppercase;line-height:1.05}
+.sc-det .d-fa{margin-top:calc(var(--u)*3);font-size:calc(var(--u)*3.4);letter-spacing:.32em;color:#c9a860;text-transform:uppercase}
+.sc-det .d-ds{margin-top:calc(var(--u)*7);max-width:calc(var(--u)*130);font-size:calc(var(--u)*4.6);line-height:1.6;color:#b8c0ca}
+.sc-det .d-tags{display:flex;flex-wrap:wrap;gap:calc(var(--u)*2.5);margin-top:calc(var(--u)*8)}
+.sc-det .d-tag{padding:calc(var(--u)*1.6) calc(var(--u)*3.2);border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);font-size:calc(var(--u)*2.9);letter-spacing:.22em;color:#aab3be;text-transform:uppercase}
+.sc-det .d-tag b{color:#eceef0;font-weight:500;margin-left:calc(var(--u)*1.5)}
+.sc-det .d-diff{display:inline-flex;gap:calc(var(--u)*1);margin-left:calc(var(--u)*1.5);vertical-align:middle}.sc-det .d-diff i{width:calc(var(--u)*1.8);height:calc(var(--u)*1.8);background:#2a3442;display:inline-block}.sc-det .d-diff i.on{background:#e0302a}
+.sc-det .d-q{margin-top:calc(var(--u)*8);max-width:calc(var(--u)*150);padding:calc(var(--u)*4) calc(var(--u)*5);border-left:2px solid rgba(201,168,96,.6);background:rgba(255,255,255,.025);font-size:calc(var(--u)*3.9);line-height:1.6;color:#d6d9de;font-style:italic}
+.sc-det .d-q small{display:block;margin-bottom:calc(var(--u)*1.5);font-style:normal;font-size:calc(var(--u)*2.7);letter-spacing:.3em;color:#c9a860;text-transform:uppercase}
+.sc-det .d-go{position:absolute;left:calc(var(--u)*11);bottom:calc(var(--u)*8);display:flex;align-items:center;gap:calc(var(--u)*4);font-size:calc(var(--u)*3.4);letter-spacing:.32em;color:#3fd08a}
+.sc-det .d-go button{background:#e8e2c0;color:#0a0c10;border:0;padding:calc(var(--u)*2.6) calc(var(--u)*7);font-family:inherit;font-size:calc(var(--u)*3.4);letter-spacing:.3em;cursor:pointer}.sc-det .d-go button:hover{background:#fff}
+.sc-det.lock .d-go{color:#6c7684}.sc-det.lock .d-go button{display:none}.sc-det.lock .d-tt,.sc-det.lock .d-ds{opacity:.55}
+.sc-hint{position:absolute;left:calc(var(--u)*24);bottom:calc(var(--u)*56);font-size:calc(var(--u)*3.8);color:#6c7684;font-style:italic}
 #scr-ctrl:not(.hidden){display:block;background:none;text-transform:none;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:0}
 .mm-gr.ct-dim{background:radial-gradient(circle at -5% -10%,rgba(40,80,255,.1),transparent 45%),linear-gradient(180deg,rgba(2,3,5,.9),rgba(2,3,5,.93) 60%,rgba(0,0,0,.97))}
 .ct-sub{position:absolute;left:calc(var(--u)*36);top:calc(var(--u)*42);font-size:calc(var(--u)*3.3);letter-spacing:.32em;color:#c9a860}
@@ -326,8 +343,9 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
    <div class="sc-card" id="sc8"><div class="n">08</div><div class="tt">Riverside Park</div><div class="fa">Portland Police Bureau · Oregon</div><div class="ds">Zimna jesienna noc. Sąsiadka skarży się na hałas w parku.</div><div class="st ok">● DOSTĘPNE</div></div>
    <div class="sc-card" id="sc9"><div class="n">09</div><div class="tt">Fallmart #2217</div><div class="fa">Pasadena PD · S.W.A.T. · Texas</div><div class="ds">Pochmurne popołudnie. Telefon na linię obsługi klienta.</div><div class="st ok">● DOSTĘPNE</div></div>
   </div>
+  <div class="sc-det" id="sc-det"></div>
   <div class="sc-hint" id="modehint">Pozostali członkowie oddziału są sterowani przez AI i wykonują twoje rozkazy.</div>
-  <div class="mm-nav"><button class="mm-i on" id="scen-next">ODPRAWA</button><button class="mm-i" data-go="menu">WRÓĆ</button><span class="mm-r">← → WYBÓR · ENTER</span></div>
+  <div class="mm-nav"><button class="mm-i on" id="scen-next">ODPRAWA</button><button class="mm-i" data-go="menu">WRÓĆ</button><span class="mm-r">↑ ↓ WYBÓR · ENTER ODPRAWA · DWUKLIK</span></div>
  </div>
 
  <div id="scr-squad" class="screen hidden">
