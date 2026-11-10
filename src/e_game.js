@@ -74,7 +74,7 @@ addEventListener('keydown',e=>{if(['Tab','ArrowUp','ArrowDown','ArrowLeft','Arro
  if(e.code==='KeyH')orderHold();
  if(e.code==='KeyN')toggleNVG();
  if(e.code==='KeyC'&&G.p1&&G.p1.alive){if(G.p1.spec==='tech'){if(!G.camv){const a=G.p1.ang;G.p1.action={t:0,dur:.5,label:'Peryskop',pose:'kneel',done:()=>startMirror(G.p1,a)};}}else orderCorner();}
- if(e.code==='Space'){const w=G.ops.filter(o=>o.wait&&!o.go);if(w.length){w.forEach(o=>o.go=true);radio(G.p1?G.p1.name:'ALFA','Wszystkie zespoły: wejście, wejście, wejście!',{prio:1});logEv('Sygnał do wejścia ('+w.map(o=>teamName(o.team)).join(' + ')+')');}}
+ if(e.code==='Space')goSignal();
  if(e.code==='KeyM')G.map=true;if(e.code==='KeyJ'&&G.running&&!G.paused)$('obj').classList.toggle('fold');if(e.code==='KeyX'&&G.running&&!G.paused&&G.p1&&G.p1.alive&&!G.ended)setHolster(!G.p1.holster);if(e.code==='KeyV'&&G.running&&!G.paused&&G.p1&&G.p1.alive&&!G.ended)swapWeapon(G.p1);if(e.code==='KeyL'&&G.running&&!G.paused&&!G.ended)toggleTorch();});
 addEventListener('keyup',e=>{K[e.code]=false;if(e.code==='KeyM')G.map=false;});
 addEventListener('blur',()=>{for(const k in K)K[k]=false;G.mouse.down=false;});
@@ -124,18 +124,25 @@ function humanUpdate(u,dt){const inp=u.in||{};u.fireCd-=dt;if(u.shoutCd>0)u.shou
  if(inp.report){const o=reportTarget(u);if(o)doReport(u,o);else toast('Nie ma czego zgłosić');}}
 
 // ================= CONTEXT MENU =================
+function goSignal(){const w=G.ops.filter(o=>o.wait&&!o.go);if(w.length){w.forEach(o=>o.go=true);radio(G.p1?G.p1.name:'ALFA',isPat()&&G.squad.filter(q=>q&&q.alive).length<=2?'Wchodzimy, teraz!':'Wszystkie zespoły: wejście, wejście, wejście!',{prio:1});logEv('Sygnał do wejścia ('+w.map(o=>teamName(o.team)).join(' + ')+')');}}
+function shieldAI(){return aiMembers().find(u=>u.shield&&u.alive);}
+function winNear(x,y){const tx=x/TS|0,ty=y/TS|0;let best=null,bd=99;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(tAt(tx+dx,ty+dy)===T.WIN){const d=Math.abs(dx)+Math.abs(dy);if(d<bd){bd=d;best={x:tx+dx,y:ty+dy};}}}return best;}
+function orderShieldWindow(u,w){let spot=null,bd=1e9;for(const[dx,dy]of[[0,1],[0,-1],[1,0],[-1,0]]){const x=w.x+dx,y=w.y+dy;if(!walkable(x,y)||LV.fsolid[I(x,y)])continue;const d=dist(u.x,u.y,x*TS+8,y*TS+8);if(d<bd){bd=d;spot=[x,y];}}
+ if(!spot){toast('Brak miejsca przy oknie');return;}dropOps([u]);for(const q of G.squad)if(q&&q.winGuard===w)q.winGuard=null;const a=Math.atan2(w.y-spot[1],w.x-spot[0]);u.winGuard={x:w.x,y:w.y,sx:spot[0],sy:spot[1]};setGoto(u,spot[0],spot[1],{then:'hold',holdFace:a,spd:40});radio(u.name,pick(['Tarcza na oknie.','Zasłaniam okno, idę.','Przyjąłem, okno.']));logEv(u.name+' zasłania okno tarczą');}
 function openCtx(e){G.ctxEv=e;const T_=G.ctxTeam||'all',W_=!!G.ctxWait;const wx=G.mouse.sx+G.cam.rx,wy=G.mouse.sy+G.cam.ry;const d=doorNear(wx,wy+4,14);const items=[];
  const has=s=>!!aiAvail(s),hasF=()=>{const s=aiAvail('scout');return s&&s.flash>0;},hasB=()=>{const s=aiAvail('breach');return s&&s.charges>0;};
  let title;
  if(d&&!d.broken&&d.open<.5){title='Drzwi'+(d.knownLocked&&d.locked?' (zamknięte na klucz)':'');
   items.push({t:'Otwórz drzwi',f:()=>startOp('open',d,null,T_)});
   items.push({t:'Podejrzyj kamerą (Ofc. Mason)',dis:!has('tech'),f:()=>startOp('peek',d)});
-  items.push({t:'Otwórz i czyść',f:()=>startOp('clear',d,'open',T_,W_)});
+  items.push({t:'Ustawcie się pod drzwiami — wejście na rozkaz',f:()=>startOp('clear',d,'open',T_,true)});
+  items.push({t:'Otwórz i czyść'+(shieldAI()?' (tarcza pierwsza)':''),f:()=>startOp('clear',d,'open',T_,W_)});
   items.push({t:'Granat hukowy i czyść (Ofc. Grant)',dis:!hasF(),f:()=>startOp('clear',d,'flash',T_,W_)});
   items.push({t:'Wysadź i czyść (Cpl. Hayes)',dis:!hasB(),f:()=>startOp('clear',d,'breach',T_,W_)});
   items.push({t:'Wysadź + granat i czyść',dis:!(hasF()&&hasB()),f:()=>startOp('clear',d,'breachflash',T_,W_)});}
  else if(d&&(d.broken||d.open>=.5)){title='Przejście';
-  items.push({t:'Czyść pomieszczenie',f:()=>startOp('clear',d,'open',T_,W_)});
+  items.push({t:'Ustawcie się przy przejściu — wejście na rozkaz',f:()=>startOp('clear',d,'open',T_,true)});
+  items.push({t:'Czyść pomieszczenie'+(shieldAI()?' (tarcza pierwsza)':''),f:()=>startOp('clear',d,'open',T_,W_)});
   items.push({t:'Granat hukowy i czyść (Ofc. Grant)',dis:!hasF(),f:()=>startOp('clear',d,'flash',T_,W_)});
   if(!d.broken)items.push({t:'Zamknij drzwi',f:()=>{const m=nearestAI(d);if(m){setGoto(m,doorSides(d,m).nx,doorSides(d,m).ny);setTimeout(()=>{if(m.alive&&!m.human)toggleDoor(d,m);},1500);}}});}
  else title='Rozkaz dla oddziału';
@@ -143,6 +150,8 @@ function openCtx(e){G.ctxEv=e;const T_=G.ctxTeam||'all',W_=!!G.ctxWait;const wx=
   if(tg){title=tg.team==='enemy'?'Poddany napastnik':'Cywil';items.unshift({t:'Skuj (najbliższy operator)',dis:!aiMembers().length,f:()=>orderCuff(tg)});}
   let rt=null,rd=16;for(const o of G.units){if(!o.visNow||!reportable(o))continue;const dd=dist(wx,wy+4,o.x,o.y-3);if(dd<rd){rd=dd;rt=o;}}
   if(rt){if(!tg)title='Zgłoszenie';items.unshift({t:'Zgłoś do dowództwa: '+reportable(rt)[0],f:()=>{const l=leader();if(l)doReport(l,rt);}});}}
+ {const w=winNear(wx,wy+4),sh=shieldAI();if(w&&sh){title=title==='Rozkaz dla oddziału'?'Okno':title;items.unshift({t:'Tarcza: zasłoń okno ('+sh.name+')',f:()=>orderShieldWindow(sh,w)});}}
+ if(G.ops.some(o=>o.wait&&!o.go))items.unshift({t:'WEJŚCIE! (Spacja)',dis:!G.ops.some(o=>o.wait&&!o.go&&o.ready),f:goSignal});
  items.push({t:'Sprawdź róg peryskopem (Ofc. Mason)',dis:!aiAvail('tech'),f:()=>orderCorner(wx,wy+4)});
  items.push({t:'Idź tutaj',f:()=>orderMove(wx,wy+4,T_)});
  items.push({t:'Za mną',f:()=>orderFollow(T_)});

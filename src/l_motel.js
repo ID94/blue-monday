@@ -102,7 +102,9 @@ function crystalArm(c){const H=G.h;H.crStage='armed';const e=new Unit({team:'ene
  say('CRYSTAL','Nie weźmiecie nas żywych!');const o=G.squad.find(q=>q&&q.alive&&!q.human)||G.p1;say(o.name,'Ona ma broń! Łazienka!');logEv('Crystal wyciąga drugą broń z łazienki');}
 const MW12=()=>({x:MOT_X0(11)+3,y:21});
 function motelWinWatch(dt){const H=G.h,dw=H.dw,w=MW12();if(!dw||!dw.alive||dw.state==='cuffed'||dw.state==='surr'||H.winBroke||H.ws)return;if(H.phase===2&&dw.target)return;
- let who=null;for(const q of [...G.squad,...G.police])if(q&&q.alive&&q.x>(w.x-.6)*TS&&q.x<(w.x+1.6)*TS&&q.y>21.5*TS&&q.y<25*TS){who=q;break;}
+ const guard=G.squad.find(q=>q&&q.alive&&q.shield&&q.winGuard&&q.winGuard.x===w.x&&q.winGuard.y===w.y&&dist(q.x,q.y,q.winGuard.sx*TS+8,q.winGuard.sy*TS+8)<TS*.9);
+ let who=null;if(guard){who=guard;H.guardT=(H.guardT||0)+dt;if(H.guardT<6){H.winT=0;return;}H.guardT=-8;}else for(const q of [...G.squad,...G.police])if(q&&q.alive&&q.x>(w.x-.6)*TS&&q.x<(w.x+1.6)*TS&&q.y>21.5*TS&&q.y<25*TS){who=q;break;}
+ if(guard){H.ws={t:0,tg:guard,n:0};say('DWAYNE (ZA SZYBĄ)','Schowaj się za tą tarczą, schowaj!');return;}
  if(who&&!H.said.winWarn&&who.human){H.said.winWarn=1;const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Uważaj, stoisz w oknie! Zasłony zasłonięte, ale widzi twój cień.');}
  H.winT=who?(H.winT||0)+dt:Math.max(0,(H.winT||0)-dt);if(H.winT>(H.phase===1?3.2:1.6)&&who){H.winT=0;H.ws={t:0,tg:who,n:0};say('DWAYNE (ZA SZYBĄ)','Myślisz, że cię nie widzę?!');}}
 function dwUpd(e,dt){const H=G.h,ws=H.ws;if(!ws)return false;if(e.stun>0||e.state==='surr'||e.state==='cuffed'){H.ws=null;return false;}const w=MW12();
