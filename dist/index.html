@@ -2804,6 +2804,7 @@ function startMotel(){G.hostage=null;G.deadline=1e9;
  H.cr=mkNPC({tx:61,ty:18,kind:'woman',pal:{body:'#8a3a5a',legs:'#2a2a3a',head:'#d8b098',face:'#d8b098',visor:'#2a1a12',hair:'#e0c070',skin:'#d8b098',eyes:1},state:'calm',pose:'kneel',a:Math.PI/2,name:'Crystal',upd:crystalUpd});
  H.dw=mkEnemy({tx:63,ty:19,weap:'ePistol',a:Math.PI/2,st:'guard',pal:{...PAL.boss},name:'Dwayne Pruitt'});H.dw.upd=dwUpd;LV.bw=new Set();LV.curt=new Set([I(MW12().x,MW12().y)]);
  G.police=[];logEv('Nye 7: Starlight Motel, pokój 12 — mężczyzna z bronią');
+ {const r=Math.random();H.dwMode=r<.32?'fight':r<.55?'give':r<.78?'shield':'breakout';const q=Math.random();H.crMode=q<.38?'accomp':q<.7?'victim':'runner';if(H.dwMode==='shield'&&H.crMode==='accomp')H.dwMode='fight';H.boT=rand(55,110);}
  setTimeout(()=>{radio('DISPATCH','Nye 7, Starlight Motel, pokój dwunasty. Recepcjonista słyszał kłótnię i widział broń. W środku kobieta. Zachowajcie dystans, wsparcie w drodze.');radio(G.p1.name,'Przyjąłem, jesteśmy na parkingu.',{radio:1});},600);}
 function guestUpd(c,dt){const R=c.R;if(c.state==='go'){c.wT=(c.wT||0)+dt;if(c.wT<c.k*.45){moveUnit(c,dt,0,0,0);return;}const drunk=R.kind==='drunk',sp=drunk?24:c.kid?44:48;
   if(drunk){c.sw=(c.sw||0)+dt;if(((c.sw*.6)|0)%4===3){moveUnit(c,dt,Math.cos(c.sw*3),Math.sin(c.sw*2),10);return;}}
@@ -2856,11 +2857,16 @@ function swatPhase(){const H=G.h;H.phase=2;radioClear();
  G.p1=G.squad[G.p1Spec||0];G.p1.human=1;if(G.players===2){G.p2=G.squad[G.p2Spec||1];G.p2.human=2;}G.order='follow';G.ops=[];G.cam.x=G.p1.x;G.cam.y=G.p1.y;
  G.h.drawn=true;logEv('SWAT szeryfa na miejscu');
  setTimeout(()=>{radio('SGT. WALKER','Patrol, dzięki. Przejmujemy. Pokój dwunasty, jeden uzbrojony, jedna kobieta w środku.',{radio:1});radio('SGT. WALKER','Hayes, ładunek albo taran na drzwi. Grant, tarcza, wchodzisz pierwszy. Uważać na okno — on już raz przez nie patrzył.',{radio:1});},1500);}
+function room12Open(){const d=LV.doorAt[I(MOT_X0(11)+1,21)];return d&&(d.broken||d.open>.5);}
 function crystalUpd(c,dt){const H=G.h;
- if(c.state==='cuffed'||c.state==='comply'){moveUnit(c,dt,0,0,0);if(c.state==='cuffed'&&!H.said.crc){H.said.crc=1;say('CRYSTAL',H.crStage==='run'?'Puszczaj! To był jego pomysł, nie mój!':'Co wy robicie?! To ja jestem ofiarą!');}return;}
- if(H.phase<2){moveUnit(c,dt,0,0,0);return;}
+ if(c.state==='cuffed'||c.state==='comply'){moveUnit(c,dt,0,0,0);if(c.state==='cuffed'&&!H.said.crc){H.said.crc=1;say('CRYSTAL',H.crMode==='accomp'?(H.crStage==='run'?'Puszczaj! To był jego pomysł, nie mój!':'Co wy robicie?! To ja jestem ofiarą!'):'Czemu mnie skuwacie?! On mnie tu trzymał!');}if(H.crMode!=='accomp'&&c.state==='comply'&&!H.crSafe&&anySquadNear(c.x,c.y,TS*2.2)){H.crSafe=true;logEv('Crystal bezpieczna');}return;}
+ if(H.hs&&H.dw.alive){moveUnit(c,dt,0,0,0);c.pose='stand';return;}
+ const active=H.phase>=2||H.dwOut;if(!active){moveUnit(c,dt,0,0,0);return;}
  const dw=H.dw,down=!dw.alive||dw.state==='cuffed'||dw.state==='surr',inside=G.squad.some(q=>q&&q.alive&&LV.room[I(q.x/TS|0,q.y/TS|0)]===22);
- if(!H.crStage){moveUnit(c,dt,0,0,0);npcFace(c,dt,6);if(inside)H.crT=(H.crT||0)+dt;if(down||H.crT>3.5){H.crStage='run';c.pose='stand';say('CRYSTAL','Nie!');logEv('Kobieta biegnie do łazienki');}return;}
+ if(H.crMode==='victim'){moveUnit(c,dt,0,0,0);npcFace(c,dt,6);c.pose='kneel';if(down&&!H.said.crv){H.said.crv=1;say('CRYSTAL','Boże... Boże, dziękuję... On chciał mnie zabić...');}if(down&&anySquadNear(c.x,c.y,TS*2.2)&&!H.crSafe){H.crSafe=true;logEv('Crystal bezpieczna — była prawdziwą ofiarą');}return;}
+ if(H.crMode==='runner'){if(!H.crStage){moveUnit(c,dt,0,0,0);npcFace(c,dt,6);if(room12Open()||inside||H.dwOut){H.crStage='run';c.pose='stand';say('CRYSTAL','Aaaa! Nie strzelajcie! Nie strzelajcie!');logEv('Kobieta wybiega z pokoju w panice');}return;}
+  if(H.crStage==='run'){const L=G.p1;if(L&&L.shoutCd>2.9&&dist(L.x,L.y,c.x,c.y)<TS*8){c.state='comply';c.pose='hands';say('CRYSTAL','Dobrze! Dobrze, stoję!');return;}if(npcGo(c,dt,5,34,66)){H.crStage='safe';H.crSafe=true;logEv('Crystal dobiegła do recepcji');}}return;}
+ if(!H.crStage){moveUnit(c,dt,0,0,0);npcFace(c,dt,6);if(inside)H.crT=(H.crT||0)+dt;if(down||H.crT>3.5||(H.dwOut&&room12Open())){H.crStage='run';c.pose='stand';say('CRYSTAL','Nie!');logEv('Kobieta biegnie do łazienki');}return;}
  if(H.crStage==='run'){if(npcGo(c,dt,MOT_X0(11)+3,13,58))crystalArm(c);}}
 function crystalArm(c){const H=G.h;H.crStage='armed';const e=new Unit({team:'enemy',weap:'ePistol',pal:c.pal,fov:130,range:8,name:'Crystal',kind:'suspect'});e.x=c.x;e.y=c.y;e.ang=Math.PI/2;e.home={x:e.x,y:e.y,a:e.ang,st:'guard'};
  const q=nearestSquad(e);e.state='search';e.goal={x:q?q.x:e.x,y:q?q.y:e.y};e.searchT=12;e.arrived=false;e.path=null;e.ico='!';e.icoT=2;e.res=12;
@@ -2873,10 +2879,21 @@ function motelWinWatch(dt){const H=G.h,dw=H.dw,w=MW12();if(!dw||!dw.alive||dw.st
  if(guard){H.ws={t:0,tg:guard,n:0};say('DWAYNE (ZA SZYBĄ)','Schowaj się za tą tarczą, schowaj!');return;}
  if(who&&!H.said.winWarn&&who.human){H.said.winWarn=1;const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)say(o.name,'Uważaj, stoisz w oknie! Zasłony zasłonięte, ale widzi twój cień.');}
  H.winT=who?(H.winT||0)+dt:Math.max(0,(H.winT||0)-dt);if(H.winT>(H.phase===1?3.2:1.6)&&who){H.winT=0;H.ws={t:0,tg:who,n:0};say('DWAYNE (ZA SZYBĄ)','Myślisz, że cię nie widzę?!');}}
-function dwUpd(e,dt){const H=G.h,ws=H.ws;if(!ws)return false;if(e.stun>0||e.state==='surr'||e.state==='cuffed'){H.ws=null;return false;}const w=MW12();
+function dwUpd(e,dt){const H=G.h,ws=H.ws;if(e.state==='surr'||e.state==='cuffed'){H.hs=null;return false;}
+ if(H.hs){return dwShield(e,dt);}
+ const trig=H.phase===2&&(room12Open()||G.squad.some(q=>q&&q.alive&&LV.room[I(q.x/TS|0,q.y/TS|0)]===22));
+ if(trig&&!H.dwReact&&!(e.stun>0)){H.dwReact=true;
+  if(H.dwMode==='give'){e.state='surr';e.pose='hands';e.target=null;say('DWAYNE','Dobra! DOBRA! Rzucam! Nie strzelajcie, kurwa!');logEv('Dwayne rzuca broń i się poddaje');return false;}
+  if(H.dwMode==='shield'){const c=H.cr;if(c&&c.alive&&c.team==='civ'&&c.state!=='cuffed'){H.hs={t:0};say('DWAYNE','STAĆ! Jeszcze krok i ją zastrzelę!');say('CRYSTAL','Proszę... proszę, zróbcie, co mówi...');logEv('Dwayne zasłania się Crystal');return true;}}}
+ if(H.phase===1&&H.dwMode==='breakout'&&!H.dwOut&&!H.swatCalled&&(H.t>H.boT||H.trust<=-2)){H.dwOut=true;const d=LV.doorAt[I(MOT_X0(11)+1,21)];d.locked=false;if(d.target===0)toggleDoor(d,e);e.state='search';e.goal={x:78*TS,y:27*TS};e.searchT=999;e.arrived=false;e.path=null;e.boss=false;say('DWAYNE','Z DROGI! Wszyscy z drogi!');logEv('Dwayne wybiega z pokoju z bronią');const o=G.squad.find(q=>q&&q.alive&&!q.human)||G.p1;setTimeout(()=>{if(!G.ended)say(o.name,'Wychodzi! Ma broń! Wychodzi z dwunastki!');},400);return false;}
+ if(!ws)return false;if(e.stun>0||e.state==='surr'||e.state==='cuffed'){H.ws=null;return false;}const w=MW12();
  ws.t+=dt;const px=w.x*TS+8,py=20*TS+6;if(dist(e.x,e.y,px,py)>3){const a=Math.atan2(py-e.y,px-e.x);moveUnit(e,dt,Math.cos(a),Math.sin(a),60);turnTo(e,a,dt,8);if(ws.t<2.5)return true;}
  const tg=ws.tg;turnTo(e,Math.atan2(tg.y-e.y,tg.x-e.x),dt,20);e.pose='stand';if(e.mag<1)e.mag=6;e.fireCd=Math.min(e.fireCd||0,.5);
  if(ws.t>.6&&(e.fireCd||0)<=0&&e.rel<=0){e.ang=Math.atan2(tg.y-2-e.y,tg.x-e.x)+(H.winBroke?rand(-.06,.06):rand(-.22,.22));fire(e);ws.n++;}if(ws.n>=3||ws.t>4){H.ws=null;}return true;}
+function dwShield(e,dt){const H=G.h,c=H.cr,hs=H.hs;hs.t+=dt;if(!c||!c.alive||c.team!=='civ'){H.hs=null;return false;}if(e.stun>0){H.hs=null;c.pose='kneel';say('CRYSTAL','Aaa!');logEv('Dwayne oszołomiony — Crystal się wyrywa');return false;}
+ const q=nearestSquad(e);if(q){const a=Math.atan2(q.y-e.y,q.x-e.x);turnTo(e,a,dt,6);c.x+=((e.x+Math.cos(e.ang)*9)-c.x)*Math.min(1,dt*8);c.y+=((e.y+Math.sin(e.ang)*9+2)-c.y)*Math.min(1,dt*8);c.ang=e.ang;}moveUnit(e,dt,0,0,0);e.pose='stand';
+ const L=G.p1;if(L&&L.shoutCd>2.9&&!hs.sh&&dist(L.x,L.y,e.x,e.y)<TS*9){hs.sh=1;if(Math.random()<.4){H.hs=null;e.state='surr';e.pose='hands';say('DWAYNE','...Dobra. Puszczam ją. Puszczam!');logEv('Dwayne puszcza zakładniczkę i się poddaje');return false;}say('DWAYNE','Zamknij się! Odsuńcie się od drzwi!');}
+ if(hs.t>8){H.hs=null;if(Math.random()<.55){e.ang=Math.atan2(c.y-e.y,c.x-e.x);kill(c,e,e.ang);SND.gun('pistol',e.x,e.y);say('DWAYNE','Sami tego chcieliście!');logEv('Dwayne strzela do Crystal');}else{e.state='surr';e.pose='hands';say('DWAYNE','Nie... nie dam rady... Poddaję się.');logEv('Dwayne się poddaje');}return false;}return true;}
 function breakWin(tx,ty,x,y,a){const i=I(tx,ty);if(!LV.bw)LV.bw=new Set();if(LV.bw.has(i))return;LV.bw.add(i);SND.glass(x,y);SND.glass(x+4,y);
  for(let k=0;k<16;k++)G.fx.push({k:'debris',x:x+rand(-6,6),y:y-6,z:6,vx:Math.cos(a)*rand(20,80)+rand(-30,30),vy:Math.sin(a)*rand(20,80)+rand(-30,30),vz:rand(10,40),t:0,life:rand(.4,.9),c:pick(['#c8e0e8','#e8f4f8','#a8c8d0'])});
  const g=WR[ty]&&WR[ty].getContext('2d');if(g){const bx=tx*TS;P(g,bx+2,17,12,9,'#0c0e10');for(let k=0;k<7;k++){P(g,bx+2+(k*2),17+(k%3),1,2+(k%4),'rgba(200,225,235,.7)');P(g,bx+3+(k*2)%11,25-(k%3),1,1,'rgba(200,225,235,.6)');}if(LV.curt&&LV.curt.has(i)){P(g,bx+2,17,3,9,'#6a2a20');P(g,bx+11,17,3,8,'#6a2a20');}}
@@ -2886,15 +2903,18 @@ function motelDecor(){const w=MW12(),g=WR[w.y]&&WR[w.y].getContext('2d');if(g){c
 function updateMotel(dt){const H=G.h;if(!H||G.ended)return;H.t+=dt;motelWinWatch(dt);
  if(H.fadeT!=null){H.fadeT+=dt;if(H.fadeT>.1&&!H.said.f1){H.said.f1=1;fadeCard('20 MINUT PÓŹNIEJ','NYE COUNTY SHERIFF · S.W.A.T.');}
   if(H.fadeT>2.2&&!H.said.f2){H.said.f2=1;swatPhase();}if(H.fadeT>4){fadeCard(null);H.fadeT=null;}}
+ if(H.dwOut&&H.dw.alive&&!['surr','cuffed'].includes(H.dw.state)&&dist(H.dw.x,H.dw.y,78*TS,27*TS)<TS*2){endMission(false,'Dwayne Pruitt uciekł z parkingu motelu.');return;}
+ if(H.phase===1&&H.dwOut){const dw=H.dw,cr=H.cr,res=x=>!x.alive||x.state==='cuffed';if(H.endT==null&&res(dw)&&(res(cr)||H.crSafe))H.endT=2.5;if(H.endT!=null){H.endT-=dt;if(H.endT<=0)endMission(true,'Dwayne Pruitt '+(dw.alive?'zatrzymany':'nie żyje')+' po próbie ucieczki. '+(cr.alive?'Crystal bezpieczna.':'Crystal nie żyje.'));}}
  if(H.phase===2){const dw=H.dw,cr=H.cr,res=x=>!x.alive||x.state==='cuffed';
-  if(H.endT==null&&res(dw)&&res(cr)){H.endT=2.5;}
+  if(H.endT==null&&res(dw)&&(res(cr)||H.crSafe)){H.endT=2.5;}
   if(H.endT!=null){H.endT-=dt;if(H.endT<=0)endMission(true,'Pokój 12 zabezpieczony. '+(dw.alive?'Dwayne Pruitt zatrzymany':'Dwayne Pruitt nie żyje')+', '+(cr.alive?'Crystal zatrzymana':'Crystal nie żyje')+'.');}}}
 function motelRender(c,cx,cy){const H=G.h;const x=22*TS+8-cx,y=25*TS-14-cy;const fl=(Math.sin(G.time*13)>-.85)?1:.4;
  c.globalCompositeOperation='lighter';const g=c.createRadialGradient(x,y,0,x,y,70);g.addColorStop(0,'rgba(255,90,168,'+(.28*fl)+')');g.addColorStop(1,'rgba(255,90,168,0)');c.fillStyle=g;c.fillRect(x-70,y-70,140,140);c.globalCompositeOperation='source-over';}
-function motelObj(){const H=G.h;if(!H)return'';if(H.phase===1)return objRows('NYE 7 · STARLIGHT MOTEL',[[H.evac>=H.rooms.length,'Ewakuuj pokoje obok ('+H.evac+'/'+H.rooms.length+')'],[H.neg>0,'Nawiąż kontakt z pokojem 12'],H.neg>=3?[H.swatCalled,'Zdecyduj o dalszych krokach']:null]);
- const dw=H.dw,cr=H.cr,res=x=>!x.alive||x.state==='cuffed';return objRows('SWAT · POKÓJ 12',[[res(dw),'Zneutralizuj podejrzanego'],[res(cr),'Zabezpiecz kobietę']]);}
-function motelDebrief(){const H=G.h||{};const dw=H.dw,cr=H.cr;let sc=(H.evac||0)*6-(H.winBroke?8:0)+Math.max(0,H.trust||0)*4;if(dw&&dw.alive)sc+=10;if(cr&&cr.alive&&cr.state==='cuffed')sc+=H.crStage==='armed'?5:15;
- patrolDebrief([['Pokoje ewakuowane',(H.evac||0)+' / 3'],['Szyba pokoju 12',H.winBroke?'przestrzelona przez podejrzanego':'nienaruszona',H.winBroke?'bad':'good'],['Negocjacje',(H.neg||0)+' wymiany · zaufanie '+(H.trust||0)],['Dwayne Pruitt',!dw?'—':!dw.alive?'nie żyje':dw.state==='cuffed'?'zatrzymany':'—'],['Crystal',!cr?'—':!cr.alive?'nie żyje':cr.state==='cuffed'?(H.crStage==='armed'?'zatrzymana (uzbrojona)':'zatrzymana zanim sięgnęła po broń'):'—'],['Druga broń',H.gunFound?'zabezpieczona':'—']],sc);}
+function motelObj(){const H=G.h;if(!H)return'';if(H.phase===1&&H.dwOut){const dw=H.dw,cr=H.cr,res=x=>!x.alive||x.state==='cuffed';return objRows('NYE 7 · STARLIGHT MOTEL',[[res(dw),'Zatrzymaj uciekającego Dwayne\'a'],[res(cr)||H.crSafe,'Zabezpiecz kobietę']]);}
+ if(H.phase===1)return objRows('NYE 7 · STARLIGHT MOTEL',[[H.evac>=H.rooms.length,'Ewakuuj pokoje obok ('+H.evac+'/'+H.rooms.length+')'],[H.neg>0,'Nawiąż kontakt z pokojem 12'],H.neg>=3?[H.swatCalled,'Zdecyduj o dalszych krokach']:null]);
+ const dw=H.dw,cr=H.cr,res=x=>!x.alive||x.state==='cuffed';return objRows('SWAT · POKÓJ 12',[[res(dw),'Zneutralizuj podejrzanego'],[res(cr)||H.crSafe,'Zabezpiecz kobietę']]);}
+function motelDebrief(){const H=G.h||{};const dw=H.dw,cr=H.cr;let sc=(H.evac||0)*6-(H.winBroke?8:0)+Math.max(0,H.trust||0)*4;if(dw&&dw.alive)sc+=10;if(cr&&cr.alive&&(cr.state==='cuffed'||H.crSafe))sc+=H.crStage==='armed'?5:15;if(cr&&!cr.alive&&H.crMode!=='accomp')sc-=30;
+ patrolDebrief([['Pokoje ewakuowane',(H.evac||0)+' / 3'],['Szyba pokoju 12',H.winBroke?'przestrzelona przez podejrzanego':'nienaruszona',H.winBroke?'bad':'good'],['Negocjacje',(H.neg||0)+' wymiany · zaufanie '+(H.trust||0)],['Dwayne Pruitt',!dw?'—':!dw.alive?'nie żyje':dw.state==='cuffed'?'zatrzymany':'—'],['Crystal',!cr?'—':!cr.alive?'nie żyje':H.crSafe&&cr.state!=='cuffed'?'bezpieczna':cr.state==='cuffed'?(H.crStage==='armed'?'zatrzymana (uzbrojona)':'zatrzymana zanim sięgnęła po broń'):'—'],['Druga broń',H.gunFound?'zabezpieczona':'—'],['Przebieg',{fight:'Dwayne bronił się do końca',give:'Dwayne poddał się przy wejściu',shield:'Dwayne zasłonił się zakładniczką',breakout:'Dwayne próbował się wyrwać'}[H.dwMode]+' · '+{accomp:'Crystal była wspólniczką',victim:'Crystal była ofiarą',runner:'Crystal uciekła w panice'}[H.crMode]]],sc);}
 LVL.motel={id:'motel',patrol:true,nvg:true,weather:'dust',crew:{role:'Deputy Sheriff',shout:'Sheriff\'s Office! Don\'t move!',names:['DEP. CRANE','DEP. VEGA'],uni:{body:'#a48c62',legs:'#3a4230',acc:'#d8b048'}},car:{s:'#2e6a3a'},ext:'stucco',terrain:motelTerrain,windows:motelWindows,rooms:ROOMS_MOTEL,doors:DOORS_MOTEL,furn:FURN_MOTEL,lamps:LAMPS_MOTEL,cams:[],entries:ENTRIES_MOTEL,
  decor:motelDecor,breakable:true,start:startMotel,update:updateMotel,interact:motelInteract,render:motelRender,stress:NOOP,obj:motelObj,debrief:motelDebrief,
  wallCol:rb=>{const n=rb>=0?ROOMS[rb].n:'';return n.startsWith('Łazienka')?['#7a8688','#5a6668']:n==='Recepcja'?['#6a5a48','#4a3e30']:['#6e5a52','#4c3e38'];},
