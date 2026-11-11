@@ -1577,6 +1577,7 @@ function updateTactical(dt){const L=leader();if(!L||G.order!=='follow'||G.ops.le
   const m=aiMembers().find(u=>u.post);if(m&&G.time-(G.postTalkT||-99)>25&&Math.random()<.5&&(G.postTalkT=G.time))radio(m.name,pick(['Zabezpieczamy.','Biorę drzwi.','Kąty czyste.','Pokrywam wejście.']));}}
 const COLF=[.45,-.45,.3,-.3],COLS=[-1.3,1.3,-2,Math.PI];
 function doFollow(u,dt,idx,engaged,cnt){const L=leader();if(!L||L===u){moveUnit(u,dt,0,0,0);return;}
+ if(u.watch&&!engaged&&typeof partnerWatch==='function'&&partnerWatch(u,dt))return;
  if(u.patrol&&isPat()&&!u.tac){patrolFollow(u,dt,L,engaged);return;}
  const lsp=L.quiet?26:48;u.pose='stand';
  if(u.post){const p=u.post,px=p.tx*TS+8,py=p.ty*TS+8,d=dist(u.x,u.y,px,py);
@@ -1957,7 +1958,7 @@ const CLUES=[
  {id:'bed',x:36,y:22,msg:'Pościel zdjęta z łóżka. Na materacu ciemna plama.'},
  {id:'towels',x:41,y:21,msg:'W wannie mokre ręczniki.'},
  {id:'pc',x:47,y:21,msg:'Komputer włączony. Gra stoi na pauzie od kilku godzin.'},
- {id:'holster',x:49,y:21,msg:'W szufladzie biurka pusta kabura i pudełko nabojów dziewięć milimetrów.'},
+ {id:'holster',x:49,y:21,msg:'W szufladzie biurka pusta kabura, pudełko nabojów dziewięć milimetrów... i mały kluczyk do kłódki.'},
  {id:'bench',x:52,y:26,msg:'Na stole warsztatowym rolka folii i taśma.'},
  {id:'drag',x:54,y:27,msg:'Smugi na betonie, jakby coś ciągnięto.'}];
 const FREEZER={x:56*16,y:26*16+4};
@@ -1965,7 +1966,7 @@ function houseScen(){return{intel:[[41,25,'ZGŁOSZENIE']],est:[1,1],hroom:'Klono
 function spawnPatrol(E){spawnPatrolPair(E);}
 function startHouse(){
  G.hostage=null;G.deadline=1e9;
- G.h={talked:false,opened:false,clues:CLUES.map(c=>({...c,found:false})),nf:0,freezer:false,said:{},react:null,endT:null,result:null};
+ G.h={asked:{},consent:false,search:false,padKey:false,talked:false,opened:false,clues:CLUES.map(c=>({...c,found:false})),nf:0,freezer:false,said:{},react:null,endT:null,result:null};
  const s=new Unit({team:'civ',kind:'suspect',pal:{...PAL_SUSPECT},state:'door',r:4,name:'Ethan Hartley'});s.x=47*TS+8;s.y=32*TS+8;s.ang=Math.PI;s.room=LV.room[I(47,32)];G.h.s=s;G.civs.push(s);G.units.push(s);
  const n=new Unit({team:'civ',kind:'neighbor',pal:{...PAL_NEIGH},state:'work',r:4,workA:-Math.PI/2+.5});n.x=27*TS+8;n.y=37*TS+8;n.ang=n.workA;G.h.n=n;G.civs.push(n);G.units.push(n);
  G.police=[];
@@ -1978,23 +1979,42 @@ function houseTraces(){const r=rng(14);
 function houseInteract(u){const H=G.h;if(!H)return null;const fx=u.x+Math.cos(u.ang)*8,fy=u.y+Math.sin(u.ang)*8,near=(x,y,r)=>Math.min(dist(fx,fy,x,y),dist(u.x,u.y,x,y))<(r||16);
  const fd=LV.doorAt[I(42,34)];if(!H.knocked&&fd&&!fd.broken&&fd.target===0&&near(42*TS+8,34*TS+8,22)&&u.y>34*TS)return{k:'house',label:'Zapukaj do drzwi',dur:0,f:knockDoor};
  const s=H.s;if(s.alive&&s.team==='civ'&&!H.talked&&s.state==='opened'&&near(s.x,s.y,30))return{k:'house',label:'Porozmawiaj z mieszkańcem',dur:0,f:talkSuspect};
- if(s.alive&&s.team==='civ'&&H.talked&&!H.idChecked&&!['cuffed','escape','comply'].includes(s.state)&&near(s.x,s.y,24))return{k:'house',label:'Poproś o dokument',dur:.5,f:checkId};
+ if(s.alive&&s.team==='civ'&&H.talked&&!['cuffed','escape','comply','odd'].includes(s.state)&&near(s.x,s.y,26))return{k:'house',label:'Rozmowa z Ethanem',dur:0,f:ethanMenu};
  if(s.alive&&s.state==='cuffed'&&!H.inCar){if(s.escort===u&&nearPt(u,35.2*TS,39.4*TS,26)&&dist(s.x,s.y,u.x,u.y)<TS*3)return{k:'house',label:'Posadź zatrzymanego w radiowozie',dur:1.6,f:putInCar};
   if(near(s.x,s.y,22))return{k:'house',label:s.escort?'Puść zatrzymanego':'Prowadź zatrzymanego',dur:0,f:(u)=>{s.escort=s.escort?null:u;s.path=null;if(s.escort){say(u.name,pick(['Idziemy. Powoli.','Wstawaj. Idziesz ze mną.','Spokojnie, idziemy do auta.']));logEv('Zatrzymany prowadzony do radiowozu');}}};}
  for(const g of H.gawk||[])if(g.alive&&!g.told&&near(g.x,g.y,22))return{k:'house',label:'Odsuń gapia',dur:0,f:(u)=>gawkBack(u,g)};
  const n=H.n;if(n.alive&&!H.said.neigh&&near(n.x,n.y,20))return{k:'house',label:'Porozmawiaj z sąsiadką',dur:0,f:talkNeighbor};
- for(const c of H.clues)if(!c.found&&near(c.x*TS+8,c.y*TS+8,13))return{k:'house',label:'Przyjrzyj się',dur:.8,f:(u)=>findClue(u,c)};
- if(!H.freezer&&near(FREEZER.x,FREEZER.y,20))return{k:'house',label:'Otwórz zamrażarkę',dur:1.4,f:openFreezer};
+ if(H.search)for(const c of H.clues)if(!c.found&&near(c.x*TS+8,c.y*TS+8,13))return{k:'house',label:'Przyjrzyj się',dur:.8,f:(u)=>findClue(u,c)};
+ if(!H.freezer&&near(FREEZER.x,FREEZER.y,20)){if(!H.search)return null;if(!H.padKey)return{k:'house',label:'Zamrażarka — kłódka',dur:0,f:(u)=>{if(!H.said.pad){H.said.pad=1;logEv('Zamrażarka w garażu zamknięta na kłódkę');}say(u.name,'Zamrażarka na kłódkę. Nowa kłódka, na starej zamrażarce... Kluczyk musi gdzieś być w domu.');}};return{k:'house',label:'Otwórz kłódkę i zamrażarkę',dur:1.8,f:openFreezer};}
  return null;}
 function knockDoor(u){const H=G.h;H.knocked=true;logEv(u.name+' puka do drzwi');if(A.ctx){const o=out(42*TS+8,34*TS+8,.6,{rev:.15}),t0=A.ctx.currentTime;if(o)for(let k=0;k<3;k++){nz(o,t0+k*.24,.08,{brown:1,type:'lowpass',f:420,g:1});tone(o,t0+k*.24,.06,{f:110,f2:70,g:.5});}}
  radio(u.name,'Policja! Proszę otworzyć!');setTimeout(()=>{if(G.ended)return;const s=H.s;if(s.alive&&s.team==='civ'&&s.state==='door'){s.state='answer';s.path=null;}},rand(2500,4000));}
+function ethanMenu(u){const H=G.h,s=H.s,A_=H.asked,it=[],ask=(k,q,a,f)=>{if(A_[k])return;it.push({t:q,f:()=>{A_[k]=1;s.state=s.state==='opened'?'opened':s.state;turnTo(s,Math.atan2(u.y-s.y,u.x-s.x),1,9);say(u.name,q.replace(/[„”]/g,''));setTimeout(()=>{if(!G.ended&&s.alive&&s.team==='civ')say('ETHAN HARTLEY',a);if(f)f();},900);}});};
+ ask('noise','„Sąsiadka słyszała krzyki i dwa huki. Co się stało?”','Nic się nie stało. Grałem w grę, może to z głośników. Albo fajerwerki, dzieciaki tu ciągle odpalają.');
+ ask('parents','„Gdzie są twoi rodzice?”','U ciotki w Columbus. Pojechali wczoraj wieczorem... albo dziś rano. Nie pamiętam. Spałem.',()=>{H.said.lie=1;logEv('Ethan: rodzice u ciotki (niespójna wersja)');});
+ ask('who','„Kto jeszcze jest w domu?”','Nikt. Tylko ja.');
+ if(A_.parents)ask('call','„Możesz do nich zadzwonić? Chcemy tylko usłyszeć, że wszystko w porządku.”','Nie odbierają... Pewnie są w drodze. Słaby zasięg.',()=>{if(!H.said.callNo){H.said.callNo=1;logEv('Ethan nie potrafi skontaktować się z rodzicami');}});
+ if(!H.idChecked)it.push({t:'„Poproszę jakiś dokument tożsamości.”',f:()=>checkId(u)});
+ const n=Object.keys(A_).length;
+ if(!H.consent)it.push({t:'„Musimy się rozejrzeć w środku. Zgodzisz się?”',dis:n<2||!H.idChecked,f:()=>askConsent(u)});
+ if(H.consent&&!H.search)it.push({t:'Zacznij przeszukanie',f:()=>startSearch(u)});
+ if(!it.length)it.push({t:'(Ethan nie ma nic do dodania)',dis:true,f:NOOP});
+ choiceMenu('Ethan Hartley'+(H.idChecked?' (20)':''),it);}
+function askConsent(u){const H=G.h,s=H.s;say(u.name,'Musimy się rozejrzeć w środku. Dla pewności, że nikomu nic się nie stało. Zgodzisz się?');
+ setTimeout(()=>{if(G.ended||!s.alive||s.team!=='civ')return;say('ETHAN HARTLEY','Serio? ...Dobra. Tylko niczego nie ruszajcie.');H.consent=true;logEv('Ethan zgadza się na rozejrzenie się po domu');startSearch(u);},1200);}
+function startSearch(u){const H=G.h,s=H.s;if(H.search)return;H.search=true;if(s.state==='opened'||s.state==='talk')s.state='calm';
+ const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o){o.watch=s;o.holster=true;setTimeout(()=>{if(!G.ended)say(o.name,pick(['Zostanę z nim w salonie. Rozejrzyj się.','Mam go. Ty sprawdź dom.']));},700);setTimeout(()=>{if(!G.ended&&s.alive&&s.team==='civ')say(o.name,'Ethan, usiądź na kanapie. Ręce tak, żebym je widział.');},2600);}
+ logEv('Przeszukanie domu — partner pilnuje Ethana');}
+function partnerWatch(u,dt){const s=u.watch,H=G.h;if(!s||!s.alive||s.team!=='civ'||s.state==='cuffed'||H.freezer){u.watch=null;return false;}
+ const d=dist(u.x,u.y,s.x,s.y);if(d>TS*1.7){const tx=s.x/TS|0,ty=s.y/TS|0;if(!u.path||u.wg!==tx+','+ty||(u.wr-=dt)<=0){u.path=findPath(u.x/TS|0,u.y/TS|0,tx,ty,3000);u.wg=tx+','+ty;u.wr=.6;}
+  if(u.path)for(const n of u.path.slice(0,3)){const dd=LV.doorAt[I(n[0],n[1])];if(dd&&dd.target===0&&!dd.locked&&!dd.broken&&dist(dd.x*TS+8,dd.y*TS+8,u.x,u.y)<TS*1.6)toggleDoor(dd,u);}
+  if(!u.path||followPath(u,dt,s.state==='escape'?52:40))u.path=null;else if(u.moving)turnTo(u,Math.atan2(u.vy,u.vx),dt,6);}
+ else{moveUnit(u,dt,0,0,0);turnTo(u,Math.atan2(s.y-u.y,s.x-u.x),dt,4);}u.pose='stand';return true;}
 function talkSuspect(u){const H=G.h;H.talked=true;const s=H.s;s.state='talk';s.talkT=7.5;turnTo(s,Math.atan2(u.y-s.y,u.x-s.x),1,9);logEv('Rozmowa z synem przy drzwiach');
  radio(u.name,'Dzień dobry, policja. Mamy zgłoszenie o krzykach i hukach z tego domu.');
- say('ETHAN HARTLEY','Huki? Nie wiem... może ktoś odpalał fajerwerki. Jestem sam, rodzice pojechali do ciotki.');
- radio(u.name,'Musimy się rozejrzeć w środku. Dla pewności.');
- say('ETHAN HARTLEY','Serio? ...Dobra. Tylko niczego nie ruszajcie.');}
+ setTimeout(()=>{if(!G.ended)toast('Porozmawiaj z Ethanem (E), zanim wejdziesz do środka');},2500);}
 function talkNeighbor(u){G.h.said.neigh=1;say('MRS. KELLER','To ja dzwoniłam. Najpierw krzyki, chyba kobiece. Potem dwa huki i cisza. Wczoraj wieczorem jeszcze ich widziałam.');radio(u.name,'Dziękuję. Proszę zostać przy swoim domu.');logEv('Rozmowa z sąsiadką');}
-function findClue(u,c){c.found=true;const H=G.h;H.nf++;logEv(c.msg.split('.')[0]+' ('+roomName(c.x*TS+8,c.y*TS+8)+')');radio(u.name,c.msg);
+function findClue(u,c){c.found=true;const H=G.h;H.nf++;if(c.id==='holster'){H.padKey=true;setTimeout(()=>{if(!G.ended)toast('Masz kluczyk do kłódki');},800);}logEv(c.msg.split('.')[0]+' ('+roomName(c.x*TS+8,c.y*TS+8)+')');radio(u.name,c.msg);
  if(c.id==='towels'&&!H.drawn){const o=G.squad.find(q=>q&&q.alive&&q!==u);radio(u.name,'Ortiz... coś tu nie gra. Broń w ręku.');if(o)radio(o.name,'Przyjąłem.');setTimeout(()=>drawWeapons('ręczniki w wannie'),900);}}
 function drawWeapons(why){const H=G.h;if(!H||H.drawn)return;H.drawn=true;logEv('Funkcjonariusze wyciągają broń ('+why+')');for(const q of G.squad){if(!q||!q.alive)continue;q.holster=false;q.hTip=0;SND.reload(q.x,q.y,'pistol');}}
 function openFreezer(u){const H=G.h;H.freezer=true;drawWeapons('zamrażarka');logEv('Zamrażarka w garażu: dwa ciała');SND.door(FREEZER.x,FREEZER.y,true);
@@ -2016,9 +2036,9 @@ function updateSuspect(c,dt){const H=G.h;
  const insideSquad=G.squad.some(q=>q.alive&&LV.room[I(q.x/TS|0,q.y/TS|0)]>=0&&LV.room[I(q.x/TS|0,q.y/TS|0)]<=7);
  const d=LV.doorAt[I(42,34)];
  switch(c.state){
- case'door':{moveUnit(c,dt,0,0,0);turnTo(c,c.ang+Math.sin(G.time*.4)*.5,dt,.5);if(insideSquad){c.state='calm';H.talked=true;say('ETHAN HARTLEY','Hej! Co wy robicie w moim domu?!');}break;}
- case'answer':{if(insideSquad){c.state='calm';H.talked=true;break;}if(goTo(42,33,36)){c.ang=Math.PI/2;if(d&&!d.broken){d.locked=false;if(!d.target)toggleDoor(d,c);}c.state='opened';say('ETHAN HARTLEY','Tak...? Coś się stało?');}break;}
- case'opened':{moveUnit(c,dt,0,0,0);face();if(insideSquad&&!H.talked){H.talked=true;c.state='calm';say('ETHAN HARTLEY','Ej! Nie macie prawa tak wchodzić!');}break;}
+ case'door':{moveUnit(c,dt,0,0,0);turnTo(c,c.ang+Math.sin(G.time*.4)*.5,dt,.5);if(insideSquad){c.state='calm';H.talked=true;H.forced=true;say('ETHAN HARTLEY','Hej! Co wy robicie w moim domu?!');startSearch(G.p1);}break;}
+ case'answer':{if(insideSquad){c.state='calm';H.talked=true;H.forced=true;startSearch(G.p1);break;}if(goTo(42,33,36)){c.ang=Math.PI/2;if(d&&!d.broken){d.locked=false;if(!d.target)toggleDoor(d,c);}c.state='opened';say('ETHAN HARTLEY','Tak...? Coś się stało?');}break;}
+ case'opened':{moveUnit(c,dt,0,0,0);face();if(insideSquad&&!H.search){H.talked=true;H.forced=true;c.state='calm';say('ETHAN HARTLEY','Ej! Nie macie prawa tak wchodzić!');startSearch(G.p1);}break;}
  case'talk':{moveUnit(c,dt,0,0,0);face();c.talkT-=dt;if(c.talkT<=0)c.state='calm';break;}
  case'calm':{if(goTo(37+(c.pace?1:0),29,20))fidget(c,dt,face);
   if(!H.freezer&&!H.oddT&&G.squad.some(q=>q&&q.alive&&dist(q.x,q.y,FREEZER.x,FREEZER.y)<TS*4.5)){c.state='odd';H.oddT=0.001;c.path=null;break;}
@@ -2042,14 +2062,15 @@ function houseRender(c,cx,cy){const H=G.h;if(!H)return;houseLifeFx(c,cx,cy);
   if(((G.time*2)|0)%2)P(c,x+27,y+3,2,2,'rgba(160,220,255,.4)');}}
 function houseObj(){const H=G.h;if(!H)return'';const s=H.s,ar=s.state==='cuffed'||!s.alive,ins=H.talked&&H.inside;
  const row=(ok,t)=>'<div class="'+(ok?'ok':'no')+'">'+t+'</div>';
- return'<div class="h">Notatnik · J</div>'+row(ins,'Sprawdź zgłoszenie')+(H.freezer?row(ar,'Zatrzymaj podejrzanego'):'')+(s.alive&&s.state==='cuffed'?row(H.inCar,'Doprowadź zatrzymanego do radiowozu'):'')+(H.nf?'<div class="opt">Notatki: '+H.nf+'</div>':'');}
+ const nq=Object.keys(H.asked||{}).length;
+ return'<div class="h">Notatnik · J</div>'+row(H.talked,'Porozmawiaj z mieszkańcem')+(H.talked&&!H.forced?row(nq>=2&&H.idChecked,'Wypytaj i wylegitymuj Ethana'):'')+(H.talked?row(H.search,'Uzyskaj zgodę na rozejrzenie się'):'')+(H.search?row(H.padKey,'Przeszukaj dom'):'')+(H.search&&H.said.pad||H.padKey?row(H.freezer,'Sprawdź zamrażarkę w garażu'):'')+(H.freezer?row(ar,'Zatrzymaj podejrzanego'):'')+(s.alive&&s.state==='cuffed'?row(H.inCar,'Doprowadź zatrzymanego do radiowozu'):'')+(H.nf?'<div class="opt">Notatki: '+H.nf+'</div>':'');}
 function houseBrief(){return`<div class="sec"><span class="lbl">JEDNOSTKA</span>Ridgefield PD · patrol <b>2-Adam-14</b><br>Ofc. Miller, Ofc. Ortiz</div>
 <div class="sec"><span class="lbl">ADRES</span>214 Oakridge Lane, Ridgefield<br>06:40 · jesienny poranek</div>
 <div class="sec"><span class="lbl">ZADANIE</span>Sprawdzić zgłoszenie.</div>`;}
-function houseDebrief(){const s=G.stats,H=G.h||{nf:0,clues:[]};let score=G.win?100:0;score+=H.nf*4;if(H.result==='arrested')score+=20;score+=((H.gawk||[]).filter(g=>g.told).length)*2;score-=s.roe*15+s.squadLost*15+s.civKilled*30;if(G.win)score+=Math.max(0,10-Math.floor(s.time/60));
+function houseDebrief(){const s=G.stats,H=G.h||{nf:0,clues:[]};let score=G.win?100:0;if(H.forced)score-=10;score+=H.nf*4;if(H.result==='arrested')score+=20;score+=((H.gawk||[]).filter(g=>g.told).length)*2;score-=s.roe*15+s.squadLost*15+s.civKilled*30;if(G.win)score+=Math.max(0,10-Math.floor(s.time/60));
  const rank=!G.win?'F':score>=140?'S':score>=125?'A':score>=105?'B':score>=80?'C':'D';
  const sus={arrested:H.inCar?'zatrzymany, w radiowozie':'zatrzymany',killed:'zabity',escaped:'zbiegł'}[H.result]||'—';const gw=(H.gawk||[]).length,gt=(H.gawk||[]).filter(g=>g.told).length;
- debFill(rank,score,[['Czas na miejscu',fmtT(s.time)],['Notatki z miejsca',H.nf+' / '+H.clues.length],['Zamrażarka w garażu',H.freezer?'otwarta — dwie ofiary':'nie sprawdzono',H.freezer?'':'bad'],['Podejrzany',sus,H.result==='arrested'?'good':H.result?'bad':''],['Rozmowa z sąsiadką',H.said&&H.said.neigh?'tak':'nie'],['Gapie odsunięci',gw?gt+' / '+gw:'—'],['Cywile zabici',s.civKilled,s.civKilled?'bad':''],['Straty',s.squadLost+' / 2',s.squadLost?'bad':''],['Nieuprawnione użycie siły',s.roe,s.roe?'bad':''],['Oddane strzały',s.shots]]);}
+ debFill(rank,score,[['Czas na miejscu',fmtT(s.time)],['Wejście do domu',H.forced?'bez zgody':H.consent?'za zgodą mieszkańca':'—',H.forced?'bad':'good'],['Notatki z miejsca',H.nf+' / '+H.clues.length],['Zamrażarka w garażu',H.freezer?'otwarta — dwie ofiary':'nie sprawdzono',H.freezer?'':'bad'],['Podejrzany',sus,H.result==='arrested'?'good':H.result?'bad':''],['Rozmowa z sąsiadką',H.said&&H.said.neigh?'tak':'nie'],['Gapie odsunięci',gw?gt+' / '+gw:'—'],['Cywile zabici',s.civKilled,s.civKilled?'bad':''],['Straty',s.squadLost+' / 2',s.squadLost?'bad':''],['Nieuprawnione użycie siły',s.roe,s.roe?'bad':''],['Oddane strzały',s.shots]]);}
 function policeLights(c,cx,cy){const on=((G.time*5)|0)%2;for(const f of LV.furn){if(f.k!=='police')continue;const x=f.x*TS+22-cx,y=f.y*TS+7.5+((LD().car||{}).oy||0)-cy;if(x<-60||y<-60||x>VW+60||y>VH+60)continue;
  const gy=on?y-5:y+6,col=on?'255,40,30':'40,90,255',g=c.createRadialGradient(x,gy,0,x,gy,34);g.addColorStop(0,'rgba('+col+',.2)');g.addColorStop(1,'rgba('+col+',0)');c.fillStyle=g;c.fillRect(x-38,gy-38,76,76);
  if(on)P(c,x,y-7,1,6,'#ff6a50');else P(c,x,y+1,1,6,'#6aa0ff');}}

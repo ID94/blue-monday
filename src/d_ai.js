@@ -251,6 +251,7 @@ function updateTactical(dt){const L=leader();if(!L||G.order!=='follow'||G.ops.le
   const m=aiMembers().find(u=>u.post);if(m&&G.time-(G.postTalkT||-99)>25&&Math.random()<.5&&(G.postTalkT=G.time))radio(m.name,pick(['Zabezpieczamy.','Biorę drzwi.','Kąty czyste.','Pokrywam wejście.']));}}
 const COLF=[.45,-.45,.3,-.3],COLS=[-1.3,1.3,-2,Math.PI];
 function doFollow(u,dt,idx,engaged,cnt){const L=leader();if(!L||L===u){moveUnit(u,dt,0,0,0);return;}
+ if(u.watch&&!engaged&&typeof partnerWatch==='function'&&partnerWatch(u,dt))return;
  if(u.patrol&&isPat()&&!u.tac){patrolFollow(u,dt,L,engaged);return;}
  const lsp=L.quiet?26:48;u.pose='stand';
  if(u.post){const p=u.post,px=p.tx*TS+8,py=p.ty*TS+8,d=dist(u.x,u.y,px,py);
