@@ -3384,9 +3384,15 @@ const WING=x=>x<29?'zachodniej':x>36?'wschodniej':null,FLIP={zachodniej:'wschodn
 const SH_L=['Hihihi... hihihi...','Kto chce się pobawić? KTO?!','Lubicie fajerwerki? BUM! BUM!','Jestem bohaterem! Napiszą o mnie!','Ciszej! CISZEJ w mojej głowie!','Mama mówi, że jestem dobrym chłopcem... DOBRYM!','Oni mi kazali. Głosy mi kazały!','Widzę cię w ścianie! Widzę cię!','Nie patrzcie na mnie! NIE PATRZCIE!','HAHAHA! Gdzie jesteście?!','Chodźcie! Chodźcie do mnie!','Nikt was nie lubił! NIKT!','Słyszę was... słyszę wasze serduszka!','To wasza wina! WASZA!','Raz, dwa, trzy... szukam!','Pan dyrektor już nie przyjdzie! HAHA!','Uśmiech! Jesteście w telewizji!'];
 function shYell(e,p){const H=G.h;H.yellT=(H.yellT||0);if(G.time-H.yellT>(p?2.5:5)){H.yellT=G.time;say('STRZELEC',pick(SH_L));}}
 function shBlast(e,a,sp){if(e.mag<1)e.mag=99;e.fireCd=0;e.rel=0;e.ang=a+rand(-sp,sp);fire(e);const H=G.h;H.shN=(H.shN||0)+1;if(H.shN>=24){H.shN=0;H.rlT=rand(2.2,3);SND.reload(e.x,e.y,'rifle');shYell(e,1);}}
-function shFrenzy(e,dt){const H=G.h,tg=e.target;if(H.rlT>0){H.rlT-=dt;moveUnit(e,dt,0,0,0);if(tg)turnTo(e,Math.atan2(tg.y-e.y,tg.x-e.x),dt,6);return true;}
+function shCoverSpot(e,tg){const c=[];const ex=e.x/TS|0,ey=e.y/TS|0;for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const x=ex+dx,y=ey+dy;if(!walkable(x,y)||LV.fsolid[I(x,y)])continue;const dd=LV.doorAt[I(x,y)];if(dd&&dd.locked)continue;const px=x*TS+8,py=y*TS+8;if(losClear(px,py,tg.x,tg.y))continue;c.push({x,y,d:Math.abs(dx)+Math.abs(dy)+(dist(px,py,tg.x,tg.y)<TS*3?5:0)});}
+ c.sort((a,b)=>a.d-b.d);for(const s of c.slice(0,8)){const p=findPath(ex,ey,s.x,s.y,600);if(p&&p.length<=8&&!p.some(n=>{const dd=LV.doorAt[I(n[0],n[1])];return dd&&dd.locked;}))return s;}return null;}
+function shCover(e,dt){const H=G.h,C=e.cov;C.t-=dt;if(C.ph==='go'){const d=dist(e.x,e.y,C.x*TS+8,C.y*TS+8);if(d>4&&C.t>0){shWalk(e,dt,C.x,C.y,'cov'+C.x+','+C.y);return true;}C.ph='wait';C.t=rand(1.2,2.8);e.path=null;if(Math.random()<.5)shYell(e);}
+ moveUnit(e,dt,0,0,0);e.pose='kneel';if(C.tg)turnTo(e,Math.atan2(C.tg.y-e.y,C.tg.x-e.x),dt,4);if(H.rlT>0)H.rlT-=dt;
+ if(C.t<=0){e.cov=null;e.pose='stand';e.peekT=rand(.9,1.6);e.path=null;}return true;}
+function shFrenzy(e,dt){const H=G.h,tg=e.target;e.peekT=(e.peekT==null?rand(.9,1.6):e.peekT)-dt;
+ if(e.peekT<=0||H.rlT>0){const sp=shCoverSpot(e,tg);e.peekT=null;if(sp){e.cov={x:sp.x,y:sp.y,ph:'go',t:2.5,tg};e.path=null;e.target=null;return shCover(e,dt);}}if(H.rlT>0){H.rlT-=dt;moveUnit(e,dt,0,0,0);if(tg)turnTo(e,Math.atan2(tg.y-e.y,tg.x-e.x),dt,6);return true;}
  const a=Math.atan2(tg.y-e.y,tg.x-e.x);turnTo(e,a,dt,10);e.sideT=(e.sideT||0)-dt;if(e.sideT<=0){e.sideT=rand(.4,.9);e.sideD=Math.random()<.5?1:-1;}
- const px=-Math.sin(a)*e.sideD,py=Math.cos(a)*e.sideD;moveUnit(e,dt,px,py,42);e.evade=.38;e.pose='stand';
+ const px=-Math.sin(a)*e.sideD,py=Math.cos(a)*e.sideD;moveUnit(e,dt,px,py,30);e.evade=.33;e.pose='stand';
  H.frT=(H.frT||0)-dt;if(H.frT<=0){H.bN=(H.bN||0)+1;if(H.bN>=randi(3,5)){H.bN=0;H.frT=rand(.35,.7);}else H.frT=.11;shBlast(e,a,.2);}if(Math.random()<dt*.6)shYell(e);return true;}
 function shBlind(e,dt){const H=G.h,R=H.ram;e.evade=.22;R.t-=dt;if(H.rlT>0){H.rlT-=dt;moveUnit(e,dt,0,0,0);return true;}
  const cy=8.5*TS+8;if(Math.abs(e.y-cy)>6&&!R.at){shWalk(e,dt,e.x/TS|0,8,'ram'+(e.x/TS|0));if(R.t<-6)H.ram=null;return true;}R.at=true;
@@ -3398,6 +3404,7 @@ function shooterUpd(e,dt){const H=G.h;
   e.fakeT-=dt;e.pose='hands';moveUnit(e,dt,0,0,0);const q=nearestSquad(e);if(q)turnTo(e,Math.atan2(q.y-e.y,q.x-e.x),dt,3);
   if(e.fakeT<=0||(q&&dist(q.x,q.y,e.x,e.y)<TS*2.2&&e.fakeT<2.2)){e.fake=0;e.state='guard';e.pose='stand';say('STRZELEC',pick(['HAHAHAHA! NABRAŁEM WAS!','Psikus! HAHAHA!','Myśleliście, że to koniec? HAHA!']));logEv('Strzelec udawał, że się poddaje');if(q){e.target=q;H.frT=0;H.bN=0;}}return true;}
  if(e.state==='surr'||e.state==='cuffed'||e.stun>0)return false;
+ if(e.cov)return shCover(e,dt);
  e.perT-=dt;if(e.perT<=0){e.perT=.1;enemyPerceive(e);}if(e.target&&e.target.alive){e.fightT=1.5;H.ram=null;return shFrenzy(e,dt);}if(e.fightT>0){e.fightT-=dt;if(e.fightT>0){if(!H.ram)H.ram={t:5,ft:.2,n:randi(4,7),dir:e.ang,at:true};return shBlind(e,dt);}e.path=null;e.goalT=null;e.state='guard';}
  if(H.ram)return shBlind(e,dt);
  H.ramCd=(H.ramCd==null?rand(14,22):H.ramCd)-dt;if(H.ramCd<=0&&!(H.det&&!H.detDone)){H.ram={t:9,ft:.5,n:randi(4,8),dir:Math.random()<.5?0:Math.PI};if(!H.up)setTimeout(()=>{if(!G.ended&&H.sh.alive)radio('DISPATCH',pick(['Świadkowie: seria strzałów na korytarzu piętra!','Strzały w środku, na korytarzu! Strzela na oślep!']));},1500);return shBlind(e,dt);}
@@ -3481,10 +3488,10 @@ function updateSchool(dt){const H=G.h;if(!H||G.ended)return;H.t+=dt;if(H.flash>0
 function schoolStress(dt,L){const c=A.ctx;if(!c||!L)return;const t=c.currentTime,ins=inGF(L)||inUF(L);
  if(!A.alarmG){A.alarmG=c.createGain();A.alarmG.gain.value=0;A.alarmG.connect(A.master);
   A.heliG=c.createGain();A.heliG.gain.value=0;A.heliG.connect(A.master);const s=c.createBufferSource();s.buffer=A.noise;s.loop=true;const hp=c.createBiquadFilter();hp.type='lowpass';hp.frequency.value=260;const am=c.createGain();am.gain.value=.5;const lf2=c.createOscillator();lf2.frequency.value=11;const lg2=c.createGain();lg2.gain.value=.5;lf2.connect(lg2);lg2.connect(am.gain);s.connect(hp);hp.connect(am);am.connect(A.heliG);s.start();lf2.start();}
- if(!A.sirG){A.sirG=c.createGain();A.sirG.gain.value=0;const pul=c.createGain();pul.gain.value=.55;const pl=c.createOscillator();pl.type='square';pl.frequency.value=2.2;const pg2=c.createGain();pg2.gain.value=.45;pl.connect(pg2);pg2.connect(pul.gain);pl.start();pul.connect(A.master);A.sirG.connect(pul);const o=c.createOscillator();o.type='sawtooth';o.frequency.value=880;const lfo=c.createOscillator();lfo.type='square';lfo.frequency.value=1.1;const lg=c.createGain();lg.gain.value=130;lfo.connect(lg);lg.connect(o.frequency);
+ if(!A.sirG){A.sirG=c.createGain();A.sirG.gain.value=0;A.sirG.connect(A.master);const o=c.createOscillator();o.type='sawtooth';o.frequency.value=900;const lfo=c.createOscillator();lfo.type='triangle';lfo.frequency.value=.32;const lg=c.createGain();lg.gain.value=330;lfo.connect(lg);lg.connect(o.frequency);
   const o2=c.createOscillator();o2.type='square';o2.frequency.value=903;lg.connect(o2.frequency);const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2200;const m=c.createGain();m.gain.value=.5;o.connect(lp);o2.connect(m);m.connect(lp);
   const cv=c.createConvolver?null:null;const dl=c.createDelay();dl.delayTime.value=.19;const fb=c.createGain();fb.gain.value=.35;lp.connect(A.sirG);lp.connect(dl);dl.connect(fb);fb.connect(dl);fb.connect(A.sirG);o.start();o2.start();lfo.start();A.sirLP=lp;}
- A.sirG.gain.setTargetAtTime(G.ended||G.lvl!=='school'?0:ins?.026:.007,t,.4);A.sirLP.frequency.setTargetAtTime(ins?2400:700,t,.3);
+ A.sirG.gain.setTargetAtTime(G.ended||G.lvl!=='school'?0:ins?.02:.005,t,.4);A.sirLP.frequency.setTargetAtTime(ins?2400:700,t,.3);
  A.alarmG.gain.setTargetAtTime(G.ended?0:ins?.035:.012,t,.2);A.heliG.gain.setTargetAtTime(G.ended?0:ins?.02:.09,t,.8);
  // pulsujący alarm: trzy sygnały, przerwa (wzór temporal-3)
  const H=G.h;H.alarmT-=dt;if(H.alarmT<=0&&!G.ended){H.alarmT=2.4;for(let k=0;k<3;k++){const t0=t+k*.5,o=c.createOscillator(),g=c.createGain();o.type='square';o.frequency.value=3100;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(.5,t0+.01);g.gain.setValueAtTime(.5,t0+.3);g.gain.linearRampToValueAtTime(0,t0+.32);const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=ins?3400:1400;o.connect(g);g.connect(lp);lp.connect(A.alarmG);o.start(t0);o.stop(t0+.35);}H.alarmP=G.time;}}
