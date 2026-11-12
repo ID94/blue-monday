@@ -201,8 +201,22 @@ function inGF(u){return u.x>SC.gf.x0*TS&&u.x<SC.gf.x1*TS&&u.y>22*TS&&u.y<36*TS;}
 function shWalk(e,dt,gx,gy,key){if(!e.path||e.goalT!==key){e.path=findPath(e.x/TS|0,e.y/TS|0,gx,gy,4000);e.goalT=key;}if(e.path)for(const nn of e.path.slice(0,3)){const dd=LV.doorAt[I(nn[0],nn[1])];if(dd&&dd.target===0&&!dd.locked&&dist(dd.x*TS+8,dd.y*TS+8,e.x,e.y)<TS*1.6)toggleDoor(dd,e);}if(!e.path||followPath(e,dt,40))e.path=null;else if(e.moving)turnTo(e,Math.atan2(e.vy,e.vx),dt,6);}
 function rattleAt(x,y){if(!A.ctx)return;const o=out(x,y,.6,{rev:.3}),t0=A.ctx.currentTime;if(o)for(let k=0;k<4;k++){nz(o,t0+k*.09,.06,{type:'bandpass',f:1500+Math.random()*600,g:.9});tone(o,t0+k*.09,.04,{f:240,f2:180,g:.35,type:'square'});}}
 const WING=x=>x<29?'zachodniej':x>36?'wschodniej':null,FLIP={zachodniej:'wschodniej',wschodniej:'zachodniej'};
+const SH_L=['HAHAHA! Gdzie jesteście?!','Chodźcie! Chodźcie do mnie!','Nikt was nie lubił! NIKT!','Słyszę was... słyszę wasze serduszka!','To wasza wina! WASZA!','Raz, dwa, trzy... szukam!','Pan dyrektor już nie przyjdzie! HAHA!','Uśmiech! Jesteście w telewizji!'];
+function shYell(e,p){const H=G.h;H.yellT=(H.yellT||0);if(G.time-H.yellT>(p?2.5:5)){H.yellT=G.time;say('STRZELEC',pick(SH_L));}}
+function shBlast(e,a,sp){if(e.mag<1)e.mag=99;e.fireCd=0;e.rel=0;e.ang=a+rand(-sp,sp);fire(e);const H=G.h;H.shN=(H.shN||0)+1;if(H.shN>=6){H.shN=0;H.rlT=rand(1.8,2.6);SND.reload(e.x,e.y,'shotgun');shYell(e,1);}}
+function shFrenzy(e,dt){const H=G.h,tg=e.target;if(H.rlT>0){H.rlT-=dt;moveUnit(e,dt,0,0,0);if(tg)turnTo(e,Math.atan2(tg.y-e.y,tg.x-e.x),dt,6);return true;}
+ const a=Math.atan2(tg.y-e.y,tg.x-e.x);turnTo(e,a,dt,10);e.sideT=(e.sideT||0)-dt;if(e.sideT<=0){e.sideT=rand(.4,.9);e.sideD=Math.random()<.5?1:-1;}
+ const px=-Math.sin(a)*e.sideD,py=Math.cos(a)*e.sideD;moveUnit(e,dt,px,py,26);e.pose='stand';
+ H.frT=(H.frT||0)-dt;if(H.frT<=0){H.frT=rand(.35,.6);shBlast(e,a,.24);}if(Math.random()<dt*.6)shYell(e);return true;}
+function shBlind(e,dt){const H=G.h,R=H.ram;R.t-=dt;if(H.rlT>0){H.rlT-=dt;moveUnit(e,dt,0,0,0);return true;}
+ const cy=8.5*TS+8;if(Math.abs(e.y-cy)>6&&!R.at){shWalk(e,dt,e.x/TS|0,8,'ram'+(e.x/TS|0));if(R.t<-6)H.ram=null;return true;}R.at=true;
+ moveUnit(e,dt,0,0,0);e.pose='stand';let a=R.dir;const q=G.squad.filter(u=>u&&u.alive&&inUF(u)).sort((u,v)=>dist(u.x,u.y,e.x,e.y)-dist(v.x,v.y,e.x,e.y))[0];if(q&&Math.random()<.7)a=Math.atan2(q.y-e.y,q.x-e.x);
+ turnTo(e,a,dt,8);R.ft-=dt;if(R.ft<=0){R.ft=rand(.3,.75);shBlast(e,a,.38);R.n--;}if(Math.random()<dt*.8)shYell(e);
+ if(R.n<=0||R.t<=0){H.ram=null;H.ramCd=H.up?rand(4,9):rand(16,26);e.path=null;e.goalT=null;}return true;}
 function shooterUpd(e,dt){const H=G.h;if(e.state==='surr'||e.state==='cuffed'||e.stun>0)return false;
- e.perT-=dt;if(e.perT<=0){e.perT=.1;enemyPerceive(e);}if(e.target){e.fightT=1.5;return false;}if(e.fightT>0){e.fightT-=dt;if(e.fightT>0)return false;e.path=null;e.goalT=null;e.state='guard';}
+ e.perT-=dt;if(e.perT<=0){e.perT=.1;enemyPerceive(e);}if(e.target&&e.target.alive){e.fightT=1.5;H.ram=null;return shFrenzy(e,dt);}if(e.fightT>0){e.fightT-=dt;if(e.fightT>0){if(!H.ram)H.ram={t:5,ft:.2,n:randi(4,7),dir:e.ang,at:true};return shBlind(e,dt);}e.path=null;e.goalT=null;e.state='guard';}
+ if(H.ram)return shBlind(e,dt);
+ H.ramCd=(H.ramCd==null?rand(14,22):H.ramCd)-dt;if(H.ramCd<=0&&!(H.det&&!H.detDone)){H.ram={t:9,ft:.5,n:randi(4,8),dir:Math.random()<.5?0:Math.PI};if(!H.up)setTimeout(()=>{if(!G.ended&&H.sh.alive)radio('DISPATCH',pick(['Świadkowie: seria strzałów na korytarzu piętra!','Strzały w środku, na korytarzu! Strzela na oślep!']));},1500);return shBlind(e,dt);}
  if(H.det&&!H.detDone){const gx=32*TS+8,gy=8*TS+8;if(dist(e.x,e.y,gx,gy)>5){shWalk(e,dt,32,8,'det');return true;}
   moveUnit(e,dt,0,0,0);turnTo(e,-Math.PI/2,dt,6);e.pose='stand';if(H.detT==null){H.detT=5;H.rattleT=0;radio('DISPATCH','Uwaga! Emma mówi, że on stoi pod jej drzwiami. Szarpie za klamkę... sala 202, piętro!',{prio:1});logEv('Strzelec pod drzwiami sali 202');}
   H.detT-=dt;H.rattleT-=dt;if(H.rattleT<=0){H.rattleT=rand(.5,.9);rattleAt(32*TS+8,7*TS+8);makeNoise(32*TS+8,8*TS,8,'kick',e);}
