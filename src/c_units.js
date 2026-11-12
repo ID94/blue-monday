@@ -102,7 +102,7 @@ function impact(x,y,tx,ty,a){const t0=tAt(tx,ty),brick=tAt(tx,ty+1)===T.GRASS||t
  const hx=Math.round(x),hy=Math.round(y-6);if((t0===T.WALL||t0===T.WIN)&&WR[ty]){const g=WR[ty].getContext('2d'),face=!isWallT(tx,ty+1),ly=face?16+((Math.random()*9)|0):2+((Math.random()*12)|0);P(g,hx-1,ly-1,3,3,'rgba(200,205,195,.35)');P(g,hx,ly,2,2,'#111');return;}P(wc,hx-1,hy-1,3,3,'rgba(200,205,195,.35)');P(wc,hx,hy,2,2,'#111');if(Math.random()<.5)P(wc,hx+2,hy+1,1,1,'#2a2a2a');}
 function bloodPool(x,y,r,rr){rr=rr||Math.random;for(let i=0;i<r*2.2;i++){const a=rr()*6.28,d=rr()*r,w=1+((rr()*3)|0);P(wc,Math.round(x+Math.cos(a)*d*1.3),Math.round(y+Math.sin(a)*d*.8),w,Math.max(1,w-1),rr()<.7?'#3a0b0b':'#4c1010');}
  P(wc,Math.round(x-r*.5),Math.round(y-1),Math.round(r),2,'#2c0707');}
-function woundUnit(u,by,a){u.wounded=true;u.treated=false;u.bleed=110;u.stun=Math.max(u.stun,.5);u.dripT=0;SND.hurt(u.x,u.y);bloodPool(u.x,u.y,2.5);G.stats.wounded++;
+function woundUnit(u,by,a){u.wounded=true;u.treated=false;u.bleed=110;u.stun=Math.max(u.stun,.5);u.dripT=0;SND.hurt(u.x,u.y);bloodPool(u.x,u.y,2.5);G.stats.wounded++;if(u.human)G.stats.pHit=(G.stats.pHit||0)+1;if(u.team==='squad')G.stats.sqHit=(G.stats.sqHit||0)+1;
  if(u.human){G.hurtF=1;G.shake=.3;}radio(u.name,pick(['Dostałem! Jestem ranny!','Trafiony... dam radę!','Ranny! Potrzebuję medyka!','Kurwa, dostałem w ramię!']),{prio:1});}
 function kill(u,by,a){if(!u.alive)return;
  if(u.team==='squad'&&!u.wounded&&!u.noWound&&Math.random()<(u.armor==='heavy'?.65:.4)){woundUnit(u,by,a);logEv(u.name+' ranny ('+roomName(u.x,u.y)+')');return;}

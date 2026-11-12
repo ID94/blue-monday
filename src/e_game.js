@@ -568,7 +568,13 @@ function showDebrief(){$('hud').classList.add('hidden');closeCtx();if(isPat()){L
 function debFill(rank,score,rows){const sc=$('scr-deb'),c=$('sc'+(PZ_SC[G.lvl]||1));sc.classList.toggle('fail',!G.win);
  $('deb-h').textContent=G.win?'MISJA ZAKOŃCZONA':'MISJA NIEUDANA';$('deb-h').style.color='';$('db-stat').textContent=G.win?'ZAMKNIĘTE':'NIEUDANE';$('db-no').textContent=(LD().nb&&LD().nb.no)||'#26-097-0042';
  $('db-tt').textContent=c?c.querySelector('.tt').textContent:'';$('db-fa').textContent=c?c.querySelector('.fa').textContent:'';$('db-rs').textContent=G.reason||'';
- const nS=G.win?({S:4,A:3,B:2,C:1,D:1}[rank]||0):0,stE=$('db-stars');stE.innerHTML=[0,1,2,3].map(i=>'<i class="'+(i<nS?'on':'')+'">★</i>').join('');[...stE.children].forEach((x,i)=>setTimeout(()=>{x.classList.add('in');if(i<nS&&A.ctx){const o=ui(.25);if(o)tone(o,A.ctx.currentTime,.18,{f:660*Math.pow(1.26,i),g:.5,type:'triangle'});}},350+i*260));
+ let nS=G.win?({S:4,A:3,B:2,C:1,D:1}[rank]||0):0;const s_=G.stats,why=[],cap=(n,t)=>{if(nS>n){nS=n;}why.push(t);};
+ if(G.win){const hum=(G.squad||[]).filter(u=>u&&u.human);
+  if(hum.some(u=>!u.alive))cap(1,'zginąłeś w akcji');else if((s_.pHit||0)>=2)cap(2,'ranny '+s_.pHit+'×');else if(s_.pHit)cap(3,'zostałeś ranny');
+  if(s_.squadLost)cap(2,'strata w zespole');else if((s_.sqHit||0)-(s_.pHit||0)>0)cap(3,'ranny członek zespołu');
+  if(s_.civKilled)cap(1,'zginął cywil z waszej ręki');if(s_.roe)cap(2,'nieuprawnione użycie siły');
+  const L=['F','D','C','B','A','S'];const rk={0:'F',1:'C',2:'B',3:'A',4:'S'}[nS];if(rk&&L.indexOf(rk)<L.indexOf(rank))rank=rk;}
+ const stE=$('db-stars');stE.title=why.join(' · ');$('db-why').textContent=why.length&&G.win?'Ocena obniżona: '+why.join(' · '):'';stE.innerHTML=[0,1,2,3].map(i=>'<i class="'+(i<nS?'on':'')+'">★</i>').join('');[...stE.children].forEach((x,i)=>setTimeout(()=>{x.classList.add('in');if(i<nS&&A.ctx){const o=ui(.25);if(o)tone(o,A.ctx.currentTime,.18,{f:660*Math.pow(1.26,i),g:.5,type:'triangle'});}},350+i*260));
  try{const k='bm_stars_'+G.lvl,old=+localStorage.getItem(k)||0;if(nS>old)localStorage.setItem(k,nS);}catch(e){}scStars();
  const r=$('deb-r');r.textContent=rank;r.className='db-rk r-'+rank;$('db-pt').textContent=score+' PKT';$('db-tm').textContent='CZAS '+fmtT(G.stats.time);
  $('deb-st').innerHTML=rows.map(x=>'<div'+(x[2]?' class="'+x[2]+'"':'')+'>'+x[0]+'<span>'+x[1]+'</span></div>').join('');
