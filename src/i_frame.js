@@ -20,8 +20,8 @@ function setLevel(l){G.lvl=l;const d=LD();
 function buildOUTM(){OUTM=document.createElement('canvas');OUTM.width=MW*TS;OUTM.height=MH*TS;const og=OUTM.getContext('2d');og.fillStyle='#fff';
  const od=(x,y)=>{const t=tAt(x,y);return t===T.GRASS||t===T.ASPH;};
  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=tAt(x,y);if(od(x,y))og.fillRect(x*TS,y*TS,TS,TS);else if((t===T.WALL||t===T.WIN)&&od(x,y+1))og.fillRect(x*TS,(y-1)*TS+4,TS,TS+12);}}
-function weatherAlpha(){return{morning:.76,night:.18,rain:.1,indoor:.3,day:.95,fog:.22,snow:.5,dust:.2}[W8()]||0;}
-function weatherTint(){return{morning:'#cfccc6',night:'#6f7a92',rain:'#8a94a8',indoor:'#bdb8b0',day:'#f8f2e6',fog:'#8e949a',snow:'#b4bccc',dust:'#c09a7a'}[W8()]||'#c4ccd6';}
+function weatherAlpha(){if(W8()==='fog'&&LD().dusk)return .5;return{morning:.76,night:.18,rain:.1,indoor:.3,day:.95,fog:.22,snow:.5,dust:.2}[W8()]||0;}
+function weatherTint(){if(W8()==='fog'&&LD().dusk)return'#b8a8aa';return{morning:'#cfccc6',night:'#6f7a92',rain:'#8a94a8',indoor:'#bdb8b0',day:'#f8f2e6',fog:'#8e949a',snow:'#b4bccc',dust:'#c09a7a'}[W8()]||'#c4ccd6';}
 function nightFx(c){const v=c.createRadialGradient(VW/2,VH/2,VH*.3,VW/2,VH/2,VW*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(2,3,8,.55)');c.fillStyle=v;c.fillRect(0,0,VW,VH);}
 function indoorFx(c){const v=c.createRadialGradient(VW/2,VH/2,VH*.35,VW/2,VH/2,VW*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(4,3,2,.45)');c.fillStyle=v;c.fillRect(0,0,VW,VH);}
 // ---- shared patrol helpers ----
@@ -79,7 +79,7 @@ function drawWeather(c,cx,cy){const w=W8(),dt=1/60;
   if(((G.time*.13)%1)<.02&&Math.random()<.5){}}
  else if(w==='fog'){c.globalCompositeOperation='lighter';for(const b of FOGB){b.x+=b.v*dt;if(b.x>1.3)b.x=-.3;const x=b.x*VW-(cx*.15)%VW,y=b.y*VH,g=c.createRadialGradient(x,y,0,x,y,b.r);g.addColorStop(0,'rgba(90,96,104,.16)');g.addColorStop(1,'rgba(90,96,104,0)');c.fillStyle=g;c.fillRect(x-b.r,y-b.r,b.r*2,b.r*2);}c.globalCompositeOperation='source-over';}}
 function weatherPost(c){const w=W8();
- if(w==='fog'){c.fillStyle='rgba(120,128,138,.13)';c.fillRect(0,0,VW,VH);nightFx(c);}
+ if(w==='fog'){if(LD().dusk){const g=c.createLinearGradient(0,0,0,VH);g.addColorStop(0,'rgba(150,110,120,.22)');g.addColorStop(.5,'rgba(170,140,130,.16)');g.addColorStop(1,'rgba(110,120,140,.14)');c.fillStyle=g;c.fillRect(0,0,VW,VH);c.fillStyle='rgba(200,170,150,.07)';c.fillRect(0,0,VW,VH);const v=c.createRadialGradient(VW/2,VH/2,VH*.35,VW/2,VH/2,VW*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(20,14,24,.4)');c.fillStyle=v;c.fillRect(0,0,VW,VH);}else{c.fillStyle='rgba(120,128,138,.13)';c.fillRect(0,0,VW,VH);nightFx(c);}}
  else if(w==='dust'){c.fillStyle='rgba(60,30,10,.08)';c.fillRect(0,0,VW,VH);nightFx(c);}
  else if(w==='snow'){c.fillStyle='rgba(150,170,200,.06)';c.fillRect(0,0,VW,VH);indoorFx(c);}
  else if(w==='day'){c.globalCompositeOperation='screen';c.fillStyle='rgba(255,236,190,.09)';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';}

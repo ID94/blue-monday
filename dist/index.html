@@ -2417,8 +2417,8 @@ function setLevel(l){G.lvl=l;const d=LD();
 function buildOUTM(){OUTM=document.createElement('canvas');OUTM.width=MW*TS;OUTM.height=MH*TS;const og=OUTM.getContext('2d');og.fillStyle='#fff';
  const od=(x,y)=>{const t=tAt(x,y);return t===T.GRASS||t===T.ASPH;};
  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=tAt(x,y);if(od(x,y))og.fillRect(x*TS,y*TS,TS,TS);else if((t===T.WALL||t===T.WIN)&&od(x,y+1))og.fillRect(x*TS,(y-1)*TS+4,TS,TS+12);}}
-function weatherAlpha(){return{morning:.76,night:.18,rain:.1,indoor:.3,day:.95,fog:.22,snow:.5,dust:.2}[W8()]||0;}
-function weatherTint(){return{morning:'#cfccc6',night:'#6f7a92',rain:'#8a94a8',indoor:'#bdb8b0',day:'#f8f2e6',fog:'#8e949a',snow:'#b4bccc',dust:'#c09a7a'}[W8()]||'#c4ccd6';}
+function weatherAlpha(){if(W8()==='fog'&&LD().dusk)return .5;return{morning:.76,night:.18,rain:.1,indoor:.3,day:.95,fog:.22,snow:.5,dust:.2}[W8()]||0;}
+function weatherTint(){if(W8()==='fog'&&LD().dusk)return'#b8a8aa';return{morning:'#cfccc6',night:'#6f7a92',rain:'#8a94a8',indoor:'#bdb8b0',day:'#f8f2e6',fog:'#8e949a',snow:'#b4bccc',dust:'#c09a7a'}[W8()]||'#c4ccd6';}
 function nightFx(c){const v=c.createRadialGradient(VW/2,VH/2,VH*.3,VW/2,VH/2,VW*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(2,3,8,.55)');c.fillStyle=v;c.fillRect(0,0,VW,VH);}
 function indoorFx(c){const v=c.createRadialGradient(VW/2,VH/2,VH*.35,VW/2,VH/2,VW*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(4,3,2,.45)');c.fillStyle=v;c.fillRect(0,0,VW,VH);}
 // ---- shared patrol helpers ----
@@ -2476,7 +2476,7 @@ function drawWeather(c,cx,cy){const w=W8(),dt=1/60;
   if(((G.time*.13)%1)<.02&&Math.random()<.5){}}
  else if(w==='fog'){c.globalCompositeOperation='lighter';for(const b of FOGB){b.x+=b.v*dt;if(b.x>1.3)b.x=-.3;const x=b.x*VW-(cx*.15)%VW,y=b.y*VH,g=c.createRadialGradient(x,y,0,x,y,b.r);g.addColorStop(0,'rgba(90,96,104,.16)');g.addColorStop(1,'rgba(90,96,104,0)');c.fillStyle=g;c.fillRect(x-b.r,y-b.r,b.r*2,b.r*2);}c.globalCompositeOperation='source-over';}}
 function weatherPost(c){const w=W8();
- if(w==='fog'){c.fillStyle='rgba(120,128,138,.13)';c.fillRect(0,0,VW,VH);nightFx(c);}
+ if(w==='fog'){if(LD().dusk){const g=c.createLinearGradient(0,0,0,VH);g.addColorStop(0,'rgba(150,110,120,.22)');g.addColorStop(.5,'rgba(170,140,130,.16)');g.addColorStop(1,'rgba(110,120,140,.14)');c.fillStyle=g;c.fillRect(0,0,VW,VH);c.fillStyle='rgba(200,170,150,.07)';c.fillRect(0,0,VW,VH);const v=c.createRadialGradient(VW/2,VH/2,VH*.35,VW/2,VH/2,VW*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(20,14,24,.4)');c.fillStyle=v;c.fillRect(0,0,VW,VH);}else{c.fillStyle='rgba(120,128,138,.13)';c.fillRect(0,0,VW,VH);nightFx(c);}}
  else if(w==='dust'){c.fillStyle='rgba(60,30,10,.08)';c.fillRect(0,0,VW,VH);nightFx(c);}
  else if(w==='snow'){c.fillStyle='rgba(150,170,200,.06)';c.fillRect(0,0,VW,VH);indoorFx(c);}
  else if(w==='day'){c.globalCompositeOperation='screen';c.fillStyle='rgba(255,236,190,.09)';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';}
@@ -2518,43 +2518,35 @@ F('laneWb',1,1,0,0,(g,x,y)=>{P(g,x,y+15,16,1,'rgba(210,210,200,.55)');});
 F('mm',1,1,1,0,(g,x,y)=>{P(g,x+7,y+4,2,11,'#6a6e72');P(g,x+4,y-4,8,9,'#1e5a36');P(g,x+4,y-4,8,1,'#2e7a4e');P(g,x+5,y-2,6,1,'#d8e0d8');P(g,x+6,y,4,2,'#d8e0d8');P(g,x+6,y+13,5,2,SH);});
 F('post',1,1,0,0,(g,x,y)=>{P(g,x+7,y+4,2,9,'#cfcfc8');P(g,x+7,y+4,2,2,'#e8a020');P(g,x+8,y+13,3,1,SH);});
 // srebrny minivan (Toyota Sienna), lewe tylne światło nie działa
-function mkMinivan(win,side){const c=document.createElement('canvas');c.width=64;c.height=40;const g=c.getContext('2d');
- const B='#a4aab0',BL='#c6ccd2',BD='#7c8288',BS='#6a7076',GL='#141c24',GR='#3a5670',TR='#2a2e33';
+function mkMinivan(win,side){const c=document.createElement('canvas');c.width=56;c.height=34;const g=c.getContext('2d');
+ const x=1,Y0=10,b='#a6acb2',hi='#c8ced4',lo='#7e848a',GL='#141c24',GR='#40607a',sd=shade(b,-40);
+ const T=(dx,dy,w,h,col)=>P(g,x+dx,Y0+dy,w,h,col),R=(dx,dy,w,h,col)=>P(g,x+dx,Y0-6+dy,w,h,col);
  // cień
- P(g,4,33,58,4,'rgba(0,0,0,.42)');P(g,8,37,50,1,'rgba(0,0,0,.2)');
- // ---- bok (strona pasażera, widoczna w 2.5D) y 22..32 ----
- P(g,2,22,60,10,BS);P(g,2,22,60,1,BD);P(g,3,31,58,1,'#4a5056');
- P(g,2,28,60,1,'#5a6066');for(let x=3;x<61;x+=1)if(x%2)P(g,x,29,1,1,'#60666c');// listwa
- // szyby boczne: tylna, przesuwne drzwi, przednie drzwi
- P(g,5,23,9,4,GL);P(g,6,23,3,1,GR);P(g,16,23,15,4,GL);P(g,17,23,5,1,GR);P(g,33,23,9,4,GL);P(g,34,23,3,1,GR);
- P(g,15,23,1,4,TR);P(g,32,23,1,4,TR);P(g,42,23,4,4,TR);
- P(g,31,22,1,9,'#5a6066');P(g,15,24,1,7,'#5a6066');P(g,16,27,15,1,'#80868c');// szyna drzwi przesuwnych
- P(g,28,28,2,1,'#c8ccd0');P(g,39,28,2,1,'#c8ccd0');// klamki
- // okno pasażera (stan)
- const me=side==='pas',st=me?win:0;if(st===1){P(g,33,23,9,1,'#05070a');P(g,33,24,9,1,GL);}if(st===2){P(g,33,23,9,4,'#2a2420');P(g,35,24,3,2,'#4a3a2e');}
- // koła
- for(const wx of[8,45]){P(g,wx-1,29,12,3,'#24282c');P(g,wx,30,10,6,'#0c0c0e');P(g,wx+3,31,4,4,'#8a8e94');P(g,wx+4,32,2,2,'#c8ccd0');P(g,wx-1,29,12,1,'#3a3e44');}
- // światła z boku
- P(g,60,24,2,3,'#f0ecd0');P(g,2,24,1,3,'#b81c16');P(g,61,30,1,2,'#e8a020');
- // ---- dach / góra y 3..22 ----
- P(g,2,4,60,18,B);P(g,3,3,58,1,BL);P(g,2,21,60,1,BD);
- // maska (przód, prawo)
- P(g,50,5,11,16,'#b0b6bc');P(g,50,5,11,1,BL);P(g,60,6,1,14,BD);P(g,52,8,7,1,'#bcc2c8');P(g,52,17,7,1,'#9aa0a6');
- P(g,61,6,1,3,'#f4f0d8');P(g,61,17,1,3,'#f4f0d8');P(g,61,11,1,4,'#2a2e33');// reflektory, grill
- // szyba przednia
- P(g,43,5,7,16,GL);P(g,44,6,2,6,GR);P(g,46,7,1,3,GR);P(g,43,5,7,1,'#0a0e12');
- // dach
- P(g,10,5,33,16,'#8e949a');P(g,10,5,33,1,BL);P(g,10,20,33,1,BD);
- P(g,12,6,29,1,'#6a7076');P(g,12,19,29,1,'#6a7076');for(const x of[13,26,39])P(g,x,6,1,14,'#5a6066');// relingi
- P(g,22,9,9,8,'#82888e');P(g,23,10,7,1,'#9aa0a6');// szyberdach
- // szyba tylna
- P(g,4,6,6,14,GL);P(g,5,7,1,5,GR);P(g,2,6,2,14,'#9aa0a6');
- // światła tył, jedno nie działa
- P(g,2,5,1,3,'#3a1010');P(g,2,18,1,3,'#c8201a');P(g,1,10,1,6,'#d8d0a0');
+ P(g,x+2,Y0+21,52,3,'rgba(0,0,0,.45)');P(g,x+5,Y0+24,46,1,'rgba(0,0,0,.18)');
+ // bok nadwozia (strona pasażera, bliżej kamery)
+ T(2,17,50,4,sd);T(2,21,50,1,'#18191c');T(2,19,50,1,shade(b,-52));
+ T(13,17,1,4,shade(b,-75));T(29,17,1,4,shade(b,-75));T(14,18,15,1,shade(b,-60));// szyna drzwi przesuwnych
+ T(26,18,2,1,'#c8ccd0');T(37,18,2,1,'#c8ccd0');
+ T(52,17,1,2,'#f6f2dc');T(1,17,1,2,'#d02a1e');T(51,19,1,1,'#d89a2a');
+ for(const wx of[6,40]){T(wx,19,8,4,'#08080a');T(wx+3,20,2,2,'#6a6e74');T(wx-1,18,10,1,shade(b,-70));}
+ // płaszczyzna górna (maska, nadwozie)
+ T(2,0,50,17,b);T(1,1,52,16,b);T(3,0,48,1,hi);T(1,16,52,1,lo);
+ T(43,1,9,15,shade(b,6));T(44,4,7,1,shade(b,-14));T(44,12,7,1,shade(b,-14));
+ T(52,2,2,13,'#0e0f11');T(53,4,1,9,'#2c2e32');T(51,1,2,3,'#f6f2dc');T(51,13,2,3,'#f6f2dc');T(52,2,1,1,'#fff');T(52,14,1,1,'#fff');T(51,5,1,2,'#d89a2a');T(51,10,1,2,'#d89a2a');
+ T(1,1,1,3,'#3a1010');T(1,13,1,3,'#c0201a');T(2,14,1,1,'#ff4a3a');T(0,5,1,7,'#1a1b1e');
+ // przednia szyba (pochylona od dachu do maski)
+ for(let k=0;k<6;k++)P(g,x+38+k,Y0-4+k,1,15,GL);for(let k=0;k<6;k++)P(g,x+38+k,Y0-4+k,1,1,'#2a2e33');T(39,-3,1,4,GR);T(40,-2,1,3,GR);T(41,0,1,2,'#6a8aa2');
+ // szyby boczne (strona bliższa)
+ R(5,16,33,6,GL);R(12,16,1,6,shade(b,-30));R(29,16,1,6,shade(b,-30));R(6,16,4,1,GR);R(14,16,6,1,GR);R(31,16,3,1,'#2e4458');
+ {const st=side==='pas'?win:0;if(st===1){R(30,16,7,1,'#05070a');}if(st===2){R(30,16,7,6,'#2a2420');R(32,18,3,2,'#4a3a2e');}}
+ // dach (wyżej niż w sedanie)
+ R(4,2,34,14,'#9aa0a6');R(4,2,34,1,hi);R(4,15,34,1,lo);R(4,3,1,12,hi);
+ R(6,3,30,1,'#6a7076');R(6,14,30,1,'#6a7076');for(const rx of[8,21,34])R(rx,3,1,12,'#5a6066');
+ R(17,6,9,6,'#848a90');R(18,7,7,1,'#a4aab0');
+ for(let k=0;k<3;k++)P(g,x+1+k,Y0-2-k,1,12,GL);R(2,5,1,3,GR);// tylna szyba klapy
+ {const sd2=side!=='pas'?win:0;R(30,1,7,1,sd2===0?GL:sd2===1?'#05070a':'#2a2420');}
  // lusterka
- P(g,44,2,3,2,TR);P(g,44,22,3,2,TR);
- // okno kierowcy (krawędź od góry)
- {const sd=side!=='pas'?win:0;P(g,34,4,8,1,sd===0?GL:sd===1?'#05070a':'#2a2420');if(sd===2)P(g,36,3,4,1,'#c49a7c');}
+ T(36,-1,2,1,'#2a2e33');T(36,17,2,1,'#2a2e33');
  return c;}
 function carTiles(on){const C=G.car;if(!C)return;const x0=Math.floor(C.x/TS),y0=Math.floor(C.y/TS);for(let y=y0;y<y0+2;y++)for(let x=x0;x<x0+4;x++)if(inb(x,y))LV.fsolid[I(x,y)]=on?1:0;}
 function roadScen(){}
@@ -2562,7 +2554,7 @@ function startRoad(){G.hostage=null;G.deadline=1e9;
  G.h={win:0,winSide:null,keys:false,flares:false,reach:null,reachDone:false,sawGun:false,stage:'stop',approach:null,docs:false,plates:false,lic:false,k9T:null,knockT:2,knocks:0,peek:false,twist:null,trunk:false,girl:false,drv:null,said:{},t:0,truckT:12,endT:null,res:null};
  G.truck=null;G.traffic=[];G.trafT=2;G.car={x:40*TS,y:32*TS,vx:0,vy:0,ang:0,mode:'parked',spr:mkMinivan(0,'drv'),engine:true};carTiles(true);G.carBlk=carBlocks;
  G.police=[];logEv('WHP 14: zatrzymanie pojazdu, US-287, mila 41');
- setTimeout(()=>{radio('DISPATCH','WHP 14, przyjęłam zatrzymanie o pierwszej dwanaście. Najbliższe wsparcie piętnaście minut od was.');},600);}
+ setTimeout(()=>{radio('DISPATCH','WHP 14, przyjęłam zatrzymanie o dziewiętnastej czterdzieści jeden. Najbliższe wsparcie piętnaście minut od was.');},600);}
 const RD={drvWin:()=>({x:G.car.x+38,y:G.car.y-8}),pasWin:()=>({x:G.car.x+38,y:G.car.y+40}),rearWin:()=>({x:G.car.x+22,y:G.car.y+40}),trunk:()=>({x:G.car.x-8,y:G.car.y+16}),mdt:()=>({x:34*TS+8,y:34*TS+4})};
 function roadInteract(u){const H=G.h,C=G.car;if(!H)return null;
  if(H.stage==='stop'){
@@ -2593,7 +2585,7 @@ function driverTalk(u){const H=G.h;const it=[];
  if(!H.said.search)it.push({t:'„Czy mogę przeszukać pojazd?”',f:()=>{H.said.search=1;say(u.name,'Czy wyrazi pan zgodę na przeszukanie pojazdu?');say('KIEROWCA','Wolałbym nie. Mam swoje prawa, prawda? Śpieszymy się.');logEv('Kierowca odmawia przeszukania');}});
  it.push({t:'„Proszę wysiąść z samochodu.”',f:()=>{say(u.name,'Proszę zgasić silnik i wysiąść z samochodu.');say('KIEROWCA','...Jasne. Już wysiadam.');logEv('Polecenie wyjścia z pojazdu');setTimeout(()=>roadTwist(u),2200);}});
  if(H.docs)it.push({t:'„Proszę zaczekać w aucie.”',f:()=>{say(u.name,'Proszę zaczekać w samochodzie.');say('KIEROWCA','Nigdzie się nie wybieram.');}});
- it.push({t:'„Dostaje pan pouczenie. Proszę naprawić światło.” (puść kierowcę)',f:()=>{say(u.name,'Tym razem pouczenie. Proszę naprawić to światło.');say('KIEROWCA','Dziękuję, panie władzo. Dobrej nocy.');releaseCar();}});
+ it.push({t:'„Dostaje pan pouczenie. Proszę naprawić światło.” (puść kierowcę)',f:()=>{say(u.name,'Tym razem pouczenie. Proszę naprawić to światło.');say('KIEROWCA','Dziękuję, panie władzo. Dobrego wieczoru.');releaseCar();}});
  choiceMenu('Kierowca — srebrna Toyota Sienna',it);}
 function showDaleId(){if(G.ended)return;const el=$('idcard');el.innerHTML='<div class="idh"><span>STATE OF INDIANA</span><span>DRIVER LICENSE</span></div><div class="idb"><canvas id="idph" width="18" height="22"></canvas><div class="idf"><div><i>DL</i> 4471-08-9925</div><div class="idn">PRUITT</div><div class="idn2">DALE ROBERT</div><div><i>DOB</i> 09/02/1979</div><div>88 COUNTY RD 300<br>MUNCIE IN</div><div><i>HGT</i> 6\'1" &nbsp;<i>EYES</i> BLU &nbsp;<i>SEX</i> M</div><div><i>EXP</i> 09/02/2028</div></div></div><div class="idsig">D. Pruitt</div>';
  const c=$('idph'),g=c.getContext('2d');P(g,0,0,18,22,'#a8b4bc');P(g,3,15,12,7,'#4a4a3a');P(g,7,12,4,4,'#b08868');P(g,5,4,8,10,'#c49a7c');P(g,5,2,8,3,'#8a7050');P(g,6,8,2,1,'#2a2a3a');P(g,10,8,2,1,'#2a2a3a');P(g,7,11,4,1,'#8a5a4a');P(g,6,12,6,1,'#7a6a50');
@@ -2667,8 +2659,8 @@ function roadStress(dt,L){const c=A.ctx;if(c&&!A.rdHum){A.rdHum=c.createGain();A
 G.crT=(G.crT||0)-dt;if(G.crT<=0&&A.ctx&&isOutdoor(L.x,L.y)){G.crT=rand(.25,.6);const o=ui(.012);tone(o,A.ctx.currentTime,.04,{f:rand(4200,4700),g:.4});}
  for(const s of G.squad){if(!s||!s.alive||!s.wounded)continue;s.breathT=(s.breathT||0)-dt;if(s.breathT<=0){s.breathT=2;if(s.human)SND.breath(s.x,s.y,.3);}}}
 function roadRender(c,cx,cy){const C=G.car;if(!C)return;const x=C.x-cx,y=C.y-cy;
- const HW=C.spr.width/2;c.save();c.translate(x+HW,y+16);c.rotate(C.ang);c.drawImage(C.spr,-HW,-16);
- if(!G.h.girl&&C.mode!=='leave')P(c,-12,7,3,3,'#d8b070');if(C.mode==='parked'||C.mode==='flee'||C.mode==='leave'){P(c,12,-6,3,3,'#8a7050');P(c,12,-7,3,1,'#5a4a3a');}
+ const HW=C.spr.width/2;c.save();c.translate(x+HW,y+16);c.rotate(C.ang);c.drawImage(C.spr,-HW,-19);
+ if(!G.h.girl&&C.mode!=='leave')P(c,-15,3,3,3,'#d8b070');if(C.mode==='parked'||C.mode==='flee'||C.mode==='leave'){P(c,10,1,3,3,'#8a7050');P(c,10,0,3,1,'#5a4a3a');}
  c.restore();
  c.globalCompositeOperation='lighter';const tl=c.createRadialGradient(x+1,y+22,0,x+1,y+22,10);tl.addColorStop(0,'rgba(255,40,30,.45)');tl.addColorStop(1,'rgba(255,40,30,0)');c.fillStyle=tl;c.fillRect(x-10,y+12,22,22);
  if(C.mode!=='crashed'&&C.engine!==false){const hl=c.createRadialGradient(x+70,y+16,0,x+70,y+16,44);hl.addColorStop(0,'rgba(255,250,220,.18)');hl.addColorStop(1,'rgba(255,250,220,0)');c.fillStyle=hl;c.fillRect(x+20,y-24,80,80);}
@@ -2690,11 +2682,11 @@ function roadObj(){const H=G.h;if(!H)return'';const e=H.drv,done=e&&(!e.alive||e
 function roadDebrief(){const H=G.h||{};const e=H.drv;const drv=!e?'—':!e.alive?'nie żyje':e.state==='cuffed'?'zatrzymany':'zbiegł';
  let sc=0;if(H.approach==='pas')sc+=10;if(H.plates)sc+=10;if(H.peek)sc+=5;if(H.lic)sc+=5;if(e&&e.alive&&e.state==='cuffed')sc+=15;
  patrolDebrief([['Podejście do auta',H.approach==='pas'?'od strony pasażera (bezpieczne)':H.approach==='drv'?'od strony kierowcy (od jezdni)':'—'],['Sprawdzone tablice',H.plates?'tak':'nie'],['Kierowca',drv],['Margaret Lindqvist',H.trunk?'uratowana':'—'],['Lily Lindqvist',H.girl?'uratowana':'—']],sc);}
-LVL.road={id:'road',patrol:true,weather:'fog',crew:{role:'State Trooper',shout:'State Police! Hands!',names:['TPR. HALE','TPR. DIETZ'],uni:{body:'#5c4a34',legs:'#2c2a26',acc:'#d8b048'}},car:{b:'#1c1d20',hi:'#34363a',lo:'#0e0f11',e:'#c8a860',r:'#e4e2da',rh:'#f2f0e8',rl:'#b8b4a8',s:'#c8a860'},ext:'none',terrain:roadTerrain,windows:roadWindows,rooms:ROOMS_ROAD,doors:DOORS_ROAD,furn:FURN_ROAD,lamps:LAMPS_ROAD,cams:[],entries:ENTRIES_ROAD,
+LVL.road={id:'road',patrol:true,weather:'fog',dusk:true,lit:.62,crew:{role:'State Trooper',shout:'State Police! Hands!',names:['TPR. HALE','TPR. DIETZ'],uni:{body:'#5c4a34',legs:'#2c2a26',acc:'#d8b048'}},car:{b:'#1c1d20',hi:'#34363a',lo:'#0e0f11',e:'#c8a860',r:'#e4e2da',rh:'#f2f0e8',rl:'#b8b4a8',s:'#c8a860'},ext:'none',terrain:roadTerrain,windows:roadWindows,rooms:ROOMS_ROAD,doors:DOORS_ROAD,furn:FURN_ROAD,lamps:LAMPS_ROAD,cams:[],entries:ENTRIES_ROAD,
  start:startRoad,update:updateRoad,interact:roadInteract,render:roadRender,over:roadOver,decor:roadDecor,stress:roadStress,obj:roadObj,debrief:roadDebrief,
  win:'WHP 14, przyjęłam. Karetka i detektywi są w drodze. Dobra robota.',planTitle:'HIGHWAY 287 · MILA 41',
- nb:{no:'#26-119-0112',pri:'P3',code:'10-38',small:'MIEJSCE',addr:'HIGHWAY 287<br>MILE MARKER 41',facts:[['JEDNOSTKA','WHP 14 · Tpr. Hale, Tpr. Dietz'],['GODZINA','01:12'],['POWÓD','Niesprawne tylne światło']],
-  title:'RADIO · ZAPIS',clock:[1,11,40],who:{D:'DISPATCH',C:'WHP 14'},bg:[26,20,28,15.75],
+ nb:{no:'#26-119-0112',pri:'P3',code:'10-38',small:'MIEJSCE',addr:'HIGHWAY 287<br>MILE MARKER 41',facts:[['JEDNOSTKA','WHP 14 · Tpr. Hale, Tpr. Dietz'],['GODZINA','19:41 · mgła, zmierzch'],['POWÓD','Niesprawne tylne światło']],
+  title:'RADIO · ZAPIS',clock:[19,40,40],who:{D:'DISPATCH',C:'WHP 14'},bg:[26,20,28,15.75],
   call:[['C','WHP 14, zatrzymanie pojazdu, Highway 287 przy mili czterdziestej pierwszej.'],['D','WHP 14, przyjęłam. Opis pojazdu?'],['C','Srebrny minivan, Toyota Sienna, tablice Indiany, Lincoln-Mary-siedem-dwa-cztery-jeden. Kierowca i chyba jeden pasażer z tyłu.'],['D','Przyjęłam, zatrzymanie o pierwszej dwanaście.'],['C','Przyjąłem. Podchodzimy.']]}};
 
 // ================= MISSION 03: WELFARE CHECK, APT 3B =================
@@ -4302,7 +4294,7 @@ function ctTab(n){$('ct1').classList.toggle('sel',n===1);$('ct2').classList.togg
 $('ct1').onclick=()=>{SND.click();ctTab(1);};$('ct2').onclick=()=>{SND.click();ctTab(2);};
 addEventListener('keydown',e=>{if($('scr-ctrl').classList.contains('hidden')||G.running&&!G.paused)return;if(e.code==='ArrowLeft'||e.code==='KeyA'){ctTab(1);e.preventDefault();}else if(e.code==='ArrowRight'||e.code==='KeyD'){ctTab(2);e.preventDefault();}else if(e.code==='Enter'||e.code==='Backspace'||e.code==='Escape'){$('scr-ctrl').querySelector('[data-go]').click();e.preventDefault();e.stopImmediatePropagation();}});
 const SCIDS=['sc1','sc2','sc3','sc4','sc5','sc6','sc7','sc8','sc9'],SCLV={sc1:'house',sc2:'road',sc3:'apt',sc4:'motel',sc5:'air',sc6:'school',sc7:'hosp',sc8:'park',sc9:'mall'};
-const SCMETA={sc1:['PATROL','06:40','jesienny poranek',2,'~10 min'],sc2:['KONTROLA DROGOWA','01:12','mgła',2,'~8 min'],sc3:['PATROL','19:30','śnieg',2,'~10 min'],sc4:['PATROL → S.W.A.T.','23:50','wiatr, pył',3,'~15 min'],sc5:['PATROL LOTNISKOWY','14:24','upał',1,'~8 min'],
+const SCMETA={sc1:['PATROL','06:40','jesienny poranek',2,'~10 min'],sc2:['KONTROLA DROGOWA','19:41','mgła, zmierzch',2,'~8 min'],sc3:['PATROL','19:30','śnieg',2,'~10 min'],sc4:['PATROL → S.W.A.T.','23:50','wiatr, pył',3,'~15 min'],sc5:['PATROL LOTNISKOWY','14:24','upał',1,'~8 min'],
  sc6:['AKTYWNY STRZELEC','14:07','słońce',3,'~10 min'],sc7:['S.W.A.T.','02:10','burza',3,'~20 min'],sc8:['PATROL','23:47','jesienna noc',2,'~10 min'],sc9:['S.W.A.T. + SAPER','15:44','pochmurno',3,'~12 min']};
 function scDetail(id){const c=$(id),m=SCMETA[id]||['','','',1,''],lock=c.classList.contains('lock'),swat=/S\.W\.A\.T|STRZELEC/.test(m[0]),d=$('sc-det');
  d.classList.toggle('lock',lock);d.style.setProperty('--acc',swat?'linear-gradient(90deg,#e0302a,#7a1a18)':'linear-gradient(90deg,#3d6bff,#1e3a8a)');d.style.setProperty('--accT',swat?'#ff7a6a':'#8fb0f2');
