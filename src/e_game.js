@@ -20,7 +20,7 @@ const CIVS=[{x:19,y:19,k:'nurse',st:'hide'},{x:39,y:5,k:'doctor',st:'hide'},{x:4
  {x:9,y:6,k:'patient',st:'wander'},{x:17,y:6,k:'patient',st:'wander'},{x:25,y:6,k:'patient',st:'wander'},{x:27,y:17,k:'patient',st:'wander'},{x:29,y:16,k:'patient',st:'wander'},{x:5,y:17,k:'patient',st:'wander'},{x:4,y:6,k:'patient',st:'wander'}];
 const CORPSES=[[33,14,'guard'],[33,33,'guard'],[54,30,'guard'],[47,12,'orderly'],[60,9,'doctor']];
 const INTEL=[[56,6,'ZAKŁADNIK?'],[37,31,'WARTA?'],[20,34,'?'],[73,29,'?'],[16,11,'?']];
-function startMission(){if(A.rdHum){A.rdHum.gain.value=0;A.rdIdle.gain.value=0;}radioClear();G.torchOff=false;G.pings=[];stopCall();buildMap();if(G.bakedFor!==G.lvl)bakeWorld();G.bakedFor=null;LV.doorRows=null;mc.clearRect(0,0,memory.width,memory.height);
+function startMission(){if(A.dreadG&&A.ctx)A.dreadG.gain.value=0;if(A.rdHum){A.rdHum.gain.value=0;A.rdIdle.gain.value=0;}radioClear();G.torchOff=false;G.pings=[];stopCall();buildMap();if(G.bakedFor!==G.lvl)bakeWorld();G.bakedFor=null;LV.doorRows=null;mc.clearRect(0,0,memory.width,memory.height);
  Object.assign(G,{running:true,paused:false,ended:false,time:0,units:[],squad:[],enemies:[],civs:[],fx:[],tracers:[],lights:[],nades:[],ops:[],order:'follow',alarm:false,execT:45,warned:false,
   camv:null,lockIn:false,carBlk:null,traffic:[],flashW:0,shake:0,obj:{found:false,freed:false},devs:null,babyT:rand(3,6),panicCD:0,log:[],nvg:false,negT:rand(50,80),negBonus:0,negAlarm:0,traps:[],stats:{roe:0,traps:0,reports:0,wounded:0,healed:0,eKilled:0,eArrest:0,eSed:0,civKilled:0,civSecured:0,squadLost:0,shots:0,time:0},press:{},deadline:720,dl:{},blackT:rand(40,70),blackDur:0,scareT:rand(10,20),trail:[],trailOwner:null,postAnchor:null,stillT:0,lightT:rand(6,15),lightF:0,clankT:rand(8,18),heartT:0,p1:null,p2:null,hudT:0});
  if(!ENTRIES[G.entry])G.entry=0;const E=ENTRIES[G.entry],fx=Math.cos(E.a),fy=Math.sin(E.a),rx=-fy,ry=fx,offs=[[0,0],[-1,-.9],[-1,.9],[-2,-.5],[-2,.5]];
@@ -347,7 +347,7 @@ function render(){const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOpera
  if(G.lvl==='hosp'){const sx=36*TS+Math.sin(G.time*.13)*230-cx,sy=50*TS+Math.cos(G.time*.19)*70-cy;if(sx>-80&&sy>-80&&sx<VW+80&&sy<VH+80){c.globalCompositeOperation='lighter';const g=c.createRadialGradient(sx,sy,0,sx,sy,46);g.addColorStop(0,'rgba(230,240,255,.22)');g.addColorStop(.7,'rgba(200,215,255,.08)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(sx-46,sy-46,92,92);c.globalCompositeOperation='source-over';}}
  for(const pu of G.police){const sx=pu.x-cx,sy=pu.y-cy;if(sx>-20&&sy>-30&&sx<VW+20&&sy<VH+20)drawHuman(c,pu,sx,sy);}
  // post
- c.globalCompositeOperation='multiply';c.fillStyle=isPat()?weatherTint():'#c4ccd6';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';if(W8()==='morning')morningFx(c,cx,cy);else if(isPat())weatherPost(c);
+ c.globalCompositeOperation='multiply';c.fillStyle=isPat()?weatherTint():'#c4ccd6';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';if(W8()==='morning')morningFx(c,cx,cy);else if(isPat())weatherPost(c);if(LD().post)LD().post(c);
  if(G.lightF>0){c.fillStyle='rgba(200,215,255,'+G.lightF*.12+')';c.fillRect(0,0,VW,VH);}
  if(G.nvg){c.globalCompositeOperation='multiply';c.fillStyle='#6cff84';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='lighter';c.fillStyle='rgba(18,60,24,.28)';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';c.drawImage(GRAIN[(G.time*30+1|0)%4],0,0);c.drawImage(GRAIN[(G.time*30+2|0)%4],1,0);}
  c.drawImage(GRAIN[(G.time*24|0)%4],0,0);c.drawImage(vigC,0,0);

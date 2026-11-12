@@ -2885,7 +2885,20 @@ function updateApt(dt){const H=G.h;if(!H||G.ended)return;H.t+=dt;
  const g=H.gary,gd=g&&(g.state==='cuffed'||!g.alive);
  if(H.endT==null&&H.body&&gd){H.endT=2.5;H.res=g.alive?'arrested':'dead';}
  if(H.endT!=null){H.endT-=dt;if(H.endT<=0&&!G.ended)endMission(true,H.res==='arrested'?'Ruth Hensley odnaleziona. Gary Hensley zatrzymany.':'Ruth Hensley odnaleziona. Gary Hensley nie żyje.');}}
-function aptStress(dt,L){tvAudio(L,APT.tv,G.h&&G.h.tvOn?3.2:0,APT.body);
+function aptDread(dt,L){const H=G.h;if(!H||!L)return;const room=LV.room[I(L.x/TS|0,L.y/TS|0)],in3B=room>=2&&room<=7;
+ const db=dist(L.x,L.y,APT.body.x,APT.body.y)/TS,near=clamp(1-(db-1.5)/9,0,1);
+ let tg=0;if(H.said.smell)tg=.15;if(in3B)tg=Math.max(tg,.25+near*near*.55);if(H.body){H.shockT=(H.shockT==null?14:H.shockT)-dt;tg=Math.max(tg,.35+clamp(H.shockT/14,0,1)*.6);}
+ if(H.gStage==='react'||H.gStage==='lie')tg=Math.max(tg,.7);if(H.gStage==='flee')tg=Math.max(tg,.95);if(L.wounded)tg=Math.max(tg,.8);if(G.ended)tg=0;
+ H.stress=(H.stress||0)+(tg-(H.stress||0))*Math.min(1,dt*(tg>(H.stress||0)?1.4:.35));const s=H.stress;
+ if(A.ctx){dreadInit();A.dreadG.gain.setTargetAtTime(s*.2,A.ctx.currentTime,.8);
+  if(s>.25){G.heartT=(G.heartT||0)-dt;if(G.heartT<=0){G.heartT=1.3-s*.75;SND.heart();H.beat=G.time;}}
+  if(s>.55&&L.human){H.brT=(H.brT||0)-dt;if(H.brT<=0){H.brT=2.6-s*1.1;SND.breath(L.x,L.y,.18+s*.25);}}}
+ if(s>.5&&L.alive&&!L.holster&&L.human){L.ang+=Math.sin(G.time*13.7)*s*.012+Math.sin(G.time*29.3)*s*.006;}}
+function aptStressFx(c){const H=G.h;if(!H)return;const s=H.stress||0;if(s<.05)return;const ph=H.beat!=null?Math.max(0,1-(G.time-H.beat)/.45):0,k=s*(.75+ph*.35);
+ const v=c.createRadialGradient(VW/2,VH/2,VH*(.62-s*.3),VW/2,VH/2,VW*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(10,2,4,'+Math.min(.85,k*.8)+')');c.fillStyle=v;c.fillRect(0,0,VW,VH);
+ if(ph>0&&s>.4){c.fillStyle='rgba(90,0,0,'+(ph*s*.12)+')';c.fillRect(0,0,VW,VH);}
+ if(s>.3){c.globalAlpha=Math.min(.35,(s-.3)*.5);c.globalCompositeOperation='saturation';c.fillStyle='#808080';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';c.globalAlpha=1;}}
+function aptStress(dt,L){aptDread(dt,L);tvAudio(L,APT.tv,G.h&&G.h.tvOn?3.2:0,APT.body);
  for(const s of G.squad){if(!s||!s.alive||!s.wounded)continue;s.breathT=(s.breathT||0)-dt;if(s.breathT<=0){s.breathT=2;if(s.human)SND.breath(s.x,s.y,.3);}}}
 function aptRender(c,cx,cy){const H=G.h;if(!H)return;
  // zimowe światło z ulicy przez okna + śnieg za szybą
@@ -2901,7 +2914,7 @@ function aptObj(){const H=G.h;if(!H)return'';const g=H.gary,gd=g&&(g.state==='cu
 function aptDebrief(){const H=G.h||{};const g=H.gary;let sc=H.nf*3;if(g&&g.alive&&g.state==='cuffed')sc+=15;if(H.key)sc+=5;
  patrolDebrief([['Notatki z miejsca',(H.nf||0)+' / '+CLUES_APT.length],['Wejście do 3B',LV.doorAt[I(39,23)]&&LV.doorAt[I(39,23)].broken?'siłą':'—'],['Sypialnia',H.key?'otwarta kluczykiem':H.body?'wyważona':'—'],['Rozmowy na klatce',[H.said.dr2?'Walt':'',H.said.j3?'Trey (oksykodon)':''].filter(Boolean).join(', ')||'—'],['Gary Hensley',!g?'—':!g.alive?'nie żyje':g.state==='cuffed'?'zatrzymany':'zbiegł']],sc);}
 LVL.apt={id:'apt',patrol:true,sounds:true,weather:'snow',crew:{names:['OFC. NOWAK','OFC. BROOKS'],uni:{body:'#7f96b4',legs:'#161c28',acc:'#d8d8d8'}},car:{s:'#2a5ab0'},ext:'brick',terrain:aptTerrain,windows:aptWindows,rooms:ROOMS_APT,doors:DOORS_APT,furn:FURN_APT,lamps:LAMPS_APT,cams:[],entries:ENTRIES_APT,
- decor:aptDecor,start:startApt,update:updateApt,interact:aptInteract,render:aptRender,stress:aptStress,obj:aptObj,debrief:aptDebrief,
+ decor:aptDecor,post:aptStressFx,start:startApt,update:updateApt,interact:aptInteract,render:aptRender,stress:aptStress,obj:aptObj,debrief:aptDebrief,
  wallCol:rb=>{const n=rb>=0?ROOMS[rb].n:'';return n==='Klatka schodowa'?['#4e5644','#343a2c']:n.startsWith('Korytarz')?['#5e5a48','#3e3a2e']:n.includes('Ruth')?['#6a5e6a','#4a3e4a']:n.includes('Gary')?['#4e5248','#34382e']:n.includes('Kuchnia')?['#7a7458','#54503a']:n.includes('Łazienka')?['#7a8688','#5a6668']:['#6a5e4a','#4a4032'];},
  win:'Beat 1123, przyjęłam. Koroner i detektywi są w drodze.',planTitle:'PINE COURT APARTMENTS · III PIĘTRO',
  nb:{no:'#26-121-0388',pri:'P4',code:'WELFARE',small:'ADRES',addr:'PINE COURT APTS<br>MIESZKANIE 3B',facts:[['JEDNOSTKA','Beat 1123 · Ofc. Nowak, Ofc. Brooks'],['GODZINA','23:10 · śnieg, −14°C'],['LOKATORKA','Ruth Hensley, 78 l.']],
@@ -3908,7 +3921,7 @@ const CIVS=[{x:19,y:19,k:'nurse',st:'hide'},{x:39,y:5,k:'doctor',st:'hide'},{x:4
  {x:9,y:6,k:'patient',st:'wander'},{x:17,y:6,k:'patient',st:'wander'},{x:25,y:6,k:'patient',st:'wander'},{x:27,y:17,k:'patient',st:'wander'},{x:29,y:16,k:'patient',st:'wander'},{x:5,y:17,k:'patient',st:'wander'},{x:4,y:6,k:'patient',st:'wander'}];
 const CORPSES=[[33,14,'guard'],[33,33,'guard'],[54,30,'guard'],[47,12,'orderly'],[60,9,'doctor']];
 const INTEL=[[56,6,'ZAKŁADNIK?'],[37,31,'WARTA?'],[20,34,'?'],[73,29,'?'],[16,11,'?']];
-function startMission(){if(A.rdHum){A.rdHum.gain.value=0;A.rdIdle.gain.value=0;}radioClear();G.torchOff=false;G.pings=[];stopCall();buildMap();if(G.bakedFor!==G.lvl)bakeWorld();G.bakedFor=null;LV.doorRows=null;mc.clearRect(0,0,memory.width,memory.height);
+function startMission(){if(A.dreadG&&A.ctx)A.dreadG.gain.value=0;if(A.rdHum){A.rdHum.gain.value=0;A.rdIdle.gain.value=0;}radioClear();G.torchOff=false;G.pings=[];stopCall();buildMap();if(G.bakedFor!==G.lvl)bakeWorld();G.bakedFor=null;LV.doorRows=null;mc.clearRect(0,0,memory.width,memory.height);
  Object.assign(G,{running:true,paused:false,ended:false,time:0,units:[],squad:[],enemies:[],civs:[],fx:[],tracers:[],lights:[],nades:[],ops:[],order:'follow',alarm:false,execT:45,warned:false,
   camv:null,lockIn:false,carBlk:null,traffic:[],flashW:0,shake:0,obj:{found:false,freed:false},devs:null,babyT:rand(3,6),panicCD:0,log:[],nvg:false,negT:rand(50,80),negBonus:0,negAlarm:0,traps:[],stats:{roe:0,traps:0,reports:0,wounded:0,healed:0,eKilled:0,eArrest:0,eSed:0,civKilled:0,civSecured:0,squadLost:0,shots:0,time:0},press:{},deadline:720,dl:{},blackT:rand(40,70),blackDur:0,scareT:rand(10,20),trail:[],trailOwner:null,postAnchor:null,stillT:0,lightT:rand(6,15),lightF:0,clankT:rand(8,18),heartT:0,p1:null,p2:null,hudT:0});
  if(!ENTRIES[G.entry])G.entry=0;const E=ENTRIES[G.entry],fx=Math.cos(E.a),fy=Math.sin(E.a),rx=-fy,ry=fx,offs=[[0,0],[-1,-.9],[-1,.9],[-2,-.5],[-2,.5]];
@@ -4235,7 +4248,7 @@ function render(){const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOpera
  if(G.lvl==='hosp'){const sx=36*TS+Math.sin(G.time*.13)*230-cx,sy=50*TS+Math.cos(G.time*.19)*70-cy;if(sx>-80&&sy>-80&&sx<VW+80&&sy<VH+80){c.globalCompositeOperation='lighter';const g=c.createRadialGradient(sx,sy,0,sx,sy,46);g.addColorStop(0,'rgba(230,240,255,.22)');g.addColorStop(.7,'rgba(200,215,255,.08)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(sx-46,sy-46,92,92);c.globalCompositeOperation='source-over';}}
  for(const pu of G.police){const sx=pu.x-cx,sy=pu.y-cy;if(sx>-20&&sy>-30&&sx<VW+20&&sy<VH+20)drawHuman(c,pu,sx,sy);}
  // post
- c.globalCompositeOperation='multiply';c.fillStyle=isPat()?weatherTint():'#c4ccd6';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';if(W8()==='morning')morningFx(c,cx,cy);else if(isPat())weatherPost(c);
+ c.globalCompositeOperation='multiply';c.fillStyle=isPat()?weatherTint():'#c4ccd6';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';if(W8()==='morning')morningFx(c,cx,cy);else if(isPat())weatherPost(c);if(LD().post)LD().post(c);
  if(G.lightF>0){c.fillStyle='rgba(200,215,255,'+G.lightF*.12+')';c.fillRect(0,0,VW,VH);}
  if(G.nvg){c.globalCompositeOperation='multiply';c.fillStyle='#6cff84';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='lighter';c.fillStyle='rgba(18,60,24,.28)';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';c.drawImage(GRAIN[(G.time*30+1|0)%4],0,0);c.drawImage(GRAIN[(G.time*30+2|0)%4],1,0);}
  c.drawImage(GRAIN[(G.time*24|0)%4],0,0);c.drawImage(vigC,0,0);

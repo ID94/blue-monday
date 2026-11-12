@@ -184,7 +184,20 @@ function updateApt(dt){const H=G.h;if(!H||G.ended)return;H.t+=dt;
  const g=H.gary,gd=g&&(g.state==='cuffed'||!g.alive);
  if(H.endT==null&&H.body&&gd){H.endT=2.5;H.res=g.alive?'arrested':'dead';}
  if(H.endT!=null){H.endT-=dt;if(H.endT<=0&&!G.ended)endMission(true,H.res==='arrested'?'Ruth Hensley odnaleziona. Gary Hensley zatrzymany.':'Ruth Hensley odnaleziona. Gary Hensley nie żyje.');}}
-function aptStress(dt,L){tvAudio(L,APT.tv,G.h&&G.h.tvOn?3.2:0,APT.body);
+function aptDread(dt,L){const H=G.h;if(!H||!L)return;const room=LV.room[I(L.x/TS|0,L.y/TS|0)],in3B=room>=2&&room<=7;
+ const db=dist(L.x,L.y,APT.body.x,APT.body.y)/TS,near=clamp(1-(db-1.5)/9,0,1);
+ let tg=0;if(H.said.smell)tg=.15;if(in3B)tg=Math.max(tg,.25+near*near*.55);if(H.body){H.shockT=(H.shockT==null?14:H.shockT)-dt;tg=Math.max(tg,.35+clamp(H.shockT/14,0,1)*.6);}
+ if(H.gStage==='react'||H.gStage==='lie')tg=Math.max(tg,.7);if(H.gStage==='flee')tg=Math.max(tg,.95);if(L.wounded)tg=Math.max(tg,.8);if(G.ended)tg=0;
+ H.stress=(H.stress||0)+(tg-(H.stress||0))*Math.min(1,dt*(tg>(H.stress||0)?1.4:.35));const s=H.stress;
+ if(A.ctx){dreadInit();A.dreadG.gain.setTargetAtTime(s*.2,A.ctx.currentTime,.8);
+  if(s>.25){G.heartT=(G.heartT||0)-dt;if(G.heartT<=0){G.heartT=1.3-s*.75;SND.heart();H.beat=G.time;}}
+  if(s>.55&&L.human){H.brT=(H.brT||0)-dt;if(H.brT<=0){H.brT=2.6-s*1.1;SND.breath(L.x,L.y,.18+s*.25);}}}
+ if(s>.5&&L.alive&&!L.holster&&L.human){L.ang+=Math.sin(G.time*13.7)*s*.012+Math.sin(G.time*29.3)*s*.006;}}
+function aptStressFx(c){const H=G.h;if(!H)return;const s=H.stress||0;if(s<.05)return;const ph=H.beat!=null?Math.max(0,1-(G.time-H.beat)/.45):0,k=s*(.75+ph*.35);
+ const v=c.createRadialGradient(VW/2,VH/2,VH*(.62-s*.3),VW/2,VH/2,VW*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(10,2,4,'+Math.min(.85,k*.8)+')');c.fillStyle=v;c.fillRect(0,0,VW,VH);
+ if(ph>0&&s>.4){c.fillStyle='rgba(90,0,0,'+(ph*s*.12)+')';c.fillRect(0,0,VW,VH);}
+ if(s>.3){c.globalAlpha=Math.min(.35,(s-.3)*.5);c.globalCompositeOperation='saturation';c.fillStyle='#808080';c.fillRect(0,0,VW,VH);c.globalCompositeOperation='source-over';c.globalAlpha=1;}}
+function aptStress(dt,L){aptDread(dt,L);tvAudio(L,APT.tv,G.h&&G.h.tvOn?3.2:0,APT.body);
  for(const s of G.squad){if(!s||!s.alive||!s.wounded)continue;s.breathT=(s.breathT||0)-dt;if(s.breathT<=0){s.breathT=2;if(s.human)SND.breath(s.x,s.y,.3);}}}
 function aptRender(c,cx,cy){const H=G.h;if(!H)return;
  // zimowe światło z ulicy przez okna + śnieg za szybą
@@ -200,7 +213,7 @@ function aptObj(){const H=G.h;if(!H)return'';const g=H.gary,gd=g&&(g.state==='cu
 function aptDebrief(){const H=G.h||{};const g=H.gary;let sc=H.nf*3;if(g&&g.alive&&g.state==='cuffed')sc+=15;if(H.key)sc+=5;
  patrolDebrief([['Notatki z miejsca',(H.nf||0)+' / '+CLUES_APT.length],['Wejście do 3B',LV.doorAt[I(39,23)]&&LV.doorAt[I(39,23)].broken?'siłą':'—'],['Sypialnia',H.key?'otwarta kluczykiem':H.body?'wyważona':'—'],['Rozmowy na klatce',[H.said.dr2?'Walt':'',H.said.j3?'Trey (oksykodon)':''].filter(Boolean).join(', ')||'—'],['Gary Hensley',!g?'—':!g.alive?'nie żyje':g.state==='cuffed'?'zatrzymany':'zbiegł']],sc);}
 LVL.apt={id:'apt',patrol:true,sounds:true,weather:'snow',crew:{names:['OFC. NOWAK','OFC. BROOKS'],uni:{body:'#7f96b4',legs:'#161c28',acc:'#d8d8d8'}},car:{s:'#2a5ab0'},ext:'brick',terrain:aptTerrain,windows:aptWindows,rooms:ROOMS_APT,doors:DOORS_APT,furn:FURN_APT,lamps:LAMPS_APT,cams:[],entries:ENTRIES_APT,
- decor:aptDecor,start:startApt,update:updateApt,interact:aptInteract,render:aptRender,stress:aptStress,obj:aptObj,debrief:aptDebrief,
+ decor:aptDecor,post:aptStressFx,start:startApt,update:updateApt,interact:aptInteract,render:aptRender,stress:aptStress,obj:aptObj,debrief:aptDebrief,
  wallCol:rb=>{const n=rb>=0?ROOMS[rb].n:'';return n==='Klatka schodowa'?['#4e5644','#343a2c']:n.startsWith('Korytarz')?['#5e5a48','#3e3a2e']:n.includes('Ruth')?['#6a5e6a','#4a3e4a']:n.includes('Gary')?['#4e5248','#34382e']:n.includes('Kuchnia')?['#7a7458','#54503a']:n.includes('Łazienka')?['#7a8688','#5a6668']:['#6a5e4a','#4a4032'];},
  win:'Beat 1123, przyjęłam. Koroner i detektywi są w drodze.',planTitle:'PINE COURT APARTMENTS · III PIĘTRO',
  nb:{no:'#26-121-0388',pri:'P4',code:'WELFARE',small:'ADRES',addr:'PINE COURT APTS<br>MIESZKANIE 3B',facts:[['JEDNOSTKA','Beat 1123 · Ofc. Nowak, Ofc. Brooks'],['GODZINA','23:10 · śnieg, −14°C'],['LOKATORKA','Ruth Hensley, 78 l.']],
