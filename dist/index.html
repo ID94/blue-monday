@@ -1093,7 +1093,7 @@ class Unit{constructor(o){this.id=UID++;this.x=0;this.y=0;this.vx=0;this.vy=0;th
  active(){return this.alive&&this.stun<=0&&this.pose!=='sleep'&&this.state!=='surr'&&this.state!=='cuffed';}
 }
 function nearLamp(u){for(const l of LAMPS||[])if(Math.hypot(l[0]*TS+8-u.x,l[1]*TS+8-u.y)<TS*4.5)return true;return false;}
-function effRange(u){let r=u.range;if(!G.nvg&&G.torchOff&&W8()!=='day'&&!nearLamp(u))r*=.5;return r;}
+function effRange(u){let r=u.range;if(!G.nvg&&G.torchOff&&!dayLit(u)&&!nearLamp(u))r*=.5;return r;}
 function effFov(u){const v=Math.hypot(u.vx||0,u.vy||0);return u.fov*(v>40?.85:v<18?1.1:1);}
 function visionPoly(u){const pts=[],R=effRange(u)*TS,r0=TS*.75,half=effFov(u)*Math.PI/360,ext=9;
  const n=Math.ceil(u.fov/1.6);for(let i=0;i<=n;i++){const a=u.ang-half+2*half*i/n,d=castRay(u.x,u.y,a,R,ext);pts.push(u.x+Math.cos(a)*d,u.y+Math.sin(a)*d);}
@@ -1132,17 +1132,18 @@ function fire(u){const W=u.W;if(!W||u.rel>0||u.fireCd>0||!u.active())return fals
  if(ind&&!sil)for(let i=0;i<(W.pel>1?3:1);i++)G.fx.push({k:'smoke',x:sx+rand(-4,4),y:sy+rand(-3,3),vx:Math.cos(u.ang)*rand(2,8)+rand(-3,3),vy:-rand(1,4),r:rand(3,5),gr:rand(3,5),a:.2,t:0,life:rand(3.5,6),c:'#a8aaa8'});
  if(W.pel===1||u.weap==='shotgun'){const ea=u.ang+Math.PI/2*(Math.cos(u.ang)>0?-1:1),del=u.weap==='shotgun';G.fx.push({k:'shell',x:u.x+Math.cos(u.ang)*3,y:u.y-1,z:9,vx:Math.cos(ea)*rand(30,55),vy:Math.sin(ea)*rand(10,25)-15,vz:rand(40,70),t:0,life:rand(.6,.9),red:del});}
  return true;}
-function hitscan(sh,x0,y0,a,maxD){const dx=Math.cos(a),dy=Math.sin(a);let x=x0,y=y0,d=0,hit=null;
+function hitscan(sh,x0,y0,a,maxD){const dx=Math.cos(a),dy=Math.sin(a);let x=x0,y=y0,d=0,hit=null,skipU=null;
  if(bulletBlock(x0/TS|0,y0/TS|0)){x0=sh.x;y0=sh.y-2;x=x0;y=y0;}
  while(d<maxD){x+=dx*2;y+=dy*2;d+=2;const tx=x/TS|0,ty=y/TS|0;
   if(bulletBlock(tx,ty)){if(sh.W&&sh.W.pel>1&&sh.team==='squad'&&LV.t[I(tx,ty)]===T.DOOR&&d<TS*1.8){const dr=LV.doorAt[I(tx,ty)];if(dr&&dr.locked){dr.locked=false;dr.shot=true;dr.knownLocked=false;if(sh.human)toast('Zamek rozstrzelany — kopnij lub otwórz drzwi');logEv(sh.name+' rozstrzelał zamek strzelbą');}}
    if(LD().breakable&&LV.t[I(tx,ty)]===T.WIN&&!(LV.bw&&LV.bw.has(I(tx,ty)))){breakWin(tx,ty,x,y,a);continue;}impact(x-dx*2,y-dy*2,tx,ty,a);break;}
   if(G.carBlk&&d>6&&G.carBlk(x,y)){carImpact(x,y,a);break;}
-  for(const u of G.units){if(!u.alive||u===sh||u.pose==='sleep')continue;const cy=u.y-2,rr=u.pose==='inbed'?3.6:(u.pose==='kneel'||u.pose==='hands'||u.pose==='sit')?4.2:5.2;
-   if((u.x-x)**2+(cy-y)**2<(rr+(u.shield?2:0))**2){if(u.shield&&Math.abs(angDiff(u.ang,a+Math.PI))<(u.human?1.15:1.45)){for(let i=0;i<5;i++)G.fx.push({k:'spark',x,y:y-6,vx:rand(-60,60),vy:rand(-60,60),t:0,life:.15});SND.clang(x,y);hit='shield';break;}hit=u;break;}}
+  for(const u of G.units){if(!u.alive||u===sh||u===skipU||u.pose==='sleep')continue;const cy=u.y-2,rr=u.pose==='inbed'?3.6:(u.pose==='kneel'||u.pose==='hands'||u.pose==='sit')?4.2:5.2;
+   if((u.x-x)**2+(cy-y)**2<(rr+(u.shield?2:0))**2){if(u.shield&&Math.abs(angDiff(u.ang,a+Math.PI))<(u.human?1.15:1.45)){for(let i=0;i<5;i++)G.fx.push({k:'spark',x,y:y-6,vx:rand(-60,60),vy:rand(-60,60),t:0,life:.15});SND.clang(x,y);hit='shield';break;}if(u.evade&&sh.team==='squad'&&Math.random()<u.evade){skipU=u;continue;}hit=u;break;}}
   if(hit)break;}
  if(hit==='shield'){G.tracers.push({x0,y0:y0-6,x1:x,y1:y-6,t:0,e:sh.team==='enemy'});return;}
  G.tracers.push({x0,y0:y0-6,x1:x,y1:y-6,t:0,e:sh.team==='enemy'});
+ if(hit&&hit.tough!=null&&sh.team==='squad'&&(hit.tough>0||G.time-(hit.toughT||-9)<.06)){if(G.time-(hit.toughT||-9)>=.06){hit.tough--;hit.toughT=G.time;hit.stun=Math.max(hit.stun||0,.3);bloodPool(hit.x,hit.y,1.2);for(let i=0;i<8;i++)G.fx.push({k:'dust',x:hit.x,y:hit.y-6,vx:rand(-40,40)+Math.cos(a)*30,vy:rand(-40,40)+Math.sin(a)*30,t:0,life:.4,c:'#8a1410'});if(hit.onTough)hit.onTough(hit);}return;}
  if(hit){if(hit.kind==='director'&&sh.team==='squad')G.stats.hostageHit=1;kill(hit,sh,a);}}
 function impact(x,y,tx,ty,a){const t0=tAt(tx,ty),brick=tAt(tx,ty+1)===T.GRASS||tAt(tx,ty+1)===T.ASPH,chip=t0===T.DOOR?'#6b4a32':brick?'#7a4a3a':'#a7afa6';
  for(let i=0;i<5;i++)G.fx.push({k:'spark',x,y:y-6,vx:rand(-60,60)-Math.cos(a)*40,vy:rand(-60,60)-Math.sin(a)*40,t:0,life:rand(.08,.2)});
@@ -1231,7 +1232,7 @@ function drawHuman(g,u,sx,sy){const SQ=u.team==='squad'&&!u.patrol;const p=u.pal
   if(u.stun>0&&((G.time*6)|0)%2){P(g,sx-5,hy-3,1,1,'#ffe');P(g,sx+4,hy-2,1,1,'#ffe');P(g,sx,hy-4,1,1,'#ffe');}
 }
 function drawArms(g,u,sx,ty){const p=u.pal,a=u.ang;
- if(u.holster&&u.W&&u.pose!=='hands'&&u.state!=='surr'&&(G.torchOff||W8()==='day')){P(g,sx-5,ty+1,1,4,p.body);P(g,sx+4,ty+1,1,4,p.body);P(g,sx-5,ty+5,1,1,p.glove||p.skin||'#c49a7c');P(g,sx+4,ty+5,1,1,p.glove||p.skin||'#c49a7c');P(g,sx+(Math.cos(a)<0?3:-4),ty+4,1,3,'#141416');u.mzx=null;return;}
+ if(u.holster&&u.W&&u.pose!=='hands'&&u.state!=='surr'&&(G.torchOff||dayLit(u))){P(g,sx-5,ty+1,1,4,p.body);P(g,sx+4,ty+1,1,4,p.body);P(g,sx-5,ty+5,1,1,p.glove||p.skin||'#c49a7c');P(g,sx+4,ty+5,1,1,p.glove||p.skin||'#c49a7c');P(g,sx+(Math.cos(a)<0?3:-4),ty+4,1,3,'#141416');u.mzx=null;return;}
  if(u.holster&&u.W&&u.pose!=='hands'&&u.state!=='surr'){const ox=sx+Math.round(Math.cos(a)*2),oy=ty+3,ex=ox+Math.cos(a)*5,ey=oy+Math.sin(a)*3.75;line(g,ox,oy,ex,ey,'#3a3c40');P(g,Math.round(ex)-1,Math.round(ey)-1,2,2,'#c8c8c0');P(g,Math.round(ex+Math.cos(a)),Math.round(ey+Math.sin(a)*.75),1,1,'#fff8d8');P(g,Math.round(ox+Math.cos(a)*1.5)-1,Math.round(oy+Math.sin(a))-1,2,2,p.glove||'#222');P(g,sx+(Math.cos(a)<0?3:-4),ty+4,1,3,'#141416');u.mzx=ex+G.cam.rx;u.mzy=ey+G.cam.ry;return;}
  if(!u.W||u.pose==='hands'||u.pose==='sit'||u.state==='surr'){P(g,sx-5,ty+1,1,4,p.body);P(g,sx+4,ty+1,1,4,p.body);u.mzx=null;return;}
  const L=u.W.len-(u.recoil||0)*2,ox=sx+Math.round(Math.cos(a)*2),oy=ty+3;
@@ -2428,6 +2429,7 @@ function setLevel(l){G.lvl=l;const d=LD();
 function buildOUTM(){OUTM=document.createElement('canvas');OUTM.width=MW*TS;OUTM.height=MH*TS;const og=OUTM.getContext('2d');og.fillStyle='#fff';
  const od=(x,y)=>{const t=tAt(x,y);return t===T.GRASS||t===T.ASPH;};
  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=tAt(x,y);if(od(x,y))og.fillRect(x*TS,y*TS,TS,TS);else if((t===T.WALL||t===T.WIN)&&od(x,y+1))og.fillRect(x*TS,(y-1)*TS+4,TS,TS+12);}}
+function dayLit(u){return W8()==='day'&&!(LD().darkIn&&u&&LD().darkIn(u));}
 function weatherAlpha(){if(W8()==='fog'&&LD().dusk)return .5;return{morning:.76,night:.18,rain:.1,indoor:.3,day:.95,fog:.22,snow:.5,dust:.2}[W8()]||0;}
 function weatherTint(){if(W8()==='fog'&&LD().dusk)return'#b8a8aa';return{morning:'#cfccc6',night:'#6f7a92',rain:'#8a94a8',indoor:'#bdb8b0',day:'#f8f2e6',fog:'#8e949a',snow:'#b4bccc',dust:'#c09a7a'}[W8()]||'#c4ccd6';}
 function nightFx(c){const v=c.createRadialGradient(VW/2,VH/2,VH*.3,VW/2,VH/2,VW*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(2,3,8,.55)');c.fillStyle=v;c.fillRect(0,0,VW,VH);}
@@ -3239,7 +3241,7 @@ const FURN_SCHOOL=[];
  // druga strona ulicy: taśma, gapie, sztab, ogródki
  for(let x=0;x<80;x++)if(x!==40&&x!==41)F_('ptape',x,52);F_('camtri',10,53);F_('ctent',64,53);
  for(let x=0;x<80;x+=1)if(x%13!==6&&x%13!==7)F_('pfence',x,55);for(const[x,y]of[[10,56],[30,56],[50,56],[70,56],[20,57],[60,57]])F_('tree',x,y);for(const x of[3,16,24,36,44,57,76])F_('bush',x,56);}
-const LAMPS_SCHOOL=[];for(const x of[18,30,42,54])LAMPS_SCHOOL.push([x,29,x===30?1:0,'#f4f8ff',46],[x,8,x===42?1:0,'#f4f8ff',46]);LAMPS_SCHOOL.push([38,34,0,'#f4f8ff',60],[55,34,0,'#f4f8ff',50],[28,33,0,'#fff4d8',50]);
+const LAMPS_SCHOOL=[];for(const x of[18,30,42,54])LAMPS_SCHOOL.push([x,29,x===30?1:2,'#c8d4e8',32],[x,8,x===42?1:2,'#c8d4e8',32]);LAMPS_SCHOOL.push([38,34,1,'#c8d4e8',34],[55,34,2],[28,33,2]);
 const ENTRIES_SCHOOL=[{n:'Przy radiowozie',s:'Ulica przed szkołą.',x:42,y:48.6,a:-Math.PI/2,px:42,py:48,drawn:1}];
 function schoolTerrain(M,set,fillR,H,V){fillR(0,0,79,57,T.GRASS,'lawn');
  fillR(1,23,11,41,T.ASPH,'pklot');fillR(4,42,7,44,T.ASPH,'road');fillR(65,23,78,35,T.ASPH,'pklot');fillR(65,36,67,44,T.ASPH,'road');
@@ -3366,7 +3368,7 @@ function startSchool(){G.hostage=null;G.deadline=1e9;G.order='hold';
  H.ems=[];for(const[x,y,a,cpr,st]of[[71,41,-1.57,1,0],[75,41,-1.57,1,0],[72,38,-1.2,0,0],[69,39,0,0,0],[76,37,2.6,0,1],[68,36,-1.6,0,1]]){const m=mkNPC({tx:x,ty:y,kind:'ems',pal:{...EMS_PAL},state:'calm',a,name:'RATOWNIK',upd:emsUpd});m.cpr=cpr;m.stand=st;m.ph=Math.random()*6;H.ems.push(m);}
  for(const[x,y,a]of[[70.5,40,0],[74.5,40,0]]){const p=mkCorpse(x+.5,y,STU_PAL(),a,90+x);p.kind='patient';p.pose='inbed';p.alive=true;p.team='civ';p.state='calm';p.upd=(c,dt)=>moveUnit(c,dt,0,0,0);G.civs.push(p);}
  G.police=[];for(const[x,y,a,st]of[[31,44,-1.4],[34,44,-1.7],[53,44,-1.6],[56,44,-1.8],[11,48,-.7],[59,47,-1.9],[39,53,1.57,1],[42,53,1.57,1],[65,55,-1.2,1],[67,55,-2,1]]){const pu=new Unit({team:'police',weap:'pistol',pal:Object.assign({},PAL.patrolA)});pu.x=x*TS+8;pu.y=y*TS+8;pu.ang=a;pu.pose=st?'stand':'kneel';G.police.push(pu);}
- H.sh=mkEnemy({tx:SC.stations[0][0],ty:SC.stations[0][1],weap:'eShot',a:Math.PI/2,st:'guard',pal:{body:'#2a2a2a',legs:'#3a3a40',hair:'#2a1a12',head:'#c8a080',face:'#c8a080',visor:'#1a1a1a'},name:'Strzelec',fov:120,range:10});H.sh.upd=shooterUpd;H.sh.boss=true;H.sh.perT=0;SC.stations=SC.stations.filter(([x,y])=>walkable(x,y));
+ H.sh=mkEnemy({tx:SC.stations[0][0],ty:SC.stations[0][1],weap:'eShot',a:Math.PI/2,st:'guard',pal:{body:'#2a2a2a',legs:'#3a3a40',hair:'#2a1a12',head:'#c8a080',face:'#c8a080',visor:'#1a1a1a'},name:'Strzelec',fov:120,range:10});H.sh.upd=shooterUpd;H.sh.tough=1;H.sh.evade=.28;H.sh.onTough=e=>{say('STRZELEC',pick(['AAAH! To nic! NIC NIE CZUJĘ!','HAHA, łaskocze! Jeszcze!','Krew... ładna, czerwona...']));logEv('Strzelec trafiony — nie pada (adrenalina)');const o=G.squad.find(q=>q&&q.alive&&!q.human);if(o)setTimeout(()=>{if(!G.ended)say(o.name,'Trafiony i dalej stoi! Jest na czymś!');},500);};H.sh.boss=true;H.sh.perT=0;SC.stations=SC.stations.filter(([x,y])=>walkable(x,y));
  H.px=new Unit({team:'enemy',weap:'eShot',name:'Strzelec'});H.px.mag=99;
  logEv('Zgłoszenie: aktywny strzelec, Millbrook High School');
  setTimeout(()=>{radio('DISPATCH','Wszystkie jednostki, aktywny strzelec w Millbrook High School. Sprawca oddaje strzały z okien na piętrze. Liczne ofiary.');radio(G.p1.name,'Dispatch, tu Davis. Mam czterech ludzi. Bierzemy sprzęt z bagażników i wchodzimy, nie czekamy na SWAT.',{radio:1});radio('DISPATCH','Przyjęłam. SWAT dojedzie za dwadzieścia pięć minut. W budynku włączony alarm przeciwpożarowy.');},700);}
@@ -3379,14 +3381,14 @@ function inGF(u){return u.x>SC.gf.x0*TS&&u.x<SC.gf.x1*TS&&u.y>22*TS&&u.y<36*TS;}
 function shWalk(e,dt,gx,gy,key){if(!e.path||e.goalT!==key){e.path=findPath(e.x/TS|0,e.y/TS|0,gx,gy,4000);e.goalT=key;}if(e.path)for(const nn of e.path.slice(0,3)){const dd=LV.doorAt[I(nn[0],nn[1])];if(dd&&dd.target===0&&!dd.locked&&dist(dd.x*TS+8,dd.y*TS+8,e.x,e.y)<TS*1.6)toggleDoor(dd,e);}if(!e.path||followPath(e,dt,40))e.path=null;else if(e.moving)turnTo(e,Math.atan2(e.vy,e.vx),dt,6);}
 function rattleAt(x,y){if(!A.ctx)return;const o=out(x,y,.6,{rev:.3}),t0=A.ctx.currentTime;if(o)for(let k=0;k<4;k++){nz(o,t0+k*.09,.06,{type:'bandpass',f:1500+Math.random()*600,g:.9});tone(o,t0+k*.09,.04,{f:240,f2:180,g:.35,type:'square'});}}
 const WING=x=>x<29?'zachodniej':x>36?'wschodniej':null,FLIP={zachodniej:'wschodniej',wschodniej:'zachodniej'};
-const SH_L=['HAHAHA! Gdzie jesteście?!','Chodźcie! Chodźcie do mnie!','Nikt was nie lubił! NIKT!','Słyszę was... słyszę wasze serduszka!','To wasza wina! WASZA!','Raz, dwa, trzy... szukam!','Pan dyrektor już nie przyjdzie! HAHA!','Uśmiech! Jesteście w telewizji!'];
+const SH_L=['Ciszej! CISZEJ w mojej głowie!','Mama mówi, że jestem dobrym chłopcem... DOBRYM!','Oni mi kazali. Głosy mi kazały!','Widzę cię w ścianie! Widzę cię!','Nie patrzcie na mnie! NIE PATRZCIE!','HAHAHA! Gdzie jesteście?!','Chodźcie! Chodźcie do mnie!','Nikt was nie lubił! NIKT!','Słyszę was... słyszę wasze serduszka!','To wasza wina! WASZA!','Raz, dwa, trzy... szukam!','Pan dyrektor już nie przyjdzie! HAHA!','Uśmiech! Jesteście w telewizji!'];
 function shYell(e,p){const H=G.h;H.yellT=(H.yellT||0);if(G.time-H.yellT>(p?2.5:5)){H.yellT=G.time;say('STRZELEC',pick(SH_L));}}
 function shBlast(e,a,sp){if(e.mag<1)e.mag=99;e.fireCd=0;e.rel=0;e.ang=a+rand(-sp,sp);fire(e);const H=G.h;H.shN=(H.shN||0)+1;if(H.shN>=6){H.shN=0;H.rlT=rand(1.8,2.6);SND.reload(e.x,e.y,'shotgun');shYell(e,1);}}
 function shFrenzy(e,dt){const H=G.h,tg=e.target;if(H.rlT>0){H.rlT-=dt;moveUnit(e,dt,0,0,0);if(tg)turnTo(e,Math.atan2(tg.y-e.y,tg.x-e.x),dt,6);return true;}
  const a=Math.atan2(tg.y-e.y,tg.x-e.x);turnTo(e,a,dt,10);e.sideT=(e.sideT||0)-dt;if(e.sideT<=0){e.sideT=rand(.4,.9);e.sideD=Math.random()<.5?1:-1;}
- const px=-Math.sin(a)*e.sideD,py=Math.cos(a)*e.sideD;moveUnit(e,dt,px,py,26);e.pose='stand';
+ const px=-Math.sin(a)*e.sideD,py=Math.cos(a)*e.sideD;moveUnit(e,dt,px,py,42);e.evade=.38;e.pose='stand';
  H.frT=(H.frT||0)-dt;if(H.frT<=0){H.frT=rand(.35,.6);shBlast(e,a,.24);}if(Math.random()<dt*.6)shYell(e);return true;}
-function shBlind(e,dt){const H=G.h,R=H.ram;R.t-=dt;if(H.rlT>0){H.rlT-=dt;moveUnit(e,dt,0,0,0);return true;}
+function shBlind(e,dt){const H=G.h,R=H.ram;e.evade=.22;R.t-=dt;if(H.rlT>0){H.rlT-=dt;moveUnit(e,dt,0,0,0);return true;}
  const cy=8.5*TS+8;if(Math.abs(e.y-cy)>6&&!R.at){shWalk(e,dt,e.x/TS|0,8,'ram'+(e.x/TS|0));if(R.t<-6)H.ram=null;return true;}R.at=true;
  moveUnit(e,dt,0,0,0);e.pose='stand';let a=R.dir;const q=G.squad.filter(u=>u&&u.alive&&inUF(u)).sort((u,v)=>dist(u.x,u.y,e.x,e.y)-dist(v.x,v.y,e.x,e.y))[0];if(q&&Math.random()<.7)a=Math.atan2(q.y-e.y,q.x-e.x);
  turnTo(e,a,dt,8);R.ft-=dt;if(R.ft<=0){R.ft=rand(.3,.75);shBlast(e,a,.38);R.n--;}if(Math.random()<dt*.8)shYell(e);
@@ -3475,7 +3477,11 @@ function updateSchool(dt){const H=G.h;if(!H||G.ended)return;H.t+=dt;if(H.flash>0
 function schoolStress(dt,L){const c=A.ctx;if(!c||!L)return;const t=c.currentTime,ins=inGF(L)||inUF(L);
  if(!A.alarmG){A.alarmG=c.createGain();A.alarmG.gain.value=0;A.alarmG.connect(A.master);
   A.heliG=c.createGain();A.heliG.gain.value=0;A.heliG.connect(A.master);const s=c.createBufferSource();s.buffer=A.noise;s.loop=true;const hp=c.createBiquadFilter();hp.type='lowpass';hp.frequency.value=260;const am=c.createGain();am.gain.value=.5;const lf2=c.createOscillator();lf2.frequency.value=11;const lg2=c.createGain();lg2.gain.value=.5;lf2.connect(lg2);lg2.connect(am.gain);s.connect(hp);hp.connect(am);am.connect(A.heliG);s.start();lf2.start();}
- A.alarmG.gain.setTargetAtTime(G.ended?0:ins?.06:.02,t,.2);A.heliG.gain.setTargetAtTime(G.ended?0:ins?.02:.09,t,.8);
+ if(!A.sirG){A.sirG=c.createGain();A.sirG.gain.value=0;A.sirG.connect(A.master);const o=c.createOscillator();o.type='sawtooth';o.frequency.value=900;const lfo=c.createOscillator();lfo.type='triangle';lfo.frequency.value=.32;const lg=c.createGain();lg.gain.value=330;lfo.connect(lg);lg.connect(o.frequency);
+  const o2=c.createOscillator();o2.type='square';o2.frequency.value=903;lg.connect(o2.frequency);const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2200;const m=c.createGain();m.gain.value=.5;o.connect(lp);o2.connect(m);m.connect(lp);
+  const cv=c.createConvolver?null:null;const dl=c.createDelay();dl.delayTime.value=.19;const fb=c.createGain();fb.gain.value=.35;lp.connect(A.sirG);lp.connect(dl);dl.connect(fb);fb.connect(dl);fb.connect(A.sirG);o.start();o2.start();lfo.start();A.sirLP=lp;}
+ A.sirG.gain.setTargetAtTime(G.ended||G.lvl!=='school'?0:ins?.05:.012,t,.4);A.sirLP.frequency.setTargetAtTime(ins?2400:700,t,.3);
+ A.alarmG.gain.setTargetAtTime(G.ended?0:ins?.035:.012,t,.2);A.heliG.gain.setTargetAtTime(G.ended?0:ins?.02:.09,t,.8);
  // pulsujący alarm: trzy sygnały, przerwa (wzór temporal-3)
  const H=G.h;H.alarmT-=dt;if(H.alarmT<=0&&!G.ended){H.alarmT=2.4;for(let k=0;k<3;k++){const t0=t+k*.5,o=c.createOscillator(),g=c.createGain();o.type='square';o.frequency.value=3100;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(.5,t0+.01);g.gain.setValueAtTime(.5,t0+.3);g.gain.linearRampToValueAtTime(0,t0+.32);const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=ins?3400:1400;o.connect(g);g.connect(lp);lp.connect(A.alarmG);o.start(t0);o.stop(t0+.35);}H.alarmP=G.time;}}
 function schoolOver(c,cx,cy,dt){if(!SROOFS[0].cv)bakeSchoolRoofs();const ins=(R,u)=>u&&u.alive&&u.x>=R.x0*TS&&u.x<=(R.x1+1)*TS&&u.y>=R.y0*TS&&u.y<=(R.y1+1)*TS;const wa=weatherAlpha();
@@ -3494,7 +3500,13 @@ function bakeSchoolRoofs(){for(const R of SROOFS){const W=(R.x1-R.x0+1)*TS+4,B=R
     if([18,26,28,39,41,49,51].includes(wx)){P(g,x+1,y0+5,10,7,'#0e1218');P(g,x+2,y0+6,2,1,'#8aa');P(g,x+8,y0+10,2,1,'#8aa');P(g,x+4,y0+8,1,1,'#8aa');}}
    P(g,(38-R.x0)*TS-10,y0+3,40,6,'#1a2a4a');P(g,(38-R.x0)*TS-8,y0+4,36,1,'#e8d8a8');}
   P(g,0,Hh,W,3,'rgba(0,0,0,.35)');R.cv=cv;R.a=1;}}
-function schoolRender(c,cx,cy){const H=G.h;if(!H)return;
+const EMLITE=[[17,29],[29,30],[41,29],[53,29],[61,30],[38,33],[17,8],[29,9],[41,8],[53,9],[61,8],[28,13],[50,13],[20,25],[35,25],[50,25],[24,4],[42,4],[55,4]];
+function schoolDark(c,cx,cy){const H=G.h;if(G.ended&&H&&H.endT!=null&&H.endT<-5)return;c.fillStyle='rgba(4,5,10,.62)';for(const[x0,y0,x1,y1]of[[14,22,63,36],[14,1,63,16]]){const x=x0*TS-cx,y=y0*TS-WH-cy,w=(x1-x0+1)*TS,h=(y1-y0+1)*TS+WH;if(x>VW||y>VH||x+w<0||y+h<0)continue;c.fillRect(x,y,w,h);}
+ c.globalCompositeOperation='lighter';const t=G.time;for(const[lx,ly]of EMLITE){const x=lx*TS+8-cx,y=ly*TS+2-cy;if(x<-80||y<-80||x>VW+80||y>VH+80)continue;const a=t*3.4+lx*.7+ly,k=.55+.45*Math.max(0,Math.cos(a));
+  const g=c.createRadialGradient(x,y,0,x,y,58);g.addColorStop(0,'rgba(255,40,24,'+(.42*k)+')');g.addColorStop(.5,'rgba(200,20,12,'+(.16*k)+')');g.addColorStop(1,'rgba(160,0,0,0)');c.fillStyle=g;c.fillRect(x-58,y-58,116,116);
+  const bx=x+Math.cos(a)*40,by=y+Math.sin(a)*22,g2=c.createRadialGradient(bx,by,0,bx,by,22);g2.addColorStop(0,'rgba(255,60,30,.25)');g2.addColorStop(1,'rgba(255,60,30,0)');c.fillStyle=g2;c.fillRect(bx-22,by-22,44,44);}
+ c.globalCompositeOperation='source-over';for(const[lx,ly]of EMLITE){const x=lx*TS+7-cx,y=ly*TS-10-cy;if(x<-4||y<-4||x>VW||y>VH)continue;P(c,x|0,y|0,3,2,((t*3.4+lx*.7+ly)%6.283)<3?'#ff3a20':'#7a1810');}}
+function schoolRender(c,cx,cy){const H=G.h;if(!H)return;schoolDark(c,cx,cy);
  {const fx=47*TS+9-cx,fy=39*TS-44-cy;for(let i=0;i<14;i++){const o=Math.round(Math.sin(G.time*4+i*.6)*1.2);for(let j=0;j<8;j++)P(c,fx+i,fy+j+o,1,1,i<6&&j<4?'#2a3a8a':(j%2?'#e8e8e4':'#c8302a'));}}
  // stroboskopy zsynchronizowane z sygnałem
  const dp=G.time-(H.alarmP||-9),on=!G.ended&&dp<1.3&&(dp%.5)<.1;if(on){c.globalCompositeOperation='lighter';for(const[x,y]of SC.strobes){const sx=x*TS+8-cx,sy=y*TS+8-cy;if(sx<-60||sy<-60||sx>VW+60||sy>VH+60)continue;const g=c.createRadialGradient(sx,sy,0,sx,sy,46);g.addColorStop(0,'rgba(255,255,255,.4)');g.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=g;c.fillRect(sx-46,sy-46,92,92);}c.globalCompositeOperation='source-over';}
@@ -3511,7 +3523,7 @@ function schoolObj(){const H=G.h;if(!H)return'';const e=H.sh,dn=!e.alive||e.stat
  return objRows('',[[H.geared,'Weź wyposażenie z radiowozu'],[H.inside,'Wejdź do budynku'],[dn,'Zneutralizuj strzelca']],'<div class="opt">Ofiary: '+H.vic+(sv?' · sale: '+sv+'/3':'')+'</div>'+(H.call?'<div class="opt call911">☎ 911 · Emma · sala 202 · '+fmtT(H.t-H.callT0)+(H.emmaSafe?' · odnaleziona':'')+'</div>':''));}
 function schoolDebrief(){const H=G.h||{},s=G.stats,e=H.sh;if(H.rogue){patrolDebrief([['Status','zatrzymany przez SWAT','bad'],['Cywile zastrzeleni przez ciebie',H.rk||0,'bad'],['Ofiary łącznie',H.vic||0],['Strzelec',!e?'—':!e.alive?'nie żyje':'na wolności']],0);return;}let sc=(G.win?60:0)+(H.emmaSafe?8:0)+Object.keys(H.safe||{}).length*6-Math.max(0,(H.vic||0)-(H.vicStart||0))*6-s.civKilled*30-s.squadLost*12+Math.max(0,30-Math.floor(s.time/20));
  patrolDebrief([['Czas do neutralizacji',H.arrT?fmtT(H.arrT):'—'],['Ofiary po przyjeździe',Math.max(0,(H.vic||0)-(H.vicStart||0)),(H.vic||0)>(H.vicStart||0)?'bad':'good'],['Ofiary łącznie',H.vic||0],['Strzelec',!e?'—':!e.alive?'nie żyje':e.state==='cuffed'?'zatrzymany':'na wolności'],['Sale z ukrytymi',Object.keys(H.safe||{}).length+' / 3'],['Emma (zgłoszenie 911)',H.emmaSafe?'odnaleziona':H.call?'czekała do końca':'—',H.emmaSafe?'good':'']],sc);}
-LVL.school={id:'school',patrol:true,nvg:false,lit:.88,weather:'day',ext:'brick',terrain:schoolTerrain,windows:schoolWindows,decor:schoolDecor,rooms:ROOMS_SCHOOL,doors:DOORS_SCHOOL,furn:FURN_SCHOOL,lamps:LAMPS_SCHOOL,cams:[],entries:ENTRIES_SCHOOL,
+LVL.school={id:'school',darkIn:u=>inGF(u)||inUF(u),patrol:true,nvg:false,lit:.88,weather:'day',ext:'brick',terrain:schoolTerrain,windows:schoolWindows,decor:schoolDecor,rooms:ROOMS_SCHOOL,doors:DOORS_SCHOOL,furn:FURN_SCHOOL,lamps:LAMPS_SCHOOL,cams:[],entries:ENTRIES_SCHOOL,
  spawn:spawnSchoolTeam,start:startSchool,update:updateSchool,interact:schoolInteract,render:schoolRender,over:schoolOver,stress:schoolStress,obj:schoolObj,debrief:schoolDebrief,
  crew:{role:'Patrol Officer',shout:'Police! Drop it!'},car:{b:'#dde0e3',hi:'#eef0f2',lo:'#a8acb0',e:'#dde0e3',r:'#d4d7da',rh:'#e6e8ea',rl:'#b0b4b8',s:'#1e3c8a'},
  wallCol:rb=>{const n=rb>=0?ROOMS[rb].n:'';return n.startsWith('Korytarz')?['#d0ccb8','#a29e8a']:n==='Hol główny'?['#d4c4a4','#a49474']:n.startsWith('Toaleta')?['#c4d4d8','#94a4aa']:n==='Stołówka'?['#e0d4b0','#b0a480']:n==='Biblioteka'?['#b89c78','#8a7052']:n==='Sekretariat'?['#c8c0b0','#989080']:n.startsWith('Klatka')?['#bcbec0','#8c8e90']:['#ddd6be','#ada68e'];},
@@ -3935,7 +3947,7 @@ const CIVS=[{x:19,y:19,k:'nurse',st:'hide'},{x:39,y:5,k:'doctor',st:'hide'},{x:4
  {x:9,y:6,k:'patient',st:'wander'},{x:17,y:6,k:'patient',st:'wander'},{x:25,y:6,k:'patient',st:'wander'},{x:27,y:17,k:'patient',st:'wander'},{x:29,y:16,k:'patient',st:'wander'},{x:5,y:17,k:'patient',st:'wander'},{x:4,y:6,k:'patient',st:'wander'}];
 const CORPSES=[[33,14,'guard'],[33,33,'guard'],[54,30,'guard'],[47,12,'orderly'],[60,9,'doctor']];
 const INTEL=[[56,6,'ZAKŁADNIK?'],[37,31,'WARTA?'],[20,34,'?'],[73,29,'?'],[16,11,'?']];
-function startMission(){if(A.dreadG&&A.ctx)A.dreadG.gain.value=0;if(A.rdHum){A.rdHum.gain.value=0;A.rdIdle.gain.value=0;}radioClear();G.torchOff=false;G.pings=[];stopCall();buildMap();if(G.bakedFor!==G.lvl)bakeWorld();G.bakedFor=null;LV.doorRows=null;mc.clearRect(0,0,memory.width,memory.height);
+function startMission(){if(A.sirG&&A.ctx)A.sirG.gain.value=0;if(A.dreadG&&A.ctx)A.dreadG.gain.value=0;if(A.rdHum){A.rdHum.gain.value=0;A.rdIdle.gain.value=0;}radioClear();G.torchOff=false;G.pings=[];stopCall();buildMap();if(G.bakedFor!==G.lvl)bakeWorld();G.bakedFor=null;LV.doorRows=null;mc.clearRect(0,0,memory.width,memory.height);
  Object.assign(G,{running:true,paused:false,ended:false,time:0,units:[],squad:[],enemies:[],civs:[],fx:[],tracers:[],lights:[],nades:[],ops:[],order:'follow',alarm:false,execT:45,warned:false,
   camv:null,lockIn:false,carBlk:null,traffic:[],flashW:0,shake:0,obj:{found:false,freed:false},devs:null,babyT:rand(3,6),panicCD:0,log:[],nvg:false,negT:rand(50,80),negBonus:0,negAlarm:0,traps:[],stats:{roe:0,traps:0,reports:0,wounded:0,healed:0,eKilled:0,eArrest:0,eSed:0,civKilled:0,civSecured:0,squadLost:0,shots:0,time:0},press:{},deadline:720,dl:{},blackT:rand(40,70),blackDur:0,scareT:rand(10,20),trail:[],trailOwner:null,postAnchor:null,stillT:0,lightT:rand(6,15),lightF:0,clankT:rand(8,18),heartT:0,p1:null,p2:null,hudT:0});
  if(!ENTRIES[G.entry])G.entry=0;const E=ENTRIES[G.entry],fx=Math.cos(E.a),fy=Math.sin(E.a),rx=-fy,ry=fx,offs=[[0,0],[-1,-.9],[-1,.9],[-2,-.5],[-2,.5]];
@@ -3970,7 +3982,7 @@ function onSquadDeath(u){const was=u.human;u.human=0;if(was===1)G.p1=null;if(was
  if(!G.squad.some(s=>s.alive)){endMission(false,'Cały oddział poległ.');return;}
  if(was)setTimeout(()=>{if(G.ended)return;const n=G.squad.find(s=>s.alive&&!s.human);if(n){n.human=was;n.task=null;n.action=null;n.path=null;if(was===1)G.p1=n;else G.p2=n;toast((was===2?'Gracz 2 przejmuje: ':'Przejmujesz: ')+n.name);for(const o of G.ops)o.mem=o.mem.filter(m=>m!==n);}},1300);}
 function onHostageDeath(){radio('TOC','Zakładnik nie żyje... Operacja zakończona niepowodzeniem.',{prio:1});endMission(false,'Zakładnik nie żyje.');}
-function endMission(win,reason){if(G.ended)return;G.lockIn=false;if(A.rdHum){A.rdHum.gain.value=0;A.rdIdle.gain.value=0;}logEv('KONIEC: '+reason);G.ended=true;G.win=win;G.reason=reason;
+function endMission(win,reason){if(G.ended)return;if(A.sirG&&A.ctx)A.sirG.gain.setTargetAtTime(0,A.ctx.currentTime,1.5);G.lockIn=false;if(A.rdHum){A.rdHum.gain.value=0;A.rdIdle.gain.value=0;}logEv('KONIEC: '+reason);G.ended=true;G.win=win;G.reason=reason;
  if(win)radio(isPat()?(LD().winWho||'DISPATCH'):'TOC',isPat()?LD().win:'Zakładnik bezpieczny. Świetna robota, Alfa. Zabezpieczyć teren.',{prio:1});
  setTimeout(showDebrief,win?3200:2800);}
 
@@ -4212,7 +4224,7 @@ function render(){const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOpera
  if(LD().render)LD().render(c,cx,cy);
  c.globalCompositeOperation='lighter';
  for(const l of LV.lamps){if(!l.k)continue;const x=l.x-cx,y=l.y-cy;if(x<-l.r||y<-l.r||x>VW+l.r||y>VH+l.r)continue;const g=c.createRadialGradient(x,y,0,x,y,l.r);g.addColorStop(0,hexA(l.col,.13));g.addColorStop(1,hexA(l.col,0));c.fillStyle=g;c.fillRect(x-l.r,y-l.r,l.r*2,l.r*2);}
- if(!G.nvg&&!G.torchOff&&W8()!=='day')for(const s of G.squad){if(!s.alive||!s.vis)continue;const R=effRange(s)*TS,g=c.createRadialGradient(s.x-cx,s.y-cy,0,s.x-cx,s.y-cy,R);g.addColorStop(0,'rgba(255,238,200,.11)');g.addColorStop(1,'rgba(255,238,200,0)');c.fillStyle=g;c.beginPath();polyPath(c,s.vis,cx,cy);c.fill();}
+ if(!G.nvg&&!G.torchOff)for(const s of G.squad){if(!s.alive||!s.vis||dayLit(s))continue;const R=effRange(s)*TS,g=c.createRadialGradient(s.x-cx,s.y-cy,0,s.x-cx,s.y-cy,R);g.addColorStop(0,'rgba(255,238,200,.11)');g.addColorStop(1,'rgba(255,238,200,0)');c.fillStyle=g;c.beginPath();polyPath(c,s.vis,cx,cy);c.fill();}
  policeLights(c,cx,cy);
  c.globalCompositeOperation='source-over';
  // monitors glow in security room

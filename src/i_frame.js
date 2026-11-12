@@ -20,6 +20,7 @@ function setLevel(l){G.lvl=l;const d=LD();
 function buildOUTM(){OUTM=document.createElement('canvas');OUTM.width=MW*TS;OUTM.height=MH*TS;const og=OUTM.getContext('2d');og.fillStyle='#fff';
  const od=(x,y)=>{const t=tAt(x,y);return t===T.GRASS||t===T.ASPH;};
  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=tAt(x,y);if(od(x,y))og.fillRect(x*TS,y*TS,TS,TS);else if((t===T.WALL||t===T.WIN)&&od(x,y+1))og.fillRect(x*TS,(y-1)*TS+4,TS,TS+12);}}
+function dayLit(u){return W8()==='day'&&!(LD().darkIn&&u&&LD().darkIn(u));}
 function weatherAlpha(){if(W8()==='fog'&&LD().dusk)return .5;return{morning:.76,night:.18,rain:.1,indoor:.3,day:.95,fog:.22,snow:.5,dust:.2}[W8()]||0;}
 function weatherTint(){if(W8()==='fog'&&LD().dusk)return'#b8a8aa';return{morning:'#cfccc6',night:'#6f7a92',rain:'#8a94a8',indoor:'#bdb8b0',day:'#f8f2e6',fog:'#8e949a',snow:'#b4bccc',dust:'#c09a7a'}[W8()]||'#c4ccd6';}
 function nightFx(c){const v=c.createRadialGradient(VW/2,VH/2,VH*.3,VW/2,VH/2,VW*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(2,3,8,.55)');c.fillStyle=v;c.fillRect(0,0,VW,VH);}

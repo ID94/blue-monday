@@ -42,7 +42,7 @@ class Unit{constructor(o){this.id=UID++;this.x=0;this.y=0;this.vx=0;this.vy=0;th
  active(){return this.alive&&this.stun<=0&&this.pose!=='sleep'&&this.state!=='surr'&&this.state!=='cuffed';}
 }
 function nearLamp(u){for(const l of LAMPS||[])if(Math.hypot(l[0]*TS+8-u.x,l[1]*TS+8-u.y)<TS*4.5)return true;return false;}
-function effRange(u){let r=u.range;if(!G.nvg&&G.torchOff&&W8()!=='day'&&!nearLamp(u))r*=.5;return r;}
+function effRange(u){let r=u.range;if(!G.nvg&&G.torchOff&&!dayLit(u)&&!nearLamp(u))r*=.5;return r;}
 function effFov(u){const v=Math.hypot(u.vx||0,u.vy||0);return u.fov*(v>40?.85:v<18?1.1:1);}
 function visionPoly(u){const pts=[],R=effRange(u)*TS,r0=TS*.75,half=effFov(u)*Math.PI/360,ext=9;
  const n=Math.ceil(u.fov/1.6);for(let i=0;i<=n;i++){const a=u.ang-half+2*half*i/n,d=castRay(u.x,u.y,a,R,ext);pts.push(u.x+Math.cos(a)*d,u.y+Math.sin(a)*d);}
@@ -81,17 +81,18 @@ function fire(u){const W=u.W;if(!W||u.rel>0||u.fireCd>0||!u.active())return fals
  if(ind&&!sil)for(let i=0;i<(W.pel>1?3:1);i++)G.fx.push({k:'smoke',x:sx+rand(-4,4),y:sy+rand(-3,3),vx:Math.cos(u.ang)*rand(2,8)+rand(-3,3),vy:-rand(1,4),r:rand(3,5),gr:rand(3,5),a:.2,t:0,life:rand(3.5,6),c:'#a8aaa8'});
  if(W.pel===1||u.weap==='shotgun'){const ea=u.ang+Math.PI/2*(Math.cos(u.ang)>0?-1:1),del=u.weap==='shotgun';G.fx.push({k:'shell',x:u.x+Math.cos(u.ang)*3,y:u.y-1,z:9,vx:Math.cos(ea)*rand(30,55),vy:Math.sin(ea)*rand(10,25)-15,vz:rand(40,70),t:0,life:rand(.6,.9),red:del});}
  return true;}
-function hitscan(sh,x0,y0,a,maxD){const dx=Math.cos(a),dy=Math.sin(a);let x=x0,y=y0,d=0,hit=null;
+function hitscan(sh,x0,y0,a,maxD){const dx=Math.cos(a),dy=Math.sin(a);let x=x0,y=y0,d=0,hit=null,skipU=null;
  if(bulletBlock(x0/TS|0,y0/TS|0)){x0=sh.x;y0=sh.y-2;x=x0;y=y0;}
  while(d<maxD){x+=dx*2;y+=dy*2;d+=2;const tx=x/TS|0,ty=y/TS|0;
   if(bulletBlock(tx,ty)){if(sh.W&&sh.W.pel>1&&sh.team==='squad'&&LV.t[I(tx,ty)]===T.DOOR&&d<TS*1.8){const dr=LV.doorAt[I(tx,ty)];if(dr&&dr.locked){dr.locked=false;dr.shot=true;dr.knownLocked=false;if(sh.human)toast('Zamek rozstrzelany — kopnij lub otwórz drzwi');logEv(sh.name+' rozstrzelał zamek strzelbą');}}
    if(LD().breakable&&LV.t[I(tx,ty)]===T.WIN&&!(LV.bw&&LV.bw.has(I(tx,ty)))){breakWin(tx,ty,x,y,a);continue;}impact(x-dx*2,y-dy*2,tx,ty,a);break;}
   if(G.carBlk&&d>6&&G.carBlk(x,y)){carImpact(x,y,a);break;}
-  for(const u of G.units){if(!u.alive||u===sh||u.pose==='sleep')continue;const cy=u.y-2,rr=u.pose==='inbed'?3.6:(u.pose==='kneel'||u.pose==='hands'||u.pose==='sit')?4.2:5.2;
-   if((u.x-x)**2+(cy-y)**2<(rr+(u.shield?2:0))**2){if(u.shield&&Math.abs(angDiff(u.ang,a+Math.PI))<(u.human?1.15:1.45)){for(let i=0;i<5;i++)G.fx.push({k:'spark',x,y:y-6,vx:rand(-60,60),vy:rand(-60,60),t:0,life:.15});SND.clang(x,y);hit='shield';break;}hit=u;break;}}
+  for(const u of G.units){if(!u.alive||u===sh||u===skipU||u.pose==='sleep')continue;const cy=u.y-2,rr=u.pose==='inbed'?3.6:(u.pose==='kneel'||u.pose==='hands'||u.pose==='sit')?4.2:5.2;
+   if((u.x-x)**2+(cy-y)**2<(rr+(u.shield?2:0))**2){if(u.shield&&Math.abs(angDiff(u.ang,a+Math.PI))<(u.human?1.15:1.45)){for(let i=0;i<5;i++)G.fx.push({k:'spark',x,y:y-6,vx:rand(-60,60),vy:rand(-60,60),t:0,life:.15});SND.clang(x,y);hit='shield';break;}if(u.evade&&sh.team==='squad'&&Math.random()<u.evade){skipU=u;continue;}hit=u;break;}}
   if(hit)break;}
  if(hit==='shield'){G.tracers.push({x0,y0:y0-6,x1:x,y1:y-6,t:0,e:sh.team==='enemy'});return;}
  G.tracers.push({x0,y0:y0-6,x1:x,y1:y-6,t:0,e:sh.team==='enemy'});
+ if(hit&&hit.tough!=null&&sh.team==='squad'&&(hit.tough>0||G.time-(hit.toughT||-9)<.06)){if(G.time-(hit.toughT||-9)>=.06){hit.tough--;hit.toughT=G.time;hit.stun=Math.max(hit.stun||0,.3);bloodPool(hit.x,hit.y,1.2);for(let i=0;i<8;i++)G.fx.push({k:'dust',x:hit.x,y:hit.y-6,vx:rand(-40,40)+Math.cos(a)*30,vy:rand(-40,40)+Math.sin(a)*30,t:0,life:.4,c:'#8a1410'});if(hit.onTough)hit.onTough(hit);}return;}
  if(hit){if(hit.kind==='director'&&sh.team==='squad')G.stats.hostageHit=1;kill(hit,sh,a);}}
 function impact(x,y,tx,ty,a){const t0=tAt(tx,ty),brick=tAt(tx,ty+1)===T.GRASS||tAt(tx,ty+1)===T.ASPH,chip=t0===T.DOOR?'#6b4a32':brick?'#7a4a3a':'#a7afa6';
  for(let i=0;i<5;i++)G.fx.push({k:'spark',x,y:y-6,vx:rand(-60,60)-Math.cos(a)*40,vy:rand(-60,60)-Math.sin(a)*40,t:0,life:rand(.08,.2)});
@@ -180,7 +181,7 @@ function drawHuman(g,u,sx,sy){const SQ=u.team==='squad'&&!u.patrol;const p=u.pal
   if(u.stun>0&&((G.time*6)|0)%2){P(g,sx-5,hy-3,1,1,'#ffe');P(g,sx+4,hy-2,1,1,'#ffe');P(g,sx,hy-4,1,1,'#ffe');}
 }
 function drawArms(g,u,sx,ty){const p=u.pal,a=u.ang;
- if(u.holster&&u.W&&u.pose!=='hands'&&u.state!=='surr'&&(G.torchOff||W8()==='day')){P(g,sx-5,ty+1,1,4,p.body);P(g,sx+4,ty+1,1,4,p.body);P(g,sx-5,ty+5,1,1,p.glove||p.skin||'#c49a7c');P(g,sx+4,ty+5,1,1,p.glove||p.skin||'#c49a7c');P(g,sx+(Math.cos(a)<0?3:-4),ty+4,1,3,'#141416');u.mzx=null;return;}
+ if(u.holster&&u.W&&u.pose!=='hands'&&u.state!=='surr'&&(G.torchOff||dayLit(u))){P(g,sx-5,ty+1,1,4,p.body);P(g,sx+4,ty+1,1,4,p.body);P(g,sx-5,ty+5,1,1,p.glove||p.skin||'#c49a7c');P(g,sx+4,ty+5,1,1,p.glove||p.skin||'#c49a7c');P(g,sx+(Math.cos(a)<0?3:-4),ty+4,1,3,'#141416');u.mzx=null;return;}
  if(u.holster&&u.W&&u.pose!=='hands'&&u.state!=='surr'){const ox=sx+Math.round(Math.cos(a)*2),oy=ty+3,ex=ox+Math.cos(a)*5,ey=oy+Math.sin(a)*3.75;line(g,ox,oy,ex,ey,'#3a3c40');P(g,Math.round(ex)-1,Math.round(ey)-1,2,2,'#c8c8c0');P(g,Math.round(ex+Math.cos(a)),Math.round(ey+Math.sin(a)*.75),1,1,'#fff8d8');P(g,Math.round(ox+Math.cos(a)*1.5)-1,Math.round(oy+Math.sin(a))-1,2,2,p.glove||'#222');P(g,sx+(Math.cos(a)<0?3:-4),ty+4,1,3,'#141416');u.mzx=ex+G.cam.rx;u.mzy=ey+G.cam.ry;return;}
  if(!u.W||u.pose==='hands'||u.pose==='sit'||u.state==='surr'){P(g,sx-5,ty+1,1,4,p.body);P(g,sx+4,ty+1,1,4,p.body);u.mzx=null;return;}
  const L=u.W.len-(u.recoil||0)*2,ox=sx+Math.round(Math.cos(a)*2),oy=ty+3;
