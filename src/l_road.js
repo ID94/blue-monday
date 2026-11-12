@@ -35,16 +35,44 @@ F('laneWb',1,1,0,0,(g,x,y)=>{P(g,x,y+15,16,1,'rgba(210,210,200,.55)');});
 F('mm',1,1,1,0,(g,x,y)=>{P(g,x+7,y+4,2,11,'#6a6e72');P(g,x+4,y-4,8,9,'#1e5a36');P(g,x+4,y-4,8,1,'#2e7a4e');P(g,x+5,y-2,6,1,'#d8e0d8');P(g,x+6,y,4,2,'#d8e0d8');P(g,x+6,y+13,5,2,SH);});
 F('post',1,1,0,0,(g,x,y)=>{P(g,x+7,y+4,2,9,'#cfcfc8');P(g,x+7,y+4,2,2,'#e8a020');P(g,x+8,y+13,3,1,SH);});
 // srebrny minivan (Toyota Sienna), lewe tylne światło nie działa
-function mkMinivan(win,side){const c=document.createElement('canvas');c.width=60;c.height=32;const g=c.getContext('2d'),b='#9aa0a6';
- P(g,4,28,54,3,SH);for(const wx of[9,43]){P(g,wx,3,9,3,'#0e0e10');P(g,wx,26,9,3,'#0e0e10');P(g,wx+3,3,3,1,'#5a5e62');P(g,wx+3,28,3,1,'#5a5e62');}
- P(g,2,5,56,22,b);P(g,2,5,56,1,'#c4cad0');P(g,2,26,56,1,'#5a6066');P(g,3,6,1,20,'#7a8086');
- P(g,48,7,9,18,'#a8aeb4');P(g,48,7,9,1,'#c4cad0');P(g,55,9,1,14,'#7a8086');
- P(g,41,7,7,18,'#16202a');P(g,42,8,1,7,'#3a5468');P(g,44,8,1,3,'#3a5468');
- P(g,10,7,31,18,'#868c92');P(g,10,7,31,1,'#a8aeb4');P(g,12,9,27,1,'#5a6066');P(g,12,22,27,1,'#5a6066');P(g,23,12,8,8,'#7a8086');P(g,24,13,6,1,'#9aa0a6');
- P(g,4,8,6,16,'#16202a');P(g,5,9,1,5,'#2f4558');P(g,2,14,2,4,'#5a6066');
- const sw=(y,x0,x1,c)=>P(g,x0,y,x1-x0,2,c);for(const y of[5,25]){sw(y,10,19,'#1a242e');sw(y,21,32,'#1a242e');P(g,20,y,1,2,'#5a6066');P(g,32,y,1,2,'#5a6066');}
- for(const y of[5,25]){const me=(y===5&&side!=='pas')||(y===25&&side==='pas');const st=me?win:0;sw(y,33,40,st===0?'#16202a':st===1?'#2a3540':'#3a2e26');if(st===0)P(g,34,y,2,1,'#3a5468');if(st===1)P(g,33,y,7,1,'#0a0c0e');if(st===2){P(g,35,y,3,2,'#4a4a3a');}}
- P(g,57,7,1,4,'#e8e4c8');P(g,57,21,1,4,'#e8e4c8');P(g,2,6,1,4,'#2a0a0a');P(g,2,22,1,4,'#c0201a');P(g,1,13,1,6,'#d8d0a0');P(g,38,4,2,1,'#2a2e33');P(g,38,27,2,1,'#2a2e33');return c;}
+function mkMinivan(win,side){const c=document.createElement('canvas');c.width=64;c.height=40;const g=c.getContext('2d');
+ const B='#a4aab0',BL='#c6ccd2',BD='#7c8288',BS='#6a7076',GL='#141c24',GR='#3a5670',TR='#2a2e33';
+ // cień
+ P(g,4,33,58,4,'rgba(0,0,0,.42)');P(g,8,37,50,1,'rgba(0,0,0,.2)');
+ // ---- bok (strona pasażera, widoczna w 2.5D) y 22..32 ----
+ P(g,2,22,60,10,BS);P(g,2,22,60,1,BD);P(g,3,31,58,1,'#4a5056');
+ P(g,2,28,60,1,'#5a6066');for(let x=3;x<61;x+=1)if(x%2)P(g,x,29,1,1,'#60666c');// listwa
+ // szyby boczne: tylna, przesuwne drzwi, przednie drzwi
+ P(g,5,23,9,4,GL);P(g,6,23,3,1,GR);P(g,16,23,15,4,GL);P(g,17,23,5,1,GR);P(g,33,23,9,4,GL);P(g,34,23,3,1,GR);
+ P(g,15,23,1,4,TR);P(g,32,23,1,4,TR);P(g,42,23,4,4,TR);
+ P(g,31,22,1,9,'#5a6066');P(g,15,24,1,7,'#5a6066');P(g,16,27,15,1,'#80868c');// szyna drzwi przesuwnych
+ P(g,28,28,2,1,'#c8ccd0');P(g,39,28,2,1,'#c8ccd0');// klamki
+ // okno pasażera (stan)
+ const me=side==='pas',st=me?win:0;if(st===1){P(g,33,23,9,1,'#05070a');P(g,33,24,9,1,GL);}if(st===2){P(g,33,23,9,4,'#2a2420');P(g,35,24,3,2,'#4a3a2e');}
+ // koła
+ for(const wx of[8,45]){P(g,wx-1,29,12,3,'#24282c');P(g,wx,30,10,6,'#0c0c0e');P(g,wx+3,31,4,4,'#8a8e94');P(g,wx+4,32,2,2,'#c8ccd0');P(g,wx-1,29,12,1,'#3a3e44');}
+ // światła z boku
+ P(g,60,24,2,3,'#f0ecd0');P(g,2,24,1,3,'#b81c16');P(g,61,30,1,2,'#e8a020');
+ // ---- dach / góra y 3..22 ----
+ P(g,2,4,60,18,B);P(g,3,3,58,1,BL);P(g,2,21,60,1,BD);
+ // maska (przód, prawo)
+ P(g,50,5,11,16,'#b0b6bc');P(g,50,5,11,1,BL);P(g,60,6,1,14,BD);P(g,52,8,7,1,'#bcc2c8');P(g,52,17,7,1,'#9aa0a6');
+ P(g,61,6,1,3,'#f4f0d8');P(g,61,17,1,3,'#f4f0d8');P(g,61,11,1,4,'#2a2e33');// reflektory, grill
+ // szyba przednia
+ P(g,43,5,7,16,GL);P(g,44,6,2,6,GR);P(g,46,7,1,3,GR);P(g,43,5,7,1,'#0a0e12');
+ // dach
+ P(g,10,5,33,16,'#8e949a');P(g,10,5,33,1,BL);P(g,10,20,33,1,BD);
+ P(g,12,6,29,1,'#6a7076');P(g,12,19,29,1,'#6a7076');for(const x of[13,26,39])P(g,x,6,1,14,'#5a6066');// relingi
+ P(g,22,9,9,8,'#82888e');P(g,23,10,7,1,'#9aa0a6');// szyberdach
+ // szyba tylna
+ P(g,4,6,6,14,GL);P(g,5,7,1,5,GR);P(g,2,6,2,14,'#9aa0a6');
+ // światła tył, jedno nie działa
+ P(g,2,5,1,3,'#3a1010');P(g,2,18,1,3,'#c8201a');P(g,1,10,1,6,'#d8d0a0');
+ // lusterka
+ P(g,44,2,3,2,TR);P(g,44,22,3,2,TR);
+ // okno kierowcy (krawędź od góry)
+ {const sd=side!=='pas'?win:0;P(g,34,4,8,1,sd===0?GL:sd===1?'#05070a':'#2a2420');if(sd===2)P(g,36,3,4,1,'#c49a7c');}
+ return c;}
 function carTiles(on){const C=G.car;if(!C)return;const x0=Math.floor(C.x/TS),y0=Math.floor(C.y/TS);for(let y=y0;y<y0+2;y++)for(let x=x0;x<x0+4;x++)if(inb(x,y))LV.fsolid[I(x,y)]=on?1:0;}
 function roadScen(){}
 function startRoad(){G.hostage=null;G.deadline=1e9;
@@ -157,7 +185,7 @@ G.crT=(G.crT||0)-dt;if(G.crT<=0&&A.ctx&&isOutdoor(L.x,L.y)){G.crT=rand(.25,.6);c
  for(const s of G.squad){if(!s||!s.alive||!s.wounded)continue;s.breathT=(s.breathT||0)-dt;if(s.breathT<=0){s.breathT=2;if(s.human)SND.breath(s.x,s.y,.3);}}}
 function roadRender(c,cx,cy){const C=G.car;if(!C)return;const x=C.x-cx,y=C.y-cy;
  const HW=C.spr.width/2;c.save();c.translate(x+HW,y+16);c.rotate(C.ang);c.drawImage(C.spr,-HW,-16);
- if(!G.h.girl&&C.mode!=='leave')P(c,-10,3,4,4,'#d8b070');if(C.mode==='parked'||C.mode==='flee'||C.mode==='leave'){P(c,8,-8,4,4,'#8a7050');if(G.h.win===2&&!G.h.drv)P(c,10,-11,3,2,'#c49a7c');}
+ if(!G.h.girl&&C.mode!=='leave')P(c,-12,7,3,3,'#d8b070');if(C.mode==='parked'||C.mode==='flee'||C.mode==='leave'){P(c,12,-6,3,3,'#8a7050');P(c,12,-7,3,1,'#5a4a3a');}
  c.restore();
  c.globalCompositeOperation='lighter';const tl=c.createRadialGradient(x+1,y+22,0,x+1,y+22,10);tl.addColorStop(0,'rgba(255,40,30,.45)');tl.addColorStop(1,'rgba(255,40,30,0)');c.fillStyle=tl;c.fillRect(x-10,y+12,22,22);
  if(C.mode!=='crashed'&&C.engine!==false){const hl=c.createRadialGradient(x+70,y+16,0,x+70,y+16,44);hl.addColorStop(0,'rgba(255,250,220,.18)');hl.addColorStop(1,'rgba(255,250,220,0)');c.fillStyle=hl;c.fillRect(x+20,y-24,80,80);}
