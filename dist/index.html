@@ -3497,8 +3497,8 @@ function schoolStress(dt,L){const c=A.ctx;if(!c||!L)return;const t=c.currentTime
  A.alarmG.gain.setTargetAtTime(G.ended?0:ins?.035:.012,t,.2);A.heliG.gain.setTargetAtTime(G.ended?0:ins?.02:.09,t,.8);
  // pulsujący alarm: trzy sygnały, przerwa (wzór temporal-3)
  const H=G.h;H.alarmT-=dt;if(H.alarmT<=0&&!G.ended){H.alarmT=2.4;for(let k=0;k<3;k++){const t0=t+k*.5,o=c.createOscillator(),g=c.createGain();o.type='square';o.frequency.value=3100;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(.5,t0+.01);g.gain.setValueAtTime(.5,t0+.3);g.gain.linearRampToValueAtTime(0,t0+.32);const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=ins?3400:1400;o.connect(g);g.connect(lp);lp.connect(A.alarmG);o.start(t0);o.stop(t0+.35);}H.alarmP=G.time;}}
-function schoolOver(c,cx,cy,dt){if(!SROOFS[0].cv)bakeSchoolRoofs();const ins=(R,u)=>u&&u.alive&&u.x>=R.x0*TS&&u.x<=(R.x1+1)*TS&&u.y>=R.y0*TS&&u.y<=(R.y1+1)*TS;const wa=weatherAlpha();
- for(const R of SROOFS){const tg=(ins(R,G.p1)||ins(R,G.p2)||(R.gf&&roofPeek({x0:R.x0,y0:R.y0,x1:R.x1,y1:R.y1})))?0:1;R.a+=(tg-R.a)*Math.min(1,dt*6);if(R.a<.02)continue;const x=R.x0*TS-2-cx,y=R.y0*TS-WH-cy-(R.band||0);if(x>VW||y>VH||x+R.cv.width<0||y+R.cv.height<0)continue;
+function schoolOver(c,cx,cy,dt){if(!SROOFS[0].cv)bakeSchoolRoofs();const ins=(R,u)=>u&&(u.alive||u===G.pDead)&&u.x>=R.x0*TS&&u.x<=(R.x1+1)*TS&&u.y>=R.y0*TS&&u.y<=(R.y1+1)*TS;const wa=weatherAlpha();
+ for(const R of SROOFS){const tg=(ins(R,G.p1)||ins(R,G.p2)||ins(R,G.pDead)||(R.gf&&roofPeek({x0:R.x0,y0:R.y0,x1:R.x1,y1:R.y1})))?0:1;R.a+=(tg-R.a)*Math.min(1,dt*6);if(R.a<.02)continue;const x=R.x0*TS-2-cx,y=R.y0*TS-WH-cy-(R.band||0);if(x>VW||y>VH||x+R.cv.width<0||y+R.cv.height<0)continue;
   c.globalAlpha=R.a;c.drawImage(R.cv,Math.round(x),Math.round(y));c.globalAlpha=R.a*(1-wa)*.9;c.fillStyle='#000';c.fillRect(Math.round(x),Math.round(y),R.cv.width,R.cv.height-6);c.globalAlpha=1;
   if(R.gf&&G.h&&G.h.flash>0&&R.a>.3){const fx=G.h.flashX*TS+6-cx,fy=y+R.cv.height-6-R.band+3;c.globalCompositeOperation='lighter';const g=c.createRadialGradient(fx,fy,0,fx,fy,26);g.addColorStop(0,'rgba(255,220,140,.9)');g.addColorStop(1,'rgba(255,160,60,0)');c.fillStyle=g;c.fillRect(fx-26,fy-26,52,52);c.globalCompositeOperation='source-over';P(c,fx-2|0,fy-2|0,5,4,'#fff6d8');}}}
 const SROOFS=[{x0:14,y0:22,x1:63,y1:36,gf:true,band:16},{x0:14,y0:1,x1:63,y1:16}];
@@ -3961,7 +3961,7 @@ const CIVS=[{x:19,y:19,k:'nurse',st:'hide'},{x:39,y:5,k:'doctor',st:'hide'},{x:4
 const CORPSES=[[33,14,'guard'],[33,33,'guard'],[54,30,'guard'],[47,12,'orderly'],[60,9,'doctor']];
 const INTEL=[[56,6,'ZAKŁADNIK?'],[37,31,'WARTA?'],[20,34,'?'],[73,29,'?'],[16,11,'?']];
 function startMission(){if(A.sirG&&A.ctx)A.sirG.gain.value=0;if(A.dreadG&&A.ctx)A.dreadG.gain.value=0;if(A.rdHum){A.rdHum.gain.value=0;A.rdIdle.gain.value=0;}radioClear();G.torchOff=false;G.pings=[];stopCall();buildMap();if(G.bakedFor!==G.lvl)bakeWorld();G.bakedFor=null;LV.doorRows=null;mc.clearRect(0,0,memory.width,memory.height);
- Object.assign(G,{running:true,paused:false,ended:false,time:0,units:[],squad:[],enemies:[],civs:[],fx:[],tracers:[],lights:[],nades:[],ops:[],order:'follow',alarm:false,execT:45,warned:false,
+ Object.assign(G,{running:true,paused:false,ended:false,pDead:null,time:0,units:[],squad:[],enemies:[],civs:[],fx:[],tracers:[],lights:[],nades:[],ops:[],order:'follow',alarm:false,execT:45,warned:false,
   camv:null,lockIn:false,carBlk:null,traffic:[],flashW:0,shake:0,obj:{found:false,freed:false},devs:null,babyT:rand(3,6),panicCD:0,log:[],nvg:false,negT:rand(50,80),negBonus:0,negAlarm:0,traps:[],stats:{roe:0,traps:0,reports:0,wounded:0,healed:0,eKilled:0,eArrest:0,eSed:0,civKilled:0,civSecured:0,squadLost:0,shots:0,time:0},press:{},deadline:720,dl:{},blackT:rand(40,70),blackDur:0,scareT:rand(10,20),trail:[],trailOwner:null,postAnchor:null,stillT:0,lightT:rand(6,15),lightF:0,clankT:rand(8,18),heartT:0,p1:null,p2:null,hudT:0});
  if(!ENTRIES[G.entry])G.entry=0;const E=ENTRIES[G.entry],fx=Math.cos(E.a),fy=Math.sin(E.a),rx=-fy,ry=fx,offs=[[0,0],[-1,-.9],[-1,.9],[-2,-.5],[-2,.5]];
  if(isPat())(LD().spawn||spawnPatrolPair)(E);else{const order=[G.p1Spec,...SPECS.map((_,i)=>i).filter(i=>i!==G.p1Spec)];
@@ -3992,12 +3992,13 @@ function bakeTraces(){const r=rng(99);
  for(const[x,y]of[[34,31],[44,23],[54,12],[22,12],[12,23]])for(let k=0;k<6;k++)P(wc,Math.round(x*TS+r()*14),Math.round(y*TS+r()*14),2,1,r()<.5?'#9a7a34':'#7a5e24');
  for(const[x,y]of[[12,23],[57,11]]){const g=wc.createRadialGradient(x*TS+8,y*TS+8,0,x*TS+8,y*TS+8,12);g.addColorStop(0,'rgba(10,8,6,.55)');g.addColorStop(1,'rgba(10,8,6,0)');wc.fillStyle=g;wc.fillRect(x*TS-4,y*TS-4,24,24);}}
 function onSquadDeath(u){const was=u.human;u.human=0;if(was===1)G.p1=null;if(was===2)G.p2=null;
+ if(was&&G.lvl==='school'&&!(G.p1&&G.p1.alive)&&!(G.p2&&G.p2.alive)){G.pDead=u;G.pDeadT=G.time;G.hurtF=1;G.shake=.4;endMission(false,'Zginąłeś na służbie.');return;}
  if(!G.squad.some(s=>s.alive)){endMission(false,'Cały oddział poległ.');return;}
  if(was)setTimeout(()=>{if(G.ended)return;const n=G.squad.find(s=>s.alive&&!s.human);if(n){n.human=was;n.task=null;n.action=null;n.path=null;if(was===1)G.p1=n;else G.p2=n;toast((was===2?'Gracz 2 przejmuje: ':'Przejmujesz: ')+n.name);for(const o of G.ops)o.mem=o.mem.filter(m=>m!==n);}},1300);}
 function onHostageDeath(){radio('TOC','Zakładnik nie żyje... Operacja zakończona niepowodzeniem.',{prio:1});endMission(false,'Zakładnik nie żyje.');}
 function endMission(win,reason){if(G.ended)return;if(A.sirG&&A.ctx)A.sirG.gain.setTargetAtTime(0,A.ctx.currentTime,1.5);G.lockIn=false;if(A.rdHum){A.rdHum.gain.value=0;A.rdIdle.gain.value=0;}logEv('KONIEC: '+reason);G.ended=true;G.win=win;G.reason=reason;
  if(win)radio(isPat()?(LD().winWho||'DISPATCH'):'TOC',isPat()?LD().win:'Zakładnik bezpieczny. Świetna robota, Alfa. Zabezpieczyć teren.',{prio:1});
- setTimeout(showDebrief,win?3200:2800);}
+ setTimeout(showDebrief,win?3200:G.pDead?4600:2800);}
 
 // ================= INPUT =================
 const K=G.keys;
@@ -4196,7 +4197,7 @@ function updateCamera(dt){const hs=[G.p1,G.p2].filter(u=>u&&u.alive);let tx,ty;
  if(hs.length===2){tx=(hs[0].x+hs[1].x)/2;ty=(hs[0].y+hs[1].y)/2;}
  else if(hs.length===1&&G.camv&&G.camv.cctv&&G.camv.u===hs[0]){const cv=G.camv;tx=cv.x+Math.cos(cv.ang)*TS*4;ty=cv.y+Math.sin(cv.ang)*TS*4;}
  else if(hs.length===1){const u=hs[0];tx=u.x;ty=u.y;if(u===G.p1){tx+=clamp((G.mouse.wx-u.x)*.25,-52,52);ty+=clamp((G.mouse.wy-u.y)*.25,-32,32);}}
- else{const L=leader();if(!L)return;tx=L.x;ty=L.y;}
+ else if(G.pDead){tx=G.pDead.x;ty=G.pDead.y;}else{const L=leader();if(!L)return;tx=L.x;ty=L.y;}
  const k=1-Math.exp(-6*dt);G.cam.x+=(tx-G.cam.x)*k;G.cam.y+=(ty-G.cam.y)*k;
  G.cam.x=clamp(G.cam.x,VW/2,MW*TS-VW/2);G.cam.y=clamp(G.cam.y,VH/2,MH*TS-VH/2);
  if(hs.length===2)for(const u of hs){const nx=clamp(u.x,G.cam.x-VW/2+14,G.cam.x+VW/2-14),ny=clamp(u.y,G.cam.y-VH/2+22,G.cam.y+VH/2-8);if(!collides(nx,ny,u.r)){u.x=nx;u.y=ny;}}}
@@ -4539,7 +4540,7 @@ buildMap();bakeWorld();
 let last=performance.now();
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(G.running&&!G.paused&&G.squad)for(const q of G.squad)if(q&&q.drawCd>0)q.drawCd-=dt;
  const still=!G.running&&$('scr-menu').classList.contains('hidden');
- try{const blur=G.running||still?'none':'blur(1.6px) saturate(.65) brightness(.75)';if(cv.style.filter!==blur)cv.style.filter=blur;const tf=!G.running?(still?cv.style.transform:menuSway()):tiltOn()?'perspective('+(TILT.p*wrap.clientHeight)+'px) rotateX('+(TILT.th*180/Math.PI)+'deg) scale('+TILT.k+')':'none';if(cv.style.transform!==tf){cv.style.transform=tf;$('monov').style.transform=G.running?'none':tf;}if(G.running){if(!G.paused)update(dt);render();}else{if(!still||!G.menuDrawn){renderMenu(dt);if(still){const c=ctx;c.save();c.setTransform(1,0,0,1,0,0);c.filter='blur(.45px) saturate(.65) brightness(.75)';c.drawImage(cv,0,0);c.restore();}G.menuDrawn=1;}if(!$('scr-brief').classList.contains('hidden')){if(isPat()){callUpdate(dt);drawWave();}else drawPlan($('brief-map'),false,G.entry);}else if(CALLS.on)stopCall();}}catch(err){console.error(err);}
+ try{let blur=G.running||still?'none':'blur(1.6px) saturate(.65) brightness(.75)';if(G.running&&G.pDead){const k=Math.min(1,(G.time-G.pDeadT)/1.6);blur='grayscale('+k.toFixed(2)+') brightness('+(1-k*.35).toFixed(2)+') contrast('+(1+k*.15).toFixed(2)+')';}if(cv.style.filter!==blur)cv.style.filter=blur;const tf=!G.running?(still?cv.style.transform:menuSway()):tiltOn()?'perspective('+(TILT.p*wrap.clientHeight)+'px) rotateX('+(TILT.th*180/Math.PI)+'deg) scale('+TILT.k+')':'none';if(cv.style.transform!==tf){cv.style.transform=tf;$('monov').style.transform=G.running?'none':tf;}if(G.running){if(!G.paused)update(dt);render();}else{if(!still||!G.menuDrawn){renderMenu(dt);if(still){const c=ctx;c.save();c.setTransform(1,0,0,1,0,0);c.filter='blur(.45px) saturate(.65) brightness(.75)';c.drawImage(cv,0,0);c.restore();}G.menuDrawn=1;}if(!$('scr-brief').classList.contains('hidden')){if(isPat()){callUpdate(dt);drawWave();}else drawPlan($('brief-map'),false,G.entry);}else if(CALLS.on)stopCall();}}catch(err){console.error(err);}
  requestAnimationFrame(frame);}
 requestAnimationFrame(frame);
 document.addEventListener('click',()=>audioInit(),{once:false});
