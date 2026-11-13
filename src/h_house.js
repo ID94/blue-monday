@@ -526,8 +526,8 @@ function bakeRoofs(){for(const R of ROOFS){const W=(R.x1-R.x0+1)*TS+4,Hh=(R.y1-R
 function roofPeek(R){const ps=[G.p1,G.p2].filter(u=>u&&u.alive);if(!ps.length)return false;
  for(const d of LV.doors){if(!(d.broken||d.open>.25))continue;if(d.x<R.x0||d.x>R.x1+1||d.y<R.y0||d.y>R.y1+1)continue;const edge=d.x===R.x0||d.x===R.x1||d.x===R.x1+1||d.y===R.y0||d.y===R.y1||d.y===R.y1+1;if(!edge)continue;
   for(const u of ps)if(dist(u.x,u.y,d.x*TS+8,d.y*TS+8)<TS*4.5)return true;}return false;}
-function houseRoofs(c,cx,cy,dt){if(!ROOFS[0].cv)bakeRoofs();const ins=(R,u)=>u&&u.alive&&u.x>=(R.x0+.5)*TS&&u.x<=(R.x1+.5)*TS&&u.y>=(R.y0+.5)*TS&&u.y<=(R.y1+.8)*TS;
- const wa=weatherAlpha(),inR=R=>ins(R,G.p1)||ins(R,G.p2)||roofPeek(R);for(const R of ROOFS){const tg=(R.grp?ROOFS.some(Q=>Q.grp===R.grp&&inR(Q)):inR(R))?0:1;R.a+=(tg-R.a)*Math.min(1,dt*6);if(R.a<.02)continue;
+function houseRoofs(c,cx,cy,dt){if(!ROOFS[0].cv)bakeRoofs();const ins=(R,u)=>u&&(u.alive||u===G.pDead)&&u.x>=(R.x0+.5)*TS&&u.x<=(R.x1+.5)*TS&&u.y>=(R.y0+.5)*TS&&u.y<=(R.y1+.8)*TS;
+ const wa=weatherAlpha(),inR=R=>ins(R,G.p1)||ins(R,G.p2)||ins(R,G.pDead)||roofPeek(R);for(const R of ROOFS){const tg=(R.grp?ROOFS.some(Q=>Q.grp===R.grp&&inR(Q)):inR(R))?0:1;R.a+=(tg-R.a)*Math.min(1,dt*6);if(R.a<.02)continue;
   const x=R.x0*TS-2-cx,y=R.y0*TS-WH-cy;if(x>VW||y>VH||x+R.cv.width<0||y+R.cv.height<0)continue;
   c.globalAlpha=R.a;c.drawImage(R.cv,Math.round(x),Math.round(y));c.globalAlpha=R.a*(1-wa)*.9;c.fillStyle='#000';c.fillRect(Math.round(x),Math.round(y),R.cv.width,R.cv.height-6);c.globalAlpha=1;}
  // linie energetyczne nad ulicą

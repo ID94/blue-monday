@@ -184,7 +184,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
 #scr-scen:not(.hidden){display:block;background:none;text-transform:none;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:0}
 .mm-gr.sc-dim{background:radial-gradient(circle at -5% -10%,rgba(40,80,255,.12),transparent 45%),radial-gradient(circle at 108% 0,rgba(230,40,40,.08),transparent 45%),linear-gradient(180deg,rgba(0,0,0,.8),rgba(0,0,0,.86) 60%,rgba(0,0,0,.95))}
 .sc-top{z-index:3}.sc-modes{display:flex;align-items:center;gap:calc(var(--u)*3)}
-.sc-m{background:none;border:0;border-bottom:1px solid transparent;padding:calc(var(--u)*3) calc(var(--u)*3) calc(var(--u)*1);margin:calc(var(--u)*-3) calc(var(--u)*-3) 0;font-family:inherit;font-size:calc(var(--u)*3.6);letter-spacing:.32em;color:#6c7684;cursor:pointer}.sc-m.sel{color:#fff;border-bottom-color:#3d6bff}
+.sc-m{background:none;border:0;border-bottom:1px solid transparent;padding:calc(var(--u)*3) calc(var(--u)*3) calc(var(--u)*1);margin:calc(var(--u)*-3) calc(var(--u)*-3) 0;font-family:inherit;font-size:calc(var(--u)*3.6);letter-spacing:.32em;color:#6c7684;cursor:pointer}.sc-m.sel{color:#fff;border-bottom-color:#3d6bff}.sc-sep{width:1px;height:calc(var(--u)*4);background:#2a303a;margin:0 calc(var(--u)*1)}.sc-m.rc.sel{color:#ff5a4a;border-bottom-color:#ff3a2a}
 .sc-row{position:absolute;left:calc(var(--u)*24);top:calc(var(--u)*46);width:calc(var(--u)*122);bottom:calc(var(--u)*66);display:flex;flex-direction:column;gap:calc(var(--u)*1.4);overflow-y:auto;padding-right:calc(var(--u)*2);scrollbar-width:thin;scrollbar-color:#2a3442 transparent}
 .sc-card{position:relative;flex:0 0 auto;display:grid;grid-template-columns:calc(var(--u)*13) 1fr auto;grid-template-rows:auto auto;align-items:center;column-gap:calc(var(--u)*3);padding:calc(var(--u)*3) calc(var(--u)*4) calc(var(--u)*3) calc(var(--u)*5);background:rgba(8,10,14,.78);border:1px solid rgba(255,255,255,.06);cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
 .sc-card:before{content:"";position:absolute;left:-1px;top:-1px;bottom:-1px;width:2px;background:transparent}
@@ -340,7 +340,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
 
  <div id="scr-scen" class="screen hidden">
   <div class="mm-gr sc-dim"></div><div class="mm-lb mm-lt"></div><div class="mm-lb mm-lbb"></div>
-  <div class="nb-top sc-top"><span><i></i>WYBÓR ZGŁOSZENIA</span><span class="sc-modes">TRYB&nbsp;&nbsp;<button class="sc-m sel" id="mode1">SOLO</button><button class="sc-m" id="mode2">CO-OP</button></span></div>
+  <div class="nb-top sc-top"><span><i></i>WYBÓR ZGŁOSZENIA</span><span class="sc-modes">TRYB&nbsp;&nbsp;<button class="sc-m sel" id="mode1">SOLO</button><button class="sc-m" id="mode2">CO-OP</button><span class="sc-sep"></span><button class="sc-m rc" id="realcop" title="Śmierć gracza kończy każdą misję">REAL COP</button></span></div>
   <div class="sc-row">
    <div class="sc-card sel1" id="sc1"><div class="n">01</div><div class="tt">214 Oakridge Lane</div><div class="fa">Ridgefield PD · Connecticut</div><div class="ds">Jesienny poranek na przedmieściu. Telefon od sąsiadki.</div><div class="st ok">● DOSTĘPNE</div></div>
    <div class="sc-card lock" id="sc2"><div class="n">02</div><div class="tt">Mile Marker 41</div><div class="fa">Wyoming Highway Patrol</div><div class="ds">Noc i gęsta mgła na pustej drodze. Rutynowa kontrola.</div><div class="st">ZABLOKOWANE</div></div>
@@ -2364,8 +2364,8 @@ function bakeRoofs(){for(const R of ROOFS){const W=(R.x1-R.x0+1)*TS+4,Hh=(R.y1-R
 function roofPeek(R){const ps=[G.p1,G.p2].filter(u=>u&&u.alive);if(!ps.length)return false;
  for(const d of LV.doors){if(!(d.broken||d.open>.25))continue;if(d.x<R.x0||d.x>R.x1+1||d.y<R.y0||d.y>R.y1+1)continue;const edge=d.x===R.x0||d.x===R.x1||d.x===R.x1+1||d.y===R.y0||d.y===R.y1||d.y===R.y1+1;if(!edge)continue;
   for(const u of ps)if(dist(u.x,u.y,d.x*TS+8,d.y*TS+8)<TS*4.5)return true;}return false;}
-function houseRoofs(c,cx,cy,dt){if(!ROOFS[0].cv)bakeRoofs();const ins=(R,u)=>u&&u.alive&&u.x>=(R.x0+.5)*TS&&u.x<=(R.x1+.5)*TS&&u.y>=(R.y0+.5)*TS&&u.y<=(R.y1+.8)*TS;
- const wa=weatherAlpha(),inR=R=>ins(R,G.p1)||ins(R,G.p2)||roofPeek(R);for(const R of ROOFS){const tg=(R.grp?ROOFS.some(Q=>Q.grp===R.grp&&inR(Q)):inR(R))?0:1;R.a+=(tg-R.a)*Math.min(1,dt*6);if(R.a<.02)continue;
+function houseRoofs(c,cx,cy,dt){if(!ROOFS[0].cv)bakeRoofs();const ins=(R,u)=>u&&(u.alive||u===G.pDead)&&u.x>=(R.x0+.5)*TS&&u.x<=(R.x1+.5)*TS&&u.y>=(R.y0+.5)*TS&&u.y<=(R.y1+.8)*TS;
+ const wa=weatherAlpha(),inR=R=>ins(R,G.p1)||ins(R,G.p2)||ins(R,G.pDead)||roofPeek(R);for(const R of ROOFS){const tg=(R.grp?ROOFS.some(Q=>Q.grp===R.grp&&inR(Q)):inR(R))?0:1;R.a+=(tg-R.a)*Math.min(1,dt*6);if(R.a<.02)continue;
   const x=R.x0*TS-2-cx,y=R.y0*TS-WH-cy;if(x>VW||y>VH||x+R.cv.width<0||y+R.cv.height<0)continue;
   c.globalAlpha=R.a;c.drawImage(R.cv,Math.round(x),Math.round(y));c.globalAlpha=R.a*(1-wa)*.9;c.fillStyle='#000';c.fillRect(Math.round(x),Math.round(y),R.cv.width,R.cv.height-6);c.globalAlpha=1;}
  // linie energetyczne nad ulicą
@@ -3930,7 +3930,7 @@ function mallDebrief(){const H=G.h||{},e=H.sus||{};let sc=0;const rows=[];
  rows.push(['Ręczne sprawdzanie przedmiotów',H.handTouched?H.handTouched+'×':'nie',H.handTouched?'bad':'good']);sc-=(H.handTouched||0)*10;
  rows.push(['Pozostały czas',H.neutral?fmtT(Math.max(0,H.bombT)):'—']);if(H.neutral)sc+=Math.floor(H.bombT/30);
  patrolDebrief(rows,sc);}
-LVL.mall={id:'mall',patrol:true,lit:.86,weather:'day',crew:{role:'S.W.A.T.',shout:'Police! Get down!'},car:{s:'#1e3c8a'},ext:'concrete',
+LVL.mall={id:'mall',patrol:true,swat:true,lit:.86,weather:'day',crew:{role:'S.W.A.T.',shout:'Police! Get down!'},car:{s:'#1e3c8a'},ext:'concrete',
  terrain:mallTerrain,windows:mallWindows,decor:mallDecor,rooms:ROOMS_MALL,doors:DOORS_MALL,furn:FURN_MALL,lamps:LAMPS_MALL,cams:CAMS_MALL,entries:ENTRIES_MALL,
  spawn:spawnMallTeam,start:startMall,update:updateMall,interact:mallInteract,render:mallRender,over:mallOver,stress:NOOP,obj:mallObj,debrief:mallDebrief,robotIn,
  wallCol:rb=>{const n=rb>=0?ROOMS[rb].n:'';return n==='Hala sprzedaży'?['#d8d4c8','#a8a498']:n==='Magazyn'?['#8a8a84','#6a6a64']:n.startsWith('WC')||n==='Apteka'?['#c4d4d8','#94a4aa']:['#b8b4a8','#888478'];},
@@ -3991,8 +3991,9 @@ function bakeTraces(){const r=rng(99);
  for(const[x,y,n]of[[11,21,7],[44,21,9],[56,10,8],[39,24,6],[70,21,5],[20,24,4]])for(let k=0;k<n;k++){const hx=x*TS+((r()*30)|0)-6;if(WR[y]){const g=WR[y].getContext('2d'),ly=17+((r()*8)|0);P(g,hx-1,ly-1,3,3,'rgba(200,205,195,.3)');P(g,hx,ly,2,2,'#111');}}
  for(const[x,y]of[[34,31],[44,23],[54,12],[22,12],[12,23]])for(let k=0;k<6;k++)P(wc,Math.round(x*TS+r()*14),Math.round(y*TS+r()*14),2,1,r()<.5?'#9a7a34':'#7a5e24');
  for(const[x,y]of[[12,23],[57,11]]){const g=wc.createRadialGradient(x*TS+8,y*TS+8,0,x*TS+8,y*TS+8,12);g.addColorStop(0,'rgba(10,8,6,.55)');g.addColorStop(1,'rgba(10,8,6,0)');wc.fillStyle=g;wc.fillRect(x*TS-4,y*TS-4,24,24);}}
+function deathEnds(){return G.realCop||(isPat()&&!LD().swat);}
 function onSquadDeath(u){const was=u.human;u.human=0;if(was===1)G.p1=null;if(was===2)G.p2=null;
- if(was&&G.lvl==='school'&&!(G.p1&&G.p1.alive)&&!(G.p2&&G.p2.alive)){G.pDead=u;G.pDeadT=G.time;G.hurtF=1;G.shake=.4;endMission(false,'Zginąłeś na służbie.');return;}
+ if(was&&deathEnds()&&!(G.p1&&G.p1.alive)&&!(G.p2&&G.p2.alive)){G.pDead=u;G.pDeadT=G.time;G.hurtF=1;G.shake=.4;endMission(false,'Zginąłeś na służbie.');return;}
  if(!G.squad.some(s=>s.alive)){endMission(false,'Cały oddział poległ.');return;}
  if(was)setTimeout(()=>{if(G.ended)return;const n=G.squad.find(s=>s.alive&&!s.human);if(n){n.human=was;n.task=null;n.action=null;n.path=null;if(was===1)G.p1=n;else G.p2=n;toast((was===2?'Gracz 2 przejmuje: ':'Przejmujesz: ')+n.name);for(const o of G.ops)o.mem=o.mem.filter(m=>m!==n);}},1300);}
 function onHostageDeath(){radio('TOC','Zakładnik nie żyje... Operacja zakończona niepowodzeniem.',{prio:1});endMission(false,'Zakładnik nie żyje.');}
@@ -4436,6 +4437,8 @@ document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=
  if(g==='squad'){buildSquadCards();}if(g==='menu'&&G.running){G.running=false;$('hud').classList.add('hidden');radioClear();}
  if(G.paused&&g==='menu'){G.paused=false;}showScreen(g==='ctrl'&&G.paused?'ctrl':g);}));
 $('mode1').onclick=()=>{G.players=1;$('mode1').classList.add('sel');$('mode2').classList.remove('sel');$('modehint').textContent='Pozostali członkowie oddziału są sterowani przez AI i wykonują twoje rozkazy.';SND.click();};
+try{G.realCop=localStorage.getItem('bm_realcop')==='1';}catch(e){}$('realcop').classList.toggle('sel',!!G.realCop);
+$('realcop').onclick=()=>{G.realCop=!G.realCop;try{G.realCop?localStorage.setItem('bm_realcop','1'):localStorage.removeItem('bm_realcop');}catch(e){}$('realcop').classList.toggle('sel',G.realCop);$('modehint').textContent=G.realCop?'REAL COP: jedno życie. Śmierć twojej postaci kończy każdą misję, także operacje S.W.A.T.':'Standard: w operacjach S.W.A.T. po twojej śmierci przejmujesz kolejnego operatora. W patrolu śmierć kończy misję.';SND.click();};
 $('mm-coop').onclick=()=>{SND.click();$('mode2').onclick();showScreen('scen');};
 {const navRoot=()=>!$('scr-menu').classList.contains('hidden')?$('scr-menu'):!$('scr-deb').classList.contains('hidden')?$('scr-deb'):(!$('scr-brief').classList.contains('hidden')&&!$('nb').classList.contains('hidden'))?$('nb'):null;
  const items=()=>{const r=navRoot();return r?[...r.querySelectorAll('.mm-i')]:[];};document.querySelectorAll('.mm-i').forEach(b=>b.addEventListener('mouseenter',()=>{items().forEach(x=>x.classList.toggle('on',x===b));}));
@@ -4459,7 +4462,7 @@ function scStars(){try{for(const id of SCIDS){const c=$(id);if(!c)continue;let e
 setTimeout(scStars,0);
 function scSelect(id,quiet){SCIDS.forEach(x=>$(x).classList.toggle('sel1',x===id));G.pendLvl=$(id).classList.contains('lock')?null:SCLV[id];scDetail(id);if(!quiet)SND.click();$(id).scrollIntoView({block:'nearest'});}
 function testMode(on){try{on?localStorage.setItem('bm_test','1'):localStorage.removeItem('bm_test');}catch(e){}SCIDS.forEach(id=>{const c=$(id);if(on&&c.classList.contains('lock')){c.classList.add('tlock');c.classList.remove('lock');const st=c.querySelector('.st');st.dataset.o=st.textContent;st.className='st ok';st.textContent='● TEST';}else if(!on&&c.classList.contains('tlock')){c.classList.remove('tlock');c.classList.add('lock');const st=c.querySelector('.st');st.className='st';st.textContent=st.dataset.o||'ZABLOKOWANE';}});
- let b=$('testbadge');if(!b){b=document.createElement('div');b.id='testbadge';b.style.cssText='position:absolute;right:calc(var(--u)*24);top:calc(var(--u)*30);font-size:calc(var(--u)*3);letter-spacing:.3em;color:#ff7a6a;border:1px solid rgba(255,122,106,.5);padding:calc(var(--u)*1) calc(var(--u)*3);z-index:5';$('scr-scen').appendChild(b);}b.textContent='TRYB TESTOWY · wszystkie misje';b.style.display=on?'block':'none';const sel=SCIDS.find(x=>$(x).classList.contains('sel1'));if(sel)scDetail(sel);}
+ let b=$('testbadge');if(!b){b=document.createElement('div');b.id='testbadge';b.style.cssText='position:absolute;pointer-events:none;left:calc(var(--u)*24);bottom:calc(var(--u)*10);font-size:calc(var(--u)*3);letter-spacing:.3em;color:#ff7a6a;border:1px solid rgba(255,122,106,.5);padding:calc(var(--u)*1) calc(var(--u)*3);z-index:5';$('scr-scen').appendChild(b);}b.textContent='TRYB TESTOWY · wszystkie misje';b.style.display=on?'block':'none';const sel=SCIDS.find(x=>$(x).classList.contains('sel1'));if(sel)scDetail(sel);}
 {let tm=false;try{tm=/[?&#]test\b/i.test(location.search+location.hash)||localStorage.getItem('bm_test')==='1';}catch(e){tm=/[?&#]test\b/i.test(location.search+location.hash);}setTimeout(()=>testMode(tm),0);
  let buf='';addEventListener('keydown',e=>{if(G.running)return;buf=(buf+(e.key||'')).slice(-4).toLowerCase();if(buf==='test'){let on=false;try{on=localStorage.getItem('bm_test')==='1';}catch(_){on=!!$('testbadge')&&$('testbadge').style.display==='block';}testMode(!on);toast(!on?'Tryb testowy WŁĄCZONY':'Tryb testowy wyłączony');buf='';}});}
 SCIDS.forEach(id=>{$(id).onclick=()=>scSelect(id);$(id).ondblclick=()=>{if(!$(id).classList.contains('lock'))$('scen-next').click();};});

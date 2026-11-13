@@ -184,7 +184,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
 #scr-scen:not(.hidden){display:block;background:none;text-transform:none;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:0}
 .mm-gr.sc-dim{background:radial-gradient(circle at -5% -10%,rgba(40,80,255,.12),transparent 45%),radial-gradient(circle at 108% 0,rgba(230,40,40,.08),transparent 45%),linear-gradient(180deg,rgba(0,0,0,.8),rgba(0,0,0,.86) 60%,rgba(0,0,0,.95))}
 .sc-top{z-index:3}.sc-modes{display:flex;align-items:center;gap:calc(var(--u)*3)}
-.sc-m{background:none;border:0;border-bottom:1px solid transparent;padding:calc(var(--u)*3) calc(var(--u)*3) calc(var(--u)*1);margin:calc(var(--u)*-3) calc(var(--u)*-3) 0;font-family:inherit;font-size:calc(var(--u)*3.6);letter-spacing:.32em;color:#6c7684;cursor:pointer}.sc-m.sel{color:#fff;border-bottom-color:#3d6bff}
+.sc-m{background:none;border:0;border-bottom:1px solid transparent;padding:calc(var(--u)*3) calc(var(--u)*3) calc(var(--u)*1);margin:calc(var(--u)*-3) calc(var(--u)*-3) 0;font-family:inherit;font-size:calc(var(--u)*3.6);letter-spacing:.32em;color:#6c7684;cursor:pointer}.sc-m.sel{color:#fff;border-bottom-color:#3d6bff}.sc-sep{width:1px;height:calc(var(--u)*4);background:#2a303a;margin:0 calc(var(--u)*1)}.sc-m.rc.sel{color:#ff5a4a;border-bottom-color:#ff3a2a}
 .sc-row{position:absolute;left:calc(var(--u)*24);top:calc(var(--u)*46);width:calc(var(--u)*122);bottom:calc(var(--u)*66);display:flex;flex-direction:column;gap:calc(var(--u)*1.4);overflow-y:auto;padding-right:calc(var(--u)*2);scrollbar-width:thin;scrollbar-color:#2a3442 transparent}
 .sc-card{position:relative;flex:0 0 auto;display:grid;grid-template-columns:calc(var(--u)*13) 1fr auto;grid-template-rows:auto auto;align-items:center;column-gap:calc(var(--u)*3);padding:calc(var(--u)*3) calc(var(--u)*4) calc(var(--u)*3) calc(var(--u)*5);background:rgba(8,10,14,.78);border:1px solid rgba(255,255,255,.06);cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
 .sc-card:before{content:"";position:absolute;left:-1px;top:-1px;bottom:-1px;width:2px;background:transparent}
@@ -340,7 +340,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Cour
 
  <div id="scr-scen" class="screen hidden">
   <div class="mm-gr sc-dim"></div><div class="mm-lb mm-lt"></div><div class="mm-lb mm-lbb"></div>
-  <div class="nb-top sc-top"><span><i></i>WYBÓR ZGŁOSZENIA</span><span class="sc-modes">TRYB&nbsp;&nbsp;<button class="sc-m sel" id="mode1">SOLO</button><button class="sc-m" id="mode2">CO-OP</button></span></div>
+  <div class="nb-top sc-top"><span><i></i>WYBÓR ZGŁOSZENIA</span><span class="sc-modes">TRYB&nbsp;&nbsp;<button class="sc-m sel" id="mode1">SOLO</button><button class="sc-m" id="mode2">CO-OP</button><span class="sc-sep"></span><button class="sc-m rc" id="realcop" title="Śmierć gracza kończy każdą misję">REAL COP</button></span></div>
   <div class="sc-row">
    <div class="sc-card sel1" id="sc1"><div class="n">01</div><div class="tt">214 Oakridge Lane</div><div class="fa">Ridgefield PD · Connecticut</div><div class="ds">Jesienny poranek na przedmieściu. Telefon od sąsiadki.</div><div class="st ok">● DOSTĘPNE</div></div>
    <div class="sc-card lock" id="sc2"><div class="n">02</div><div class="tt">Mile Marker 41</div><div class="fa">Wyoming Highway Patrol</div><div class="ds">Noc i gęsta mgła na pustej drodze. Rutynowa kontrola.</div><div class="st">ZABLOKOWANE</div></div>

@@ -180,7 +180,7 @@ function mallDebrief(){const H=G.h||{},e=H.sus||{};let sc=0;const rows=[];
  rows.push(['Ręczne sprawdzanie przedmiotów',H.handTouched?H.handTouched+'×':'nie',H.handTouched?'bad':'good']);sc-=(H.handTouched||0)*10;
  rows.push(['Pozostały czas',H.neutral?fmtT(Math.max(0,H.bombT)):'—']);if(H.neutral)sc+=Math.floor(H.bombT/30);
  patrolDebrief(rows,sc);}
-LVL.mall={id:'mall',patrol:true,lit:.86,weather:'day',crew:{role:'S.W.A.T.',shout:'Police! Get down!'},car:{s:'#1e3c8a'},ext:'concrete',
+LVL.mall={id:'mall',patrol:true,swat:true,lit:.86,weather:'day',crew:{role:'S.W.A.T.',shout:'Police! Get down!'},car:{s:'#1e3c8a'},ext:'concrete',
  terrain:mallTerrain,windows:mallWindows,decor:mallDecor,rooms:ROOMS_MALL,doors:DOORS_MALL,furn:FURN_MALL,lamps:LAMPS_MALL,cams:CAMS_MALL,entries:ENTRIES_MALL,
  spawn:spawnMallTeam,start:startMall,update:updateMall,interact:mallInteract,render:mallRender,over:mallOver,stress:NOOP,obj:mallObj,debrief:mallDebrief,robotIn,
  wallCol:rb=>{const n=rb>=0?ROOMS[rb].n:'';return n==='Hala sprzedaży'?['#d8d4c8','#a8a498']:n==='Magazyn'?['#8a8a84','#6a6a64']:n.startsWith('WC')||n==='Apteka'?['#c4d4d8','#94a4aa']:['#b8b4a8','#888478'];},
