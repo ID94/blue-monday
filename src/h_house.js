@@ -146,7 +146,7 @@ function startHouse(){
  G.hostage=null;G.deadline=1e9;
  G.h={asked:{},consent:false,search:false,padKey:false,talked:false,opened:false,clues:CLUES.map(c=>({...c,found:false})),nf:0,freezer:false,said:{},react:null,endT:null,result:null};
  const s=new Unit({team:'civ',kind:'suspect',pal:{...PAL_SUSPECT},state:'door',r:4,name:'Ethan Hartley'});s.x=47*TS+8;s.y=32*TS+8;s.ang=Math.PI;s.room=LV.room[I(47,32)];G.h.s=s;G.civs.push(s);G.units.push(s);
- const n=new Unit({team:'civ',kind:'neighbor',pal:{...PAL_NEIGH},state:'work',r:4,workA:-Math.PI/2+.5});n.x=27*TS+8;n.y=37*TS+8;n.ang=n.workA;G.h.n=n;G.civs.push(n);G.units.push(n);
+ const n=new Unit({team:'civ',kind:'neighbor',pal:{...PAL_NEIGH},state:'work',r:4,workA:-Math.PI/2+.5});n.x=27*TS+8;n.y=37*TS+8;n.ang=n.workA;n.name='Mrs. Keller';G.h.n=n;G.civs.push(n);G.units.push(n);
  G.police=[];
  houseTraces();logEv('2-Adam-14 na miejscu: 214 Oakridge Lane');
  setTimeout(()=>{radio('DISPATCH','2-Adam-14, dwieście czternaście Oakridge Lane. Sąsiadka zgłasza krzyki i dwa huki około piątej pięćdziesiąt.');radio(G.p1?G.p1.name:'2-ADAM-14','2-Adam-14, przyjąłem. Jesteśmy na miejscu.',{radio:1});},700);}

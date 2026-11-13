@@ -286,6 +286,17 @@ function drawCam(g,c,cx,cy){const x=Math.round(c.x-cx),y=Math.round(c.y-cy)-10;i
  P(g,x-2,y-2,5,4,'#2c2f33');P(g,x-1+Math.round(Math.cos(c.a)*2),y-1+Math.round(Math.sin(c.a)),3,2,'#3c4045');if(c.on&&((G.time*2)|0)%2)P(g,x,y-2,1,1,G.camv&&G.camv.cam===c?'#ff3020':'#30c050');}
 let _ent=null;function entCv(){if(!_ent){_ent=document.createElement('canvas');_ent.width=VW;_ent.height=VH;}return _ent.getContext('2d');}
 function rowLayer(c,r,cx,cy){if(WR[r])c.drawImage(WR[r],cx,0,VW,TS+WH,0,r*TS-WH-cy,VW,TS+WH);if(FR[r])c.drawImage(FR[r],cx,0,VW,FRH,0,r*TS+TS-FRH-cy,VW,FRH);const dr=LV.doorRows&&LV.doorRows[r];if(dr)for(const d of dr)drawDoor(c,d,cx,cy);}
+function spkUnit(who){const n=String(who||'').toUpperCase().replace(/\s*\(.*$/,'').trim();if(!n)return null;let best=null;
+ for(const u of G.units){if(!u.alive||!u.name)continue;const un=u.name.toUpperCase();if(un===n)return u;if(!best&&(un.startsWith(n+' ')||n.startsWith(un+' ')||un.split(' ').pop()===n.split(' ').pop()&&n.length>4))best=u;}return best;}
+function drawSpeech(c,cx,cy){const s=R.cur;if(!s||!G.running)return;if(s.u===undefined||s.uw!==s.who){s.uw=s.who;s.u=spkUnit(s.who);}const u=s.u;if(!u||!u.alive)return;
+ const col=s.cls==='sp-o'?'#7fb0ff':s.cls==='sp-d'?'#5fd08a':'#e8c46a',vis=u.team==='squad'||u.visNow,al=vis?1:.45,t=G.time-s.t0;
+ const hx=u.x-cx,hy=u.y-cy-(u.pose==='sit'||u.pose==='kneel'?17:22);const pad=10;
+ if(hx<pad||hy<pad||hx>VW-pad||hy>VH-pad){const ax=clamp(hx,pad,VW-pad),ay=clamp(hy,pad,VH-pad),a=Math.atan2(hy-ay,hx-ax);c.save();c.globalAlpha=.85;c.translate(ax,ay);c.rotate(a);c.fillStyle=col;c.beginPath();c.moveTo(5,0);c.lineTo(-3,-4);c.lineTo(-3,4);c.closePath();c.fill();c.restore();
+  c.globalAlpha=.85;for(let i=0;i<3;i++){const on=((t*4|0)%3)===i;P(c,(ax-6+i*3-Math.cos(a)*9)|0,(ay-Math.sin(a)*9)|0,2,2,on?'#fff':col);}c.globalAlpha=1;return;}
+ const bob=Math.round(Math.sin(t*6)*.6),x=Math.round(hx)-6,y=Math.round(hy)-6+bob;c.globalAlpha=al*Math.min(1,t*6);
+ P(c,x,y,13,7,'rgba(6,8,12,.82)');P(c,x+1,y-1,11,1,'rgba(6,8,12,.82)');P(c,x+1,y+7,11,1,'rgba(6,8,12,.82)');P(c,x+5,y+8,3,1,'rgba(6,8,12,.82)');P(c,x+6,y+9,1,1,'rgba(6,8,12,.82)');
+ P(c,x,y-1,1,1,'rgba(0,0,0,0)');P(c,x+1,y-1,11,1,col);P(c,x+1,y+7,4,1,col);P(c,x+8,y+7,4,1,col);P(c,x,y,1,7,col);P(c,x+12,y,1,7,col);P(c,x+5,y+8,1,1,col);P(c,x+7,y+8,1,1,col);P(c,x+6,y+9,1,1,col);
+ for(let i=0;i<3;i++){const ph=(t*5-i*.6),hh=((ph|0)%3===0)?1:0;P(c,x+3+i*3,y+3-hh,2,2,hh?'#ffffff':col);}c.globalAlpha=1;}
 function render(){const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-over';c.globalAlpha=1;
  let cx=Math.round(G.cam.x-VW/2),cy=Math.round(G.cam.y-VH/2);if(G.shake>0){cx+=randi(-2,2);cy+=randi(-2,2);}
  cx=clamp(cx,0,MW*TS-VW);cy=clamp(cy,0,MH*TS-VH);G.cam.rx=cx;G.cam.ry=cy;
@@ -333,6 +344,7 @@ function render(){const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOpera
  if(isPat())for(const u of G.units){if(u.team==='squad'||!u.alive||u.visNow||!u.seenT)continue;const t=G.time-u.seenT;if(t>3.5)continue;const sx=u.seenX-cx,sy=u.seenY-cy;if(sx<-20||sy<-30||sx>VW+20||sy>VH+20)continue;c.globalAlpha=.3*(1-t/3.5);const ox=u.x,oy=u.y;u.x=u.seenX;u.y=u.seenY;drawHuman(c,u,sx,sy);u.x=ox;u.y=oy;c.globalAlpha=1;}
  if(G.pings)for(const p of G.pings){const L=p.big?1.1:.75,k=1-p.t/L,r=(p.big?3:2)+p.t*(p.big?16:9);c.strokeStyle='rgba(230,226,210,'+(.5*k)+')';c.lineWidth=1;c.beginPath();c.ellipse(p.x-cx,p.y-cy,r,r*.55,0,0,6.283);c.stroke();}
  if(LD().over)LD().over(c,cx,cy,1/60);
+ drawSpeech(c,cx,cy);
  // police lights
  for(const f of LV.furn){if(f.k!=='police'&&f.k!=='ambul')continue;const px=(f.x+f.w/2)*TS-cx,py=(f.y+.6)*TS-cy;if(px<-100||py<-100||px>VW+100||py>VH+100)continue;const on=((G.time*3+f.x)|0)%2;c.globalCompositeOperation='lighter';const g=c.createRadialGradient(px,py,0,px,py,90);g.addColorStop(0,f.k==='ambul'?(on?'rgba(255,40,40,.2)':'rgba(0,0,0,0)'):(on?'rgba(255,40,40,.22)':'rgba(40,80,255,.24)'));g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(px-90,py-90,180,180);c.globalCompositeOperation='source-over';P(c,px-2,py-3,2,2,on?'#ff4040':'#401010');P(c,px,py-3,2,2,on?'#102040':'#4060ff');}
  if(W8()==='morning')drawLeaves(cx,cy);else if(W8()==='rain')drawRain(cx,cy,false);else if(isPat())drawWeather(c,cx,cy);
