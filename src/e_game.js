@@ -293,10 +293,9 @@ function drawSpeech(c,cx,cy){const s=R.cur;if(!s||!G.running)return;if(s.u===und
  const hx=u.x-cx,hy=u.y-cy-(u.pose==='sit'||u.pose==='kneel'?17:22);const pad=10;
  if(hx<pad||hy<pad||hx>VW-pad||hy>VH-pad){const ax=clamp(hx,pad,VW-pad),ay=clamp(hy,pad,VH-pad),a=Math.atan2(hy-ay,hx-ax);c.save();c.globalAlpha=.85;c.translate(ax,ay);c.rotate(a);c.fillStyle=col;c.beginPath();c.moveTo(5,0);c.lineTo(-3,-4);c.lineTo(-3,4);c.closePath();c.fill();c.restore();
   c.globalAlpha=.85;for(let i=0;i<3;i++){const on=((t*4|0)%3)===i;P(c,(ax-6+i*3-Math.cos(a)*9)|0,(ay-Math.sin(a)*9)|0,2,2,on?'#fff':col);}c.globalAlpha=1;return;}
- const bob=Math.round(Math.sin(t*6)*.6),x=Math.round(hx)-6,y=Math.round(hy)-6+bob;c.globalAlpha=al*Math.min(1,t*6);
- P(c,x,y,13,7,'rgba(6,8,12,.82)');P(c,x+1,y-1,11,1,'rgba(6,8,12,.82)');P(c,x+1,y+7,11,1,'rgba(6,8,12,.82)');P(c,x+5,y+8,3,1,'rgba(6,8,12,.82)');P(c,x+6,y+9,1,1,'rgba(6,8,12,.82)');
- P(c,x,y-1,1,1,'rgba(0,0,0,0)');P(c,x+1,y-1,11,1,col);P(c,x+1,y+7,4,1,col);P(c,x+8,y+7,4,1,col);P(c,x,y,1,7,col);P(c,x+12,y,1,7,col);P(c,x+5,y+8,1,1,col);P(c,x+7,y+8,1,1,col);P(c,x+6,y+9,1,1,col);
- for(let i=0;i<3;i++){const ph=(t*5-i*.6),hh=((ph|0)%3===0)?1:0;P(c,x+3+i*3,y+3-hh,2,2,hh?'#ffffff':col);}c.globalAlpha=1;}
+ const bob=Math.round(Math.sin(t*6)*.5),x=Math.round(hx)-4,y=Math.round(hy)-5+bob,bg='rgba(6,8,12,.82)';c.globalAlpha=al*Math.min(1,t*6);
+ P(c,x,y,9,5,bg);P(c,x+1,y-1,7,1,col);P(c,x+1,y+5,2,1,col);P(c,x+6,y+5,2,1,col);P(c,x,y,1,5,col);P(c,x+8,y,1,5,col);P(c,x+3,y+5,3,1,bg);P(c,x+3,y+6,1,1,col);P(c,x+5,y+6,1,1,col);P(c,x+4,y+7,1,1,col);P(c,x+4,y+6,1,1,bg);
+ for(let i=0;i<3;i++){const ph=(t*5-i*.6),hh=((ph|0)%3===0)?1:0;P(c,x+2+i*2,y+2-hh,1,1,hh?'#ffffff':col);}c.globalAlpha=1;}
 function render(){const c=ctx;c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-over';c.globalAlpha=1;
  let cx=Math.round(G.cam.x-VW/2),cy=Math.round(G.cam.y-VH/2);if(G.shake>0){cx+=randi(-2,2);cy+=randi(-2,2);}
  cx=clamp(cx,0,MW*TS-VW);cy=clamp(cy,0,MH*TS-VH);G.cam.rx=cx;G.cam.ry=cy;

@@ -253,22 +253,24 @@ const COLF=[.45,-.45,.3,-.3],COLS=[-1.3,1.3,-2,Math.PI];
 function doFollow(u,dt,idx,engaged,cnt){const L=leader();if(!L||L===u){moveUnit(u,dt,0,0,0);return;}
  if(u.watch&&!engaged&&typeof partnerWatch==='function'&&partnerWatch(u,dt))return;
  if(u.patrol&&isPat()&&!u.tac){patrolFollow(u,dt,L,engaged);return;}
- const lsp=L.quiet?26:48;u.pose='stand';
+ let lsp=L.quiet?26:48;u.pose='stand';
  if(u.post){const p=u.post,px=p.tx*TS+8,py=p.ty*TS+8,d=dist(u.x,u.y,px,py);
   if(d<3){moveUnit(u,dt,0,0,0);u.path=null;if(!engaged){turnTo(u,p.face+Math.sin(G.time*.5+u.id)*.3,dt,3);if(p.kind==='door')u.pose='kneel';}return;}
   if(d<TS*2.5&&walkLine(u.x,u.y,px,py,u.r)){u.path=null;moveUnit(u,dt,(px-u.x)/d,(py-u.y)/d,Math.min(32,d*3+8));}
   else{u.repath-=dt;if(!u.path||u.repath<=0){u.path=findPath(u.x/TS|0,u.y/TS|0,p.tx,p.ty);u.repath=.8;if(!u.path){u.post=null;return;}}followPath(u,dt,32);}
   if(!engaged)turnTo(u,d<TS*1.5?p.face:Math.atan2(u.vy,u.vx),dt,6);return;}
- const lr=LV.room[I(L.x/TS|0,L.y/TS|0)],corrL=lr>=0&&ROOMS[lr].n.startsWith('Korytarz'),back=(corrL?20:17)*(idx+1)+6;
+ const lr=LV.room[I(L.x/TS|0,L.y/TS|0)],corrL=lr>=0&&ROOMS[lr].n.startsWith('Korytarz'),sch=corrL&&G.lvl==='school',back=(sch?23:corrL?20:17)*(idx+1)+6;
+ if(sch)lsp=L.quiet?22:33;
  const tp=trailPoint(back),side=idx%2?1:-1;let fdir=null;
- if(corrL){const t2=trailPoint(back+12),dx=tp.x-t2.x,dy=tp.y-t2.y,l=Math.hypot(dx,dy);if(l>1){fdir=Math.atan2(dy,dx);const ox=-dy/l*side*7,oy=dx/l*side*7;if(!collides(tp.x+ox,tp.y+oy,u.r+.5)){tp.x+=ox;tp.y+=oy;}}}
+ if(corrL){const t2=trailPoint(back+12),dx=tp.x-t2.x,dy=tp.y-t2.y,l=Math.hypot(dx,dy);if(l>1){fdir=Math.atan2(dy,dx);const ow=sch?9:7,ox=-dy/l*side*ow,oy=dx/l*side*ow;if(!collides(tp.x+ox,tp.y+oy,u.r+.5)){tp.x+=ox;tp.y+=oy;}}}
  const d=dist(u.x,u.y,tp.x,tp.y),dl=dist(u.x,u.y,L.x,L.y);
- if(d<4){moveUnit(u,dt,0,0,0);u.path=null;}
+ if(d<4){moveUnit(u,dt,0,0,0);u.path=null;if(sch&&!engaged&&!L.moving&&idx%2===0)u.pose='kneel';}
  else if(d<TS*3&&walkLine(u.x,u.y,tp.x,tp.y,u.r)){u.path=null;const sp=d>TS*1.5?lsp+(corrL?1:4):Math.max(10,d*3);moveUnit(u,dt,(tp.x-u.x)/d,(tp.y-u.y)/d,Math.min(sp,corrL?lsp+1:52));}
- else{u.repath-=dt;if(!u.path||u.repath<=0){u.path=findPath(u.x/TS|0,u.y/TS|0,tp.x/TS|0,tp.y/TS|0);u.repath=.6;}if(u.path)followPath(u,dt,dl>TS*7?56:lsp+3);else moveUnit(u,dt,0,0,0);}
+ else{u.repath-=dt;if(!u.path||u.repath<=0){u.path=findPath(u.x/TS|0,u.y/TS|0,tp.x/TS|0,tp.y/TS|0);u.repath=.6;}if(u.path)followPath(u,dt,dl>TS*7?(sch?44:56):lsp+3);else moveUnit(u,dt,0,0,0);}
  if(!engaged){const last=idx===cnt-1&&cnt>1;let la;
   let od=null;if(corrL&&!last){let bd=TS*2.4;for(const dd of LV.doors){if(!(dd.broken||dd.open>.5))continue;const q=dist(u.x,u.y,dd.x*TS+8,dd.y*TS+8);if(q<bd){bd=q;od=dd;}}}
   if(od){la=Math.atan2(od.y*TS+8-u.y,od.x*TS+8-u.x);turnTo(u,la,dt,5);return;}
+  if(sch&&fdir!=null&&!last){for(const sg of[side,-side]){const pa=fdir+sg*Math.PI/2,qx=u.x+Math.cos(pa)*30,qy=u.y+Math.sin(pa)*30;if(!collides(qx,qy,3)&&LV.room[I(qx/TS|0,qy/TS|0)]!==lr&&walkLine(u.x,u.y,qx,qy,2)){turnTo(u,pa+Math.sin(G.time*1.3+idx)*.15,dt,6);return;}}}
   if(corrL&&fdir!=null)la=last?fdir+Math.PI:fdir-side*.45;
   else if(L.moving)la=(u.moving?Math.atan2(u.vy,u.vx):L.heading)+(last?Math.PI:COLF[idx%4]);
   else la=L.heading+(last?Math.PI:COLS[idx%3]);
