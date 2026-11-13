@@ -212,7 +212,7 @@ const FORM=[[1.1,-.85],[1.1,.85],[2.2,-.55],[2.2,.55]],SECT=[-.7,.7,-2.5,2.5];
 function leader(){if(G.p1&&G.p1.alive)return G.p1;if(G.p2&&G.p2.alive)return G.p2;return G.squad.find(s=>s.alive)||null;}
 function aiAvail(spec){return G.squad.find(u=>u.alive&&!u.human&&u.spec===spec);}
 const TEAMOF={lead:'red',breach:'red',tech:'red',medic:'blue',scout:'blue'};
-function aiMembers(team){return G.squad.filter(u=>u.alive&&!u.human&&(!team||team==='all'||TEAMOF[u.spec]===team));}
+function aiMembers(team){return G.squad.filter(u=>u.alive&&!u.human&&!u.sg&&(!team||team==='all'||TEAMOF[u.spec]===team));}
 function squadCombat(u,dt){u.perT-=dt;
  if(u.perT<=0){u.perT=.12;let best=null,bd=1e9;
   for(const e of G.enemies){if(!e.alive||e.state==='surr'||e.state==='cuffed'||e.pose==='sleep')continue;if(!canSee(u,e.x,e.y))continue;const d=dist(u.x,u.y,e.x,e.y);if(d<bd){bd=d;best=e;}}
@@ -281,6 +281,7 @@ function updateSquadAI(u,dt,idx,cnt){u.fireCd-=dt;
  const engaged=squadCombat(u,dt);if(!engaged&&u.mag<u.W.mag*.35&&u.rel<=0)startReload(u);
  const L=leader();u.quiet=L?L.quiet:false;
  if(u.action){moveUnit(u,dt,0,0,0);const a=u.action;u.pose=a.pose||'stand';a.t+=dt;if(a.tick)a.tick(dt);if(!engaged&&a.face!=null)turnTo(u,a.face,dt,6);if(a.t>=a.dur){u.action=null;u.pose='stand';a.done&&a.done();}return;}
+ if(u.sg){u.task=null;u.post=u.sg;doFollow(u,dt,idx,engaged,cnt);return;}
  if(u.spec==='medic'&&!engaged){const w=G.squad.find(s=>s.alive&&s.wounded&&!s.treated&&!s.beingHealed);
   if(w){if(w===u){startHeal(u,u);return;}const d=dist(u.x,u.y,w.x,w.y);if(d<18){startHeal(u,w);return;}
    if(u.healAnn!==w){u.healAnn=w;radio(u.name,'Idę do ciebie, '+w.name+'!');}u.healPT=(u.healPT||0)-dt;if(!u.path||u.healPT<=0){u.path=findPath(u.x/TS|0,u.y/TS|0,w.x/TS|0,w.y/TS|0);u.healPT=.6;}

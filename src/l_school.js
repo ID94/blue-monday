@@ -276,8 +276,11 @@ function schoolInteract(u){const H=G.h;if(!H)return null;
  for(const hd of H.hide){if(H.safe[hd.room])continue;const x=hd.door[0]*TS+8,y=hd.door[1]*TS+8;if(nearPt(u,x,y,22))return{k:'house',label:'Zapukaj: „Policja!”',dur:0,f:()=>{H.safe[hd.room]=1;knockAt(x,y);say(u.name,'Policja! Ktoś tam jest?');setTimeout(()=>{if(G.ended)return;say(hd.who,'Jesteśmy tutaj! '+hd.n+' osób, nikt nie jest ranny... On był na górze!');say(u.name,'Zostańcie w środku, drzwi zamknięte. Ktoś po was przyjdzie.');logEv(hd.room+': '+hd.n+' osób ukrytych, bez obrażeń');},1400);}};}
  return null;}
 function stairsGo(s,up){const H=G.h,L=G.p1;const tx=(up?s.ux:s.gx)*TS,ty=(up?s.uy:s.gy)*TS;let i=0;
- for(const q of G.squad){if(!q||!q.alive)continue;const o=[[0,0],[1,0],[-1,0],[0,1],[1,1]][i++%5];q.x=tx+o[0]*12;q.y=ty+o[1]*12;q.path=null;q.task=null;q.post=null;q.vx=q.vy=0;unstick(q);}
- G.trailOwner=null;clearPosts();G.ops=[];G.cam.x=L.x;G.cam.y=L.y;SND.step(L.x,L.y,'conc',.8);
+ const sgU=G.squad.find(q=>q&&q.alive&&!q.human&&q.name==='OFC. NGUYEN');
+ if(up&&sgU&&!sgU.sg){const gx=s.gx|0,gy=(s.gy|0);sgU.sg={tx:gx+(gx<30?1:-1),ty:gy-1,face:-Math.PI/2,kind:'stair'};sgU.task=null;sgU.path=null;setTimeout(()=>{if(!G.ended&&sgU.alive)radio(sgU.name,'Zostaję na dole, trzymam klatkę '+s.n+'. Nikt tędy nie zejdzie.',{radio:1});},1400);logEv(sgU.name+' zabezpiecza klatkę '+s.n);}
+ else if(!up&&sgU&&sgU.sg){sgU.sg=null;sgU.post=null;}
+ for(const q of G.squad){if(!q||!q.alive||(up&&q.sg))continue;const o=[[0,0],[1,0],[-1,0],[0,1],[1,1]][i++%5];q.x=tx+o[0]*12;q.y=ty+o[1]*12;q.path=null;q.task=null;q.post=null;q.vx=q.vy=0;unstick(q);}
+ G.trailOwner=null;clearPosts();if(sgU&&sgU.sg)sgU.post=sgU.sg;G.ops=[];G.cam.x=L.x;G.cam.y=L.y;SND.step(L.x,L.y,'conc',.8);
  radio(L.name,up?'Piętro. Idziemy za strzałami.':'Parter.',{radio:1});logEv(up?'Zespół wchodzi na piętro':'Zespół schodzi na parter');
  if(up&&!H.up){H.up=true;const e=H.sh;setTimeout(()=>{if(!G.ended&&H.call&&!H.emmaSafe&&H.sh.alive){const w=WING(H.sh.x/TS);radio('DISPATCH','Emma słyszy kroki na schodach... pyta, czy to wy. Ostatnio słyszała go '+(w?'po stronie '+w:'blisko siebie')+'.');H.relN=Math.max(H.relN,9);}},6500);setTimeout(()=>{if(!G.ended)radio('DISPATCH','Przyjęłam, piętro. Świadkowie: wciąż strzela z okien, przemieszcza się między salami.');},2500);}}
 const PA_LINES=['Uwaga, uwaga. Lockdown. Uczniowie i nauczyciele pozostają w salach. Zamknąć drzwi, zgasić światło.','To nie są ćwiczenia. Lockdown. Nie wychodzić na korytarze.','Uwaga. Lockdown. Czekać na policję.'];
