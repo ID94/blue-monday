@@ -5,6 +5,7 @@ const WEAP={
  shotgun:{n:'Strzelba M870',mag:7,rate:.75,auto:0,spread:.13,range:11,snd:'shotgun',rl:3,pel:7,noise:24,len:9,thick:1},
  pistol:{n:'Glock 17',mag:17,rate:.2,auto:0,spread:.045,range:16,snd:'pistol',rl:1.6,pel:1,noise:16,len:5},
  silenced:{n:'Broń z tłumikiem',mag:15,rate:.22,auto:0,spread:.03,range:16,snd:'silenced',rl:1.6,pel:1,noise:3,len:7},
+ eShotgun:{n:'Strzelba',mag:6,rate:.7,auto:0,spread:.15,range:9,snd:'shotgun',rl:3,pel:6,noise:24,len:9,thick:1},
  eRifle:{n:'AK',mag:30,rate:.15,auto:1,spread:.085,range:18,snd:'enemy',rl:2.6,pel:1,noise:22,len:9,thick:1},
  ePistol:{n:'Broń krótka',mag:12,rate:.4,auto:0,spread:.08,range:14,snd:'epistol',rl:1.8,pel:1,noise:18,len:5},
 };
@@ -79,7 +80,7 @@ function fire(u){const W=u.W;if(!W||u.rel>0||u.fireCd>0||!u.active())return fals
  u.heat=Math.min(4,(u.heat||0)+(W.pel>1?1.2:.35));const sx=u.mzx||mz.x,sy=u.mzy||mz.y-6;
  const sil=W.snd==='silenced';for(let i=0;i<(W.pel>1?5:2)*(ind?2:1);i++)G.fx.push({k:'smoke',x:sx,y:sy,vx:Math.cos(u.ang)*rand(8,25)+rand(-6,6),vy:Math.sin(u.ang)*rand(5,18)-rand(4,10),r:rand(1.5,3),gr:rand(5,9)*(ind?1.3:1),a:sil?.12:ind?.4:.32,t:0,life:rand(.7,1.4)*(ind?1.8:1),c:'#9a9c9a'});
  if(ind&&!sil)for(let i=0;i<(W.pel>1?3:1);i++)G.fx.push({k:'smoke',x:sx+rand(-4,4),y:sy+rand(-3,3),vx:Math.cos(u.ang)*rand(2,8)+rand(-3,3),vy:-rand(1,4),r:rand(3,5),gr:rand(3,5),a:.2,t:0,life:rand(3.5,6),c:'#a8aaa8'});
- if(W.pel===1||u.weap==='shotgun'){const ea=u.ang+Math.PI/2*(Math.cos(u.ang)>0?-1:1),del=u.weap==='shotgun';G.fx.push({k:'shell',x:u.x+Math.cos(u.ang)*3,y:u.y-1,z:9,vx:Math.cos(ea)*rand(30,55),vy:Math.sin(ea)*rand(10,25)-15,vz:rand(40,70),t:0,life:rand(.6,.9),red:del});}
+ if(W.pel===1||u.weap==='shotgun'||u.weap==='eShotgun'){const ea=u.ang+Math.PI/2*(Math.cos(u.ang)>0?-1:1),del=u.weap==='shotgun'||u.weap==='eShotgun';G.fx.push({k:'shell',x:u.x+Math.cos(u.ang)*3,y:u.y-1,z:9,vx:Math.cos(ea)*rand(30,55),vy:Math.sin(ea)*rand(10,25)-15,vz:rand(40,70),t:0,life:rand(.6,.9),red:del});}
  return true;}
 function hitscan(sh,x0,y0,a,maxD){const dx=Math.cos(a),dy=Math.sin(a);let x=x0,y=y0,d=0,hit=null,skipU=null;
  if(bulletBlock(x0/TS|0,y0/TS|0)){x0=sh.x;y0=sh.y-2;x=x0;y=y0;}
@@ -103,9 +104,9 @@ function impact(x,y,tx,ty,a){const t0=tAt(tx,ty),brick=tAt(tx,ty+1)===T.GRASS||t
  const hx=Math.round(x),hy=Math.round(y-6);if((t0===T.WALL||t0===T.WIN)&&WR[ty]){const g=WR[ty].getContext('2d'),face=!isWallT(tx,ty+1),ly=face?16+((Math.random()*9)|0):2+((Math.random()*12)|0);P(g,hx-1,ly-1,3,3,'rgba(200,205,195,.35)');P(g,hx,ly,2,2,'#111');return;}P(wc,hx-1,hy-1,3,3,'rgba(200,205,195,.35)');P(wc,hx,hy,2,2,'#111');if(Math.random()<.5)P(wc,hx+2,hy+1,1,1,'#2a2a2a');}
 function bloodPool(x,y,r,rr){rr=rr||Math.random;for(let i=0;i<r*2.2;i++){const a=rr()*6.28,d=rr()*r,w=1+((rr()*3)|0);P(wc,Math.round(x+Math.cos(a)*d*1.3),Math.round(y+Math.sin(a)*d*.8),w,Math.max(1,w-1),rr()<.7?'#3a0b0b':'#4c1010');}
  P(wc,Math.round(x-r*.5),Math.round(y-1),Math.round(r),2,'#2c0707');}
-function woundUnit(u,by,a){u.wounded=true;u.treated=false;u.bleed=110;u.stun=Math.max(u.stun,.5);u.dripT=0;SND.hurt(u.x,u.y);bloodPool(u.x,u.y,2.5);G.stats.wounded++;if(u.human)G.stats.pHit=(G.stats.pHit||0)+1;if(u.team==='squad')G.stats.sqHit=(G.stats.sqHit||0)+1;
+function woundUnit(u,by,a){u.wounded=true;u.woundAt=G.time;u.treated=false;u.bleed=110;u.stun=Math.max(u.stun,.5);u.dripT=0;SND.hurt(u.x,u.y);bloodPool(u.x,u.y,2.5);G.stats.wounded++;if(u.human)G.stats.pHit=(G.stats.pHit||0)+1;if(u.team==='squad')G.stats.sqHit=(G.stats.sqHit||0)+1;
  if(u.human){G.hurtF=1;G.shake=.3;}radio(u.name,pick(['Dostałem! Jestem ranny!','Trafiony... dam radę!','Ranny! Potrzebuję medyka!','Kurwa, dostałem w ramię!']),{prio:1});}
-function kill(u,by,a){if(!u.alive)return;
+function kill(u,by,a){if(!u.alive)return;if(u.team==='squad'&&u.woundAt===G.time)return;
  if(u.team==='squad'&&!u.wounded&&!u.noWound&&Math.random()<(u.armor==='heavy'?.65:.4)){woundUnit(u,by,a);logEv(u.name+' ranny ('+roomName(u.x,u.y)+')');return;}
  if(u.team==='enemy'&&by&&by.team==='squad'&&(u.state==='surr'||u.state==='cuffed'||u.pose==='sleep'||(u.stun>0&&!u.target))){G.stats.roe++;logEv('NIEUPRAWNIONE UŻYCIE SIŁY: '+by.name+' ('+roomName(u.x,u.y)+')');setTimeout(()=>radio('TOC','Nieuprawnione użycie siły! Podejrzany nie stanowił zagrożenia.',{prio:1}),600);}u.alive=false;u.deathT=0;u.fallA=a||0;u.pose='dead';u.target=null;u.action=null;u.task=null;
  u.vx=Math.cos(a||0)*45;u.vy=Math.sin(a||0)*45;SND.body(u.x,u.y);u.mseed=Math.random()*1000|0;
