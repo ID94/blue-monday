@@ -88,7 +88,7 @@ function hitscan(sh,x0,y0,a,maxD){const dx=Math.cos(a),dy=Math.sin(a);let x=x0,y
   if(bulletBlock(tx,ty)){if(sh.W&&sh.W.pel>1&&sh.team==='squad'&&LV.t[I(tx,ty)]===T.DOOR&&d<TS*1.8){const dr=LV.doorAt[I(tx,ty)];if(dr&&dr.locked){dr.locked=false;dr.shot=true;dr.knownLocked=false;if(sh.human)toast('Zamek rozstrzelany — kopnij lub otwórz drzwi');logEv(sh.name+' rozstrzelał zamek strzelbą');}}
    if(LD().breakable&&LV.t[I(tx,ty)]===T.WIN&&!(LV.bw&&LV.bw.has(I(tx,ty)))){breakWin(tx,ty,x,y,a);continue;}impact(x-dx*2,y-dy*2,tx,ty,a);break;}
   if(G.carBlk&&d>6&&G.carBlk(x,y)){carImpact(x,y,a);break;}
-  for(const u of G.units){if(!u.alive||u===sh||u===skipU||u.pose==='sleep')continue;const cy=u.y-2,rr=u.pose==='inbed'?3.6:(u.pose==='kneel'||u.pose==='hands'||u.pose==='sit')?4.2:5.2;
+  for(const u of G.units){if(!u.alive||u===sh||u===skipU||(u.pose==='sleep'&&!u.fakeDead))continue;const cy=u.y-2,rr=u.pose==='inbed'?3.6:(u.pose==='kneel'||u.pose==='hands'||u.pose==='sit')?4.2:5.2;
    if((u.x-x)**2+(cy-y)**2<(rr+(u.shield?2:0))**2){if(u.shield&&Math.abs(angDiff(u.ang,a+Math.PI))<(u.human?1.15:1.45)){for(let i=0;i<5;i++)G.fx.push({k:'spark',x,y:y-6,vx:rand(-60,60),vy:rand(-60,60),t:0,life:.15});SND.clang(x,y);hit='shield';break;}if(u.evade&&sh.team==='squad'&&Math.random()<u.evade){skipU=u;continue;}hit=u;break;}}
   if(hit)break;}
  if(hit==='shield'){G.tracers.push({x0,y0:y0-6,x1:x,y1:y-6,t:0,e:sh.team==='enemy'});return;}
@@ -108,7 +108,7 @@ function woundUnit(u,by,a){u.wounded=true;u.woundAt=G.time;u.treated=false;u.ble
  if(u.human){G.hurtF=1;G.shake=.3;}radio(u.name,pick(['Dostałem! Jestem ranny!','Trafiony... dam radę!','Ranny! Potrzebuję medyka!','Kurwa, dostałem w ramię!']),{prio:1});}
 function kill(u,by,a){if(!u.alive)return;if(u.team==='squad'&&u.woundAt===G.time)return;
  if(u.team==='squad'&&!u.wounded&&!u.noWound&&Math.random()<(u.armor==='heavy'?.65:.4)){woundUnit(u,by,a);logEv(u.name+' ranny ('+roomName(u.x,u.y)+')');return;}
- if(u.team==='enemy'&&by&&by.team==='squad'&&(u.state==='surr'||u.state==='cuffed'||u.pose==='sleep'||(u.stun>0&&!u.target))){G.stats.roe++;logEv('NIEUPRAWNIONE UŻYCIE SIŁY: '+by.name+' ('+roomName(u.x,u.y)+')');setTimeout(()=>radio('TOC','Nieuprawnione użycie siły! Podejrzany nie stanowił zagrożenia.',{prio:1}),600);}u.alive=false;u.deathT=0;u.fallA=a||0;u.pose='dead';u.target=null;u.action=null;u.task=null;
+ if(u.team==='enemy'&&by&&by.team==='squad'&&(u.state==='surr'||u.state==='cuffed'||(u.pose==='sleep'&&!u.fakeDead)||(u.stun>0&&!u.target))){G.stats.roe++;logEv('NIEUPRAWNIONE UŻYCIE SIŁY: '+by.name+' ('+roomName(u.x,u.y)+')');setTimeout(()=>radio('TOC','Nieuprawnione użycie siły! Podejrzany nie stanowił zagrożenia.',{prio:1}),600);}u.alive=false;u.deathT=0;u.fallA=a||0;u.pose='dead';u.target=null;u.action=null;u.task=null;
  u.vx=Math.cos(a||0)*45;u.vy=Math.sin(a||0)*45;SND.body(u.x,u.y);u.mseed=Math.random()*1000|0;
  for(let i=0;i<5;i++)G.fx.push({k:'dust',x:u.x,y:u.y-6,vx:rand(-25,25),vy:rand(-30,10),t:0,life:.35,c:'#5d5a52'});
  const byS=by&&by.team==='squad';u.killedBy=by;
